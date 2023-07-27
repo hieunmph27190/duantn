@@ -23,6 +23,10 @@ public class ProductDetailServiceImpl implements ProductDetailService {
         return productDetailRepository.findByType(type, pageable);
     }
 
+    @Override
+    public Boolean existsByProductIdAndColorIdAndSizeId(UUID idProduct, UUID idColor, UUID idSize) {
+        return productDetailRepository.existsByProductIdAndColorIdAndSizeId(idProduct, idColor, idSize);
+    }
 
     @Override
     public Page<ProductDetail> searchByKeyAndType(String key, Integer type,UUID idProduct, Pageable pageable) {

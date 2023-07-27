@@ -64,15 +64,38 @@ public class ProductDetailController {
 
     @PutMapping( value = "/{id}")
     public ResponseEntity<?> update(@PathVariable UUID id, @Valid @ModelAttribute ProductDetail productDetail , BindingResult bindingResult) {
+        if (productDetail.getColor()==null){
+            bindingResult.rejectValue("color.id","required","Vui lòng nhập trường này");
+        }else {
+            if (productDetail.getColor().getId()==null){
+                bindingResult.rejectValue("color.id","required","Vui lòng nhập trường này");
+            };
+        }
+        if (productDetail.getSize()==null){
+            bindingResult.rejectValue("size.id","required","Vui lòng nhập trường này");
+        }else {
+            if (productDetail.getSize().getId()==null){
+                bindingResult.rejectValue("size.id","required","Vui lòng nhập trường này");
+            };
+        }
 
         if (bindingResult.hasErrors()){
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+
         if (productDetailService.existsById(id)){
+            Optional<ProductDetail> optionalProductDetail = productDetailService.findById(id);
+            ProductDetail productDetailDB = optionalProductDetail.get();
+            if (!(productDetailDB.getColor().getId().equals(productDetail.getColor().getId())&&productDetailDB.getSize().getId().equals(productDetail.getSize().getId()))){
+                if (productDetailService.existsByProductIdAndColorIdAndSizeId(productDetail.getProduct().getId(),productDetail.getColor().getId(),productDetail.getSize().getId())){
+                    return ResponseEntity.badRequest().body("Biến thể này đã tồn tại");
+                }
+            }
             productDetail.setId(id);
             ProductDetail productDetailSaved = productDetailService.save(productDetail);
             return ResponseEntity.ok(productDetailSaved);
+
         }else {
             return ResponseEntity.badRequest().body("Không tồn tại");
         }
@@ -82,10 +105,27 @@ public class ProductDetailController {
 
     @PostMapping ()
     public ResponseEntity<?> add(@Valid @ModelAttribute ProductDetail productDetail , BindingResult bindingResult) {
+        if (productDetail.getColor()==null){
+            bindingResult.rejectValue("color.id","required","Vui lòng nhập trường này");
+        }else {
+            if (productDetail.getColor().getId()==null){
+                bindingResult.rejectValue("color.id","required","Vui lòng nhập trường này");
+            };
+        }
+        if (productDetail.getSize()==null){
+            bindingResult.rejectValue("size.id","required","Vui lòng nhập trường này");
+        }else {
+            if (productDetail.getSize().getId()==null){
+                bindingResult.rejectValue("size.id","required","Vui lòng nhập trường này");
+            };
+        }
 
         if (bindingResult.hasErrors()){
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
+        }
+        if (productDetailService.existsByProductIdAndColorIdAndSizeId(productDetail.getProduct().getId(),productDetail.getColor().getId(),productDetail.getSize().getId())){
+            return ResponseEntity.badRequest().body("Biến thể này đã tồn tại");
         }
         productDetail.setId(null);
         ProductDetail productDetailSaved = productDetailService.save(productDetail);
@@ -99,7 +139,7 @@ public class ProductDetailController {
                 productDetailService.deleteById(id);
                 return ResponseEntity.ok().build();
             }catch (DataIntegrityViolationException exception){
-                return ResponseEntity.badRequest().body("Không thể xóa khi (đã có sản phẩm sử dụng)");
+                return ResponseEntity.badRequest().body("Không thể xóa khi (đã được sử dụng)");
             }
         }else {
             return ResponseEntity.badRequest().body("Không tồn tại");

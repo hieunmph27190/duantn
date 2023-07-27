@@ -13,7 +13,9 @@ import java.util.UUID;
 public interface ProductDetailService {
     Page<ProductDetail> findByType(Integer type, Pageable pageable);
 
-    Page<ProductDetail> searchByKeyAndType(String key, Integer type,UUID idProduct, Pageable pageable);
+    Boolean existsByProductIdAndColorIdAndSizeId(UUID idProduct, UUID idColor, UUID idSize);
+
+    Page<ProductDetail> searchByKeyAndType(String key, Integer type, UUID idProduct, Pageable pageable);
 
     <S extends ProductDetail> List<S> saveAll(Iterable<S> entities);
 

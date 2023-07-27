@@ -17,4 +17,5 @@ public interface ProductDetailRepository extends JpaRepository<ProductDetail, UU
             "and (:type is null or c.type = :type) " +
             "and (:idProduct is not null and c.product.id = :idProduct) ")
     Page<ProductDetail> searchByKeyAndType(@Param("key") String key, @Param("type") Integer type,@Param("idProduct") UUID idProduct, Pageable pageable);
+    Boolean existsByProductIdAndColorIdAndSizeId( UUID idProduct, UUID idColor,UUID idSize);
 }
