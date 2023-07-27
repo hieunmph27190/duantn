@@ -44,11 +44,12 @@ public class BrandController {
             @RequestParam(value = "search[value]", required = false) Optional<String> searchValue,
             @RequestParam(value = "order[0][column]", required = false) Optional<Integer> orderColumn,
             @RequestParam(value = "order[0][dir]", required = false) Optional<String> orderDir,
+            @RequestParam(value = "callAll", required = false,defaultValue = "false") Optional<Boolean> all,
             HttpServletRequest request,Model model
     ) {
         String orderColumnName = request.getParameter("columns["+orderColumn.orElse(0)+"][data]");
         Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10), Sort.by(orderDir.orElse("asc").equals("desc")?Sort.Direction.DESC:Sort.Direction.ASC,orderColumnName==null?"code":orderColumnName));
-        Page<Brand> page = brandService.searchByKeyAndType(searchValue.orElse(""),null, pageable);
+        Page<Brand> page = brandService.searchByKeyAndType(searchValue.orElse(""),all.get()?null:1, pageable);
         DataTablesResponse response = new DataTablesResponse(draw,page);
         return response;
     }

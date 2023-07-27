@@ -38,7 +38,9 @@ $(document).ready(function() {
     "ajax": {
       "url": urlBase,
       "type": "GET",
-      "data": function(d) {},
+      "data": function(d) {
+        d.callAll = true
+      },
       "dataSrc": function(json) {
         return json.data;
       }

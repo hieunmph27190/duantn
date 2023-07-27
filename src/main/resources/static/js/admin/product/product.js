@@ -145,6 +145,14 @@ $(document).ready(function() {
     }
   });
 
+  $(`#${tableNameDetail}_filter input`).on('keypress', function(event) {
+    // Kiểm tra mã phím
+    if (event.keyCode === 13) {
+      let searchValue = $(this).val();
+      table.search(searchValue).draw();
+    }
+  });
+
 
 
 
@@ -153,6 +161,8 @@ $(document).ready(function() {
   $('#btn-view-add').click(function (){
     $('#view-add').modal('show');
   });
+
+
 
   function loadDataModal() {
     let rowData = table.row($(this).closest('tr')).data();
@@ -354,7 +364,7 @@ $(document).ready(function() {
     "processing": true,
     "serverSide": true,
     "ajax": {
-      "url": "/product-detail",
+      "url": urlBaseDetail,
       "type": "GET",
       "data": function(d) {
         var rowData = table.row('.selected-row').data();
@@ -432,14 +442,27 @@ $(document).ready(function() {
     "lengthMenu": [10, 25, 50, 100],
   });
 
+  // Show form update detail
+  $(`#${tableNameDetail} tbody`).on('dblclick', 'tr', loadDataModalDetail);
+  $('#btn-view-add-detail').click(function (){
+    var dataProductSelected = table.row('.selected-row').data();
+    if (!(dataProductSelected&&dataProductSelected.id)){
+      alert("Chưa chọn sản phẩm")
+    }else {
+      $(`#form-product-detail-add input[name="product.id"]`).val(dataProductSelected.id)
+      $('#view-detail-add').modal('show');
+    }
+
+  });
+
   function deleteDLDetail() {
-    let rowData = table.row($(this).closest('tr')).data();
+    let rowData = tableChiTiet.row($(this).closest('tr')).data();
     if (confirm("Xác nhận xóa")){
       $.ajax({
         url: urlBaseDetail+'/' + rowData.id,
         type: 'DELETE',
         success: function(response) {
-          table.ajax.reload(null, false);
+          tableChiTiet.ajax.reload(null, false);
           alert("Xóa thành công")
         },
         error: function(xhr, status, error) {
@@ -450,6 +473,49 @@ $(document).ready(function() {
 
     }
   }
+
+  // Sự kiện submit form add detail
+  $(`#form-${objectNameDetail}-add`).on('submit', function(e) {
+    e.preventDefault();
+    let formData = new FormData(this);
+    ["color.id","size.id"].forEach((item)=>{
+      let selectArray = formData.getAll(item);
+      let selectValue = selectArray[0];
+      formData.set(item, selectValue);
+    })
+
+    if ($(this).valid()) {
+      $.ajax({
+        url: urlBaseDetail,
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+          // Xử lý thành công
+          alert('Dữ liệu đã được cập nhật thành công!');
+          tableChiTiet.ajax.reload(null, false);
+          clearForm(`form-${objectNameDetail}-add`, response)
+          $('#view-detail-add').modal('hide');
+        },
+        error: function (xhr, status, error) {
+          // Xử lý lỗi nếu cần thiết
+          if(xhr.status==400){
+            let errorResponse = xhr.responseJSON;
+            if (errorResponse){
+              $(`#form-${objectNameDetail}-add`).validate().showErrors(errorResponse);
+            }else {
+              alert('Lỗi khi cập nhật dữ liệu: ' + xhr.responseText);
+            }
+            // Hiển thị thông báo lỗi tương ứng với từng trường
+          }else {
+            alert('Lỗi :' + error);
+          }
+
+        }
+      });
+    }
+  });
 
 
   // Sự kiện submit form Update detail
@@ -615,6 +681,58 @@ $(document).ready(function() {
       }
     });
   })
+
+  var configValidateDetail = {
+    rules: {
+      "product.id": {
+        required: true,
+      },
+      amount: {
+        required: true
+      },
+      price: {
+        required: true
+      },
+      "color.id": {
+        required: true
+      },
+      "size.id": {
+        required: true
+      },
+      type: {
+        required: true
+      }
+    },
+    messages: {
+      "product.id": {
+        required: "Vui lòng nhập trường này",
+      },
+      amount: {
+        required: "Vui lòng nhập trường này"
+      },
+      price: {
+        required: "Vui lòng nhập trường này"
+      },
+      "color.id": {
+        required: "Vui lòng nhập trường này"
+      },
+      "size.id": {
+        required: "Vui lòng nhập trường này"
+      },
+      type: {
+        required: "Vui lòng chọn trường này"
+      }
+    }
+  }
+
+
+// Validate form add
+  $(`#form-${objectNameDetail}-add`).validate(configValidateDetail);
+// Validate form update
+  $(`#form-${objectNameDetail}-update`).validate({
+    rules:{...configValidateDetail.rules,id:{required:true}},
+    messages:{...configValidateDetail.messages,id:{required:"Vui lòng nhập trường này"}}
+  });
 
 
 

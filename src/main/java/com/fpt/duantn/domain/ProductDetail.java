@@ -6,10 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,8 +32,9 @@ public class ProductDetail {
     @Column(name = "amount")
     private Long amount;
 
-    @Column(name = "create_date")
-    private Date createDate;
+    @CreationTimestamp
+    @Column(name = "create_date",updatable = false)
+    private Timestamp createDate;
 
     @Column(name = "price")
     private BigDecimal price;
