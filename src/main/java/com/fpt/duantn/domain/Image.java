@@ -1,5 +1,6 @@
 package com.fpt.duantn.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @JsonInclude
     @Lob
     @Column(name = "image")
     private Blob image;
@@ -38,5 +40,8 @@ public class Image {
     private Product product;
 
 
-
+    public Image(UUID id, Integer type) {
+        this.id = id;
+        this.type = type;
+    }
 }

@@ -122,12 +122,14 @@ $(document).ready(function() {
         "render": function(data, type, row) {
           // Nội dung HTML của cột tiếp theo
           return `<button class="btn btn-info btn-circle-sm btn-view-update"><i class="fas fa-info-circle"></i></button>
+                    <button class="btn btn btn-warning btn-circle-sm btn-view-img-update"><i class="fas fa-info-circle"></i></button>
                     <button class="btn btn-info btn btn-danger btn-circle-sm btn-delete"><i class="fas fa-trash"></i></button>`;
         }
       }
     ],
     "drawCallback": function(settings) {
       $(`#${tableName} tbody tr `).on('click', '.btn-view-update', loadDataModal);
+      $(`#${tableName} tbody tr`).on('click', '.btn-view-img-update', showImg);
       $(`#${tableName} tbody tr`).on('click', '.btn-delete', deleteDL);
     },
     searchDelay: 1500,
@@ -162,7 +164,14 @@ $(document).ready(function() {
     $('#view-add').modal('show');
   });
 
-
+  function showImg(){
+      let row = table.row($(this).closest('tr'))
+      let rowData = row.data();
+      $('#view-detail-img-update ').modal('show');
+      $('#view-detail-img-update #form-product-image-add input[name="id"]').val(rowData.id)
+      selectRow(row.nodes().to$())
+      tableImg.ajax.reload(null,false);
+  }
 
   function loadDataModal() {
     let rowData = table.row($(this).closest('tr')).data();
@@ -215,6 +224,7 @@ $(document).ready(function() {
           alert('Dữ liệu đã được thêm thành công!');
           table.ajax.reload(null, false);
           clearForm(`form-${objectName}-add`, response)
+          selectedFiles = clearSelectedFiles(inputFile,selectedFiles,"imagePreview")
           $('#view-add').modal('hide');
         },
         error: function (xhr, status, error) {
@@ -595,22 +605,44 @@ $(document).ready(function() {
 
 
   // chọn row
-  $('#dataTable tbody').on('click', 'tr', function() {
+  function selectRow(row){
     $('#dataTable tbody tr').removeClass('selected-row');
-    $(this).addClass('selected-row');
+    row.addClass('selected-row');
+  }
+
+  $('#dataTable tbody').on('click', 'tr', function() {
+    selectRow($(this))
     tableChiTiet.ajax.reload(null,false);
   });
+
+  var selectedFilesUpdate = [];
+  var inputFileUpdate = $('#fileInputUpdate').on('change', function() {
+    loadfile(this,inputFileUpdate,selectedFilesUpdate,"imagePreviewUpdate")
+  });
+
 
 
   var selectedFiles = [];
   var inputFile = $('#fileInput').on('change', function() {
-    var fileList = this.files;
-    var imagePreview = $('#imagePreview');
+    loadfile(this,selectedFiles,selectedFiles,"imagePreview")
+  });
 
-    // Duyệt qua danh sách các tệp đã chọn
+
+  function loadfile(thiss,inputFilex,selectedFilesx,imagePreviewID){
+    let fileList = thiss.files;
+    let imagePreview = $(`#${imagePreviewID}`);
     for (var i = 0; i < fileList.length; i++) {
       let file = fileList[i];
+      selectedFilesx.push(file);
+    }
+    updateInputFileValue(inputFilex,selectedFilesx);
+    imagePreview.empty();
+    console.log(imagePreview)
+    // Duyệt qua danh sách các tệp đã chọn
+    for (let i = 0; i < selectedFilesx.length; i++) {
+      let file = selectedFilesx[i];
       let reader = new FileReader();
+
 
       // Đọc và hiển thị ảnh lên giao diện
       reader.onload = function(event) {
@@ -620,34 +652,44 @@ $(document).ready(function() {
         var deleteButton = $('<button>').text('x').addClass('delete-button');
         var imageContainer = $('<div>').addClass('image-container p-3 border-dark ').append(image, deleteButton);
         imagePreview.append(imageContainer);
-
+        console.log("x")
         // Thêm sự kiện click cho nút xóa
         deleteButton.on('click', function() {
           $(this).parent().remove();
-          selectedFiles.splice(selectedFiles.indexOf(file), 1);
-          updateInputFileValue();
+          selectedFilesx.splice(selectedFilesx.indexOf(file), 1);
+          updateInputFileValue(inputFilex, selectedFilesx);
         });
       };
 
       reader.readAsDataURL(file);
     }
-    for (var i = 0; i < fileList.length; i++) {
-      let file = fileList[i];
-      selectedFiles.push(file);
-    }
-    updateInputFileValue();
-  });
+
+  }
+  function clearSelectedFiles(inputFilex, selectedFilesx,imagePreviewID) {
+    // Xóa các tệp đã chọn
+    selectedFilesx = [];
+
+    // Cập nhật lại giá trị của input file để xóa dữ liệu
+    updateInputFileValue(inputFilex,selectedFilesx);
+
+    // Xóa hết các ảnh hiện có trong imagePreview
+    let imagePreview = $(`#${imagePreviewID}`);
+    imagePreview.empty();
+    return selectedFilesx;
+  }
 
   // Hàm cập nhật giá trị của input file với mảng selectedFiles
-  function updateInputFileValue() {
+  function updateInputFileValue(inputFilex,selectedFilesx) {
 
     let fileList = new DataTransfer();
     // Thêm các tệp vào fileList
-    for (var i = 0; i < selectedFiles.length; i++) {
-      fileList.items.add(selectedFiles[i]);
+    for (var i = 0; i < selectedFilesx.length; i++) {
+      fileList.items.add(selectedFilesx[i]);
     }
-    // Gán lại giá trị của input file với fileList
-    inputFile.prop('files', fileList.files)
+    if (inputFilex.files) {
+      inputFilex.files.clear(); // Xóa tất cả các tệp trong input file
+      inputFilex.files = fileList.files; // Gán lại các tệp từ newFileList vào input file
+    }
   }
 
 
@@ -735,6 +777,147 @@ $(document).ready(function() {
   });
 
 
+
+  var tableImg = $(`#tableImg`).DataTable({
+    searching: false,
+    "processing": true,
+    "serverSide": true,
+    "ajax": {
+      "url": "/image",
+      "type": "GET",
+      "data": function(d) {
+        d.idProduct =table.row('.selected-row').data()?.id
+      },
+      "dataSrc": function(json) {
+        return json.data;
+      }
+    },
+    "columns": [
+      {data: "id"},
+      {
+        "data": "id",
+        "orderable": false,
+        "render": function(data, type, row) {
+          if (data){
+            return "<img src='/product/"+data+"/image' width='120px' height='160px'>"
+          }else {
+            return "null"
+          }
+
+        }
+      },
+      {
+        "data": "type",
+        "render": function(data, type, row) {
+          if (data == 0) {
+            return "Không hoạt động";
+          } else if (data == 1) {
+            return "Hoạt động";
+          }else if (data == 2) {
+            return "Ảnh chính";
+          } else {
+            return "";
+          }
+        }
+      },
+      {
+        "data": null,
+        "orderable": false,
+        "render": function(data, type, row) {
+          // Nội dung HTML của cột tiếp theo
+          return `<button type="button" class="btn btn-info btn-sm btn-primary btn-circle-sm btn-img-settype" typeset="2" >Làm ảnh chính</button>
+                    <button type="button" class="btn btn-info btn-sm btn btn-info btn-circle-sm btn-img-settype" typeset="1" >Hoạt động</button>
+                     <button type="button" class="btn btn-info btn-sm btn btn-info btn-circle-sm btn-img-settype" typeset="0" >Không hoạt động</button>
+                       <button type="button" class="btn btn-info btn btn-danger btn-circle-sm btn-img-delete"><i class="fas fa-trash"></i></button>`;
+        }
+      }
+    ],
+    "drawCallback": function(settings) {
+      $(`#tableImg tbody tr`).on('click', '.btn-img-settype',settype);
+      $(`#tableImg tbody tr`).on('click', '.btn-img-delete',deleteDLImg);
+    },
+    searchDelay: 1500,
+    "paging": true,
+    "pageLength": 10,
+    "lengthMenu": [10, 25, 50, 100],
+  });
+
+  function settype() {
+    let type = $(this).attr("typeset")
+    let rowData = tableImg.row($(this).closest('tr')).data();
+    if (confirm("Xác nhận sửa")){
+      $.ajax({
+        url: "/image"+'/settype/' + rowData.id,
+        type: 'PUT',
+        "data": {
+          type
+        },
+        success: function(response) {
+          tableImg.ajax.reload(null, false);
+          alert("Sửa thành công")
+        },
+        error: function(xhr, status, error) {
+          alert('Lỗi :' + xhr.responseText);
+        }
+      });
+    }else {
+
+    }
+  }
+
+  function deleteDLImg() {
+    let rowData = tableImg.row($(this).closest('tr')).data();
+    if (confirm("Xác nhận xóa")){
+      $.ajax({
+        url: "/image"+'/' + rowData.id,
+        type: 'DELETE',
+        success: function(response) {
+          tableImg.ajax.reload(null, false);
+          alert("Xóa thành công")
+        },
+        error: function(xhr, status, error) {
+          alert('Lỗi :' + xhr.responseText);
+        }
+      });
+    }else {
+
+    }
+  }
+
+  // Sự kiện submit form Add image
+  $(`#form-product-image-add`).on('submit', function(e) {
+    e.preventDefault();
+    let formData = new FormData(this);
+    if ($(this).valid()) {
+      $.ajax({
+        url: "/image",
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+          // Xử lý thành công
+          alert('Dữ liệu đã được thêm thành công!');
+          tableImg.ajax.reload(null, false);
+          clearForm(`form-product-image-add`, response)
+          selectedFilesUpdate = clearSelectedFiles(inputFileUpdate,selectedFilesUpdate,"imagePreviewUpdate")
+        },
+        error: function (xhr, status, error) {
+          if(xhr.status==400){
+            let errorResponse = xhr.responseJSON;
+            if (errorResponse){
+            }else if(xhr.responseText) {
+              alert('Lỗi khi thêm dữ liệu: ' + xhr.responseText);
+            }else {
+              alert('Lỗi :' + error);
+            }
+          }else {
+            alert('Lỗi :' + error);
+          }
+        }
+      });
+    }
+  });
 
 
 });

@@ -27,8 +27,8 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public List<Image> findByProductIdAndAndProductType(UUID id, Integer type) {
-        return imageRepository.findByProductIdAndAndProductType(id, type);
+    public List<Image> findByProductIdAndProductType(UUID id, Integer type) {
+        return imageRepository.findByProductIdAndProductType(id, type);
     }
 
     @Override
@@ -42,8 +42,8 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Page<Image> findByProductIdAndAndProductType(UUID id, Integer type, Pageable pageable) {
-        return imageRepository.findByProductIdAndAndProductType(id, type, pageable);
+    public Page<Image> findByProductIdAndProductType(UUID id, Integer type, Pageable pageable) {
+        return imageRepository.findByProductIdAndProductType(id, type, pageable);
     }
 
     @Override

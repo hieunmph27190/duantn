@@ -136,7 +136,7 @@ public class ProductController {
                 }
                 imagesList.add(image);
             } catch (IOException |SQLException e) {
-                ResponseEntity.badRequest().body("Không đọc ghi được ảnh (kiểm tra lại sản phảm vừa tạo)");
+                return ResponseEntity.badRequest().body("Không đọc ghi được ảnh (kiểm tra lại sản phảm vừa tạo)");
             }
         }
         imageService.saveAll(imagesList);
@@ -165,7 +165,7 @@ public class ProductController {
     }
     @GetMapping("/image/{id}")
     public ResponseEntity<?> getProductImage(@PathVariable UUID id) {
-        List<Image> images = imageService.findByProductIdAndAndProductType(id,null);
+        List<Image> images = imageService.findByProductIdAndProductType(id,null);
         return ResponseEntity.ok(images);
     }
 

@@ -15,13 +15,13 @@ public interface ImageService {
 
     Page<Image> findByType(Integer type, Pageable pageable);
 
-    List<Image> findByProductIdAndAndProductType(UUID id, Integer type);
+    List<Image> findByProductIdAndProductType(UUID id, Integer type);
 
     void deleteAllById(Iterable<? extends UUID> uuids);
 
     List<UUID> findIDByProductId(UUID id, Integer type);
 
-    Page<Image> findByProductIdAndAndProductType(UUID id, Integer type, Pageable pageable);
+    Page<Image> findByProductIdAndProductType(UUID id, Integer type, Pageable pageable);
 
     <S extends Image> List<S> saveAll(Iterable<S> entities);
 
