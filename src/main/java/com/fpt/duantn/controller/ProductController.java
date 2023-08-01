@@ -150,7 +150,7 @@ public class ProductController {
                 productService.deleteById(id);
                 return ResponseEntity.ok().build();
             }catch (DataIntegrityViolationException exception){
-                return ResponseEntity.badRequest().body("Không thể xóa khi (đã có sản phẩm sử dụng)");
+                return ResponseEntity.badRequest().body("Không thể xóa khi (đã sử dụng)");
             }
         }else {
             return ResponseEntity.badRequest().body("Không tồn tại");

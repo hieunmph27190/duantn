@@ -56,7 +56,6 @@ public class ImageController {
         FileImgUtil fileImgUtil = new FileImgUtil();
         Product product = new Product();
         product.setId(idProduct);
-        System.out.println(files.length);
         List<Image> imagesList= new ArrayList<>();
         for (MultipartFile multipartFile : files){
             try {

@@ -147,15 +147,6 @@ $(document).ready(function() {
     }
   });
 
-  $(`#${tableNameDetail}_filter input`).on('keypress', function(event) {
-    // Kiểm tra mã phím
-    if (event.keyCode === 13) {
-      let searchValue = $(this).val();
-      table.search(searchValue).draw();
-    }
-  });
-
-
 
 
   // Show form update
@@ -389,7 +380,7 @@ $(document).ready(function() {
         "data": "color",
         "render": function(data, type, row) {
           if (data){
-            return data.name+" | "+data.code;
+            return data.name+"("+data.code+")";
           }else {
             return "";
           }
@@ -399,7 +390,7 @@ $(document).ready(function() {
         "data": "size",
         "render": function(data, type, row) {
           if (data){
-            return  data.size+" | "+data.code;;
+            return  data.size+"("+data.code+")"
           }else {
             return "";
           }
@@ -451,6 +442,15 @@ $(document).ready(function() {
     "pageLength": 10,
     "lengthMenu": [10, 25, 50, 100],
   });
+
+  $(`#${tableNameDetail}_filter input`).on('keypress', function(event) {
+    // Kiểm tra mã phím
+    if (event.keyCode === 13) {
+      let searchValue = $(this).val();
+      tableChiTiet.search(searchValue).draw();
+    }
+  });
+
 
   // Show form update detail
   $(`#${tableNameDetail} tbody`).on('dblclick', 'tr', loadDataModalDetail);

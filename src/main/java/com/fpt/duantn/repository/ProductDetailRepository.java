@@ -13,7 +13,11 @@ import java.util.UUID;
 @Repository
 public interface ProductDetailRepository extends JpaRepository<ProductDetail, UUID> {
     Page<ProductDetail> findByType(Integer type, Pageable pageable);
-    @Query("SELECT c from  ProductDetail c where (:key = '' or CAST(c.id AS string) like :key ) " +
+    @Query("SELECT c from  ProductDetail c where ((:key = '' or CAST(c.id AS string) like :key ) " +
+            "or c.color.code like concat('%',:key,'%') " +
+            "or c.color.name like concat('%',:key,'%') " +
+            "or c.size.code like concat('%',:key,'%') " +
+            "or c.size.size like concat('%',:key,'%') )" +
             "and (:type is null or c.type = :type) " +
             "and (:idProduct is not null and c.product.id = :idProduct) ")
     Page<ProductDetail> searchByKeyAndType(@Param("key") String key, @Param("type") Integer type,@Param("idProduct") UUID idProduct, Pageable pageable);
