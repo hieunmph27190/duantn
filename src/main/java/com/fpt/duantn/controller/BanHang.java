@@ -13,37 +13,37 @@ public class BanHang {
 
     @GetMapping("/about")
     public String about() {
-        return "Trangchu/about";
+        return "banhang/view/about";
     }
 
     @GetMapping("/blog")
     public String blog() {
-        return "Trangchu/blog";
+        return "banhang/view/blog";
     }
 
     @GetMapping("/cart")
     public String cart() {
-        return "Trangchu/cart";
+        return "banhang/view/cart";
     }
 
     @GetMapping("/checkout")
     public String checkout() {
-        return "Trangchu/checkout";
+        return "banhang/view/checkout";
     }
 
     @GetMapping("/contact")
     public String contact() {
-        return "Trangchu/contact";
+        return "banhang/view/contact";
     }
 
     @GetMapping("/shop")
     public String shop() {
-        return "Trangchu/shop";
+        return "banhang/view/shop";
     }
 
     @GetMapping("/blogsingle")
     public String blogsingle() {
-        return "Trangchu/blog-single";
+        return "banhang/view/blog-single";
     }
 
 
