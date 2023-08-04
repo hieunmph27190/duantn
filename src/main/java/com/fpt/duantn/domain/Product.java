@@ -1,5 +1,6 @@
 package com.fpt.duantn.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -56,5 +57,11 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "brandid")
     private Brand brand;
+
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    private List<Image> images;
+
 
 }

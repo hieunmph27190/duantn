@@ -683,7 +683,7 @@ $(document).ready(function() {
 
     let fileList = new DataTransfer();
     // Thêm các tệp vào fileList
-    for (var i = 0; i < selectedFilesx.length; i++) {
+    for (let i = 0; i < selectedFilesx.length; i++) {
       fileList.items.add(selectedFilesx[i]);
     }
     if (inputFilex.files) {
@@ -888,7 +888,7 @@ $(document).ready(function() {
   $(`#form-product-image-add`).on('submit', function(e) {
     e.preventDefault();
     let formData = new FormData(this);
-    if ($(this).valid()) {
+    if ($(this).valid()&&formData.getAll('imgs')[0].name!="") {
       $.ajax({
         url: "/image",
         type: 'POST',
@@ -916,6 +916,8 @@ $(document).ready(function() {
           }
         }
       });
+    }else {
+      alert("Chưa chọn ảnh")
     }
   });
 

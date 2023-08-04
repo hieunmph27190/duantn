@@ -146,7 +146,6 @@ public class ProductController {
     public ResponseEntity delete(@PathVariable UUID id) {
         if (productService.existsById(id)){
             try {
-                imageService.deleteAllById(imageService.findIDByProductId(id,null));
                 productService.deleteById(id);
                 return ResponseEntity.ok().build();
             }catch (DataIntegrityViolationException exception){
