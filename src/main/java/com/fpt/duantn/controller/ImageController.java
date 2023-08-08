@@ -3,11 +3,9 @@ package com.fpt.duantn.controller;
 
 import com.fpt.duantn.domain.Image;
 import com.fpt.duantn.domain.Product;
-import com.fpt.duantn.domain.ProductDetail;
-import com.fpt.duantn.model.DataTablesResponse;
+import com.fpt.duantn.dto.DataTablesResponse;
 import com.fpt.duantn.service.ImageService;
 import com.fpt.duantn.util.FileImgUtil;
-import com.fpt.duantn.util.FormErrorUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

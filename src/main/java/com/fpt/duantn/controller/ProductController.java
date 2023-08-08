@@ -1,12 +1,10 @@
 package com.fpt.duantn.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fpt.duantn.domain.Color;
+
 import com.fpt.duantn.domain.Image;
 import com.fpt.duantn.domain.Product;
-import com.fpt.duantn.model.DataTablesResponse;
-import com.fpt.duantn.model.ProductResponse;
-import com.fpt.duantn.service.ColorService;
+import com.fpt.duantn.dto.DataTablesResponse;
+import com.fpt.duantn.dto.ProductResponse;
 import com.fpt.duantn.service.ImageService;
 import com.fpt.duantn.service.ProductService;
 import com.fpt.duantn.util.FileImgUtil;
@@ -32,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.*;
 
 @Controller

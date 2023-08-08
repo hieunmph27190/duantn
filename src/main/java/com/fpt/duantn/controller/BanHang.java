@@ -1,13 +1,19 @@
 package com.fpt.duantn.controller;
 
+import com.fpt.duantn.service.ProductService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class BanHang {
+    @Autowired
+    private ProductService productService;
 
     @GetMapping("")
-    public String home() {
+    public String home(Model model) {
+        model.addAttribute("sps",productService.findAll());
         return "banhang/view/index";
     }
 

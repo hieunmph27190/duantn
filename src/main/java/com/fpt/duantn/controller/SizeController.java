@@ -1,10 +1,7 @@
 package com.fpt.duantn.controller;
 
-import com.fpt.duantn.domain.Color;
 import com.fpt.duantn.domain.Size;
-import com.fpt.duantn.model.DataTablesResponse;
-import com.fpt.duantn.repository.ProductDetailRepository;
-import com.fpt.duantn.service.ColorService;
+import com.fpt.duantn.dto.DataTablesResponse;
 import com.fpt.duantn.service.SizeService;
 import com.fpt.duantn.util.FormErrorUtil;
 import jakarta.servlet.http.HttpServletRequest;

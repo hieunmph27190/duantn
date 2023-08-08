@@ -1,9 +1,7 @@
 package com.fpt.duantn.controller;
 
 import com.fpt.duantn.domain.Color;
-import com.fpt.duantn.model.DataTablesResponse;
-
-import com.fpt.duantn.repository.ColorRepository;
+import com.fpt.duantn.dto.DataTablesResponse;
 
 import com.fpt.duantn.service.ColorService;
 import com.fpt.duantn.util.FormErrorUtil;
@@ -20,10 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;

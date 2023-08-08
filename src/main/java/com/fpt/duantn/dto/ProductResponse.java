@@ -1,4 +1,4 @@
-package com.fpt.duantn.model;
+package com.fpt.duantn.dto;
 
 import com.fpt.duantn.domain.Brand;
 import com.fpt.duantn.domain.Category;

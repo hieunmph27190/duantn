@@ -1,9 +1,7 @@
 package com.fpt.duantn.controller;
 
-import com.fpt.duantn.domain.Category;
 import com.fpt.duantn.domain.ProductDetail;
-import com.fpt.duantn.model.DataTablesResponse;
-import com.fpt.duantn.service.CategoryService;
+import com.fpt.duantn.dto.DataTablesResponse;
 import com.fpt.duantn.service.ProductDetailService;
 import com.fpt.duantn.service.ProductService;
 import com.fpt.duantn.util.FormErrorUtil;
@@ -15,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

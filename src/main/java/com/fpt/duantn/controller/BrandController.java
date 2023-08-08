@@ -1,8 +1,7 @@
 package com.fpt.duantn.controller;
 
 import com.fpt.duantn.domain.Brand;
-import com.fpt.duantn.domain.Color;
-import com.fpt.duantn.model.DataTablesResponse;
+import com.fpt.duantn.dto.DataTablesResponse;
 import com.fpt.duantn.service.BrandService;
 
 import com.fpt.duantn.util.FormErrorUtil;

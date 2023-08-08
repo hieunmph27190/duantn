@@ -1,4 +1,4 @@
-package com.fpt.duantn.model;
+package com.fpt.duantn.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,11 +14,11 @@ import java.util.Optional;
 
 public class DataTablesResponse {
     private Integer draw;
-    private Long recordsTotal;
+    private Integer recordsTotal;
     private Long recordsFiltered;
     private List<?> data;
 
-    public DataTablesResponse(Integer draw, Long recordsTotal, Long recordsFiltered, List<?> data) {
+    public DataTablesResponse(Integer draw, Integer recordsTotal, Long recordsFiltered, List<?> data) {
         this.draw = draw;
         this.recordsTotal = recordsTotal;
         this.recordsFiltered = recordsFiltered;
@@ -26,7 +26,7 @@ public class DataTablesResponse {
     }
     public DataTablesResponse(Optional<Integer>draw, Page<?> page) {
         this.draw = draw.orElse(10);
-        this.recordsTotal = page.getTotalElements();
+        this.recordsTotal = page.getNumberOfElements();
         this.recordsFiltered = page.getTotalElements();
         this.data = page.getContent();
     }

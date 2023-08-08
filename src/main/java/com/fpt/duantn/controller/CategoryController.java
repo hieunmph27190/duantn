@@ -1,7 +1,7 @@
 package com.fpt.duantn.controller;
 
 import com.fpt.duantn.domain.Category;
-import com.fpt.duantn.model.DataTablesResponse;
+import com.fpt.duantn.dto.DataTablesResponse;
 import com.fpt.duantn.service.CategoryService;
 import com.fpt.duantn.util.FormErrorUtil;
 import jakarta.servlet.http.HttpServletRequest;

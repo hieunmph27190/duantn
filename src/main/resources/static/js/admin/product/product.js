@@ -43,9 +43,6 @@ $(document).ready(function() {
 
 
 
-
-
-
   var table = $(`#${tableName}`).DataTable({
     "processing": true,
     "serverSide": true,
@@ -189,9 +186,7 @@ $(document).ready(function() {
         alert("Không thể lấy dữ liệu")
       }
     });
-
   }
-
 
   // Sự kiện submit form Add
   $(`#form-${objectName}-add`).on('submit', function(e) {
