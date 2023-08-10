@@ -612,14 +612,14 @@ $(document).ready(function() {
 
   var selectedFilesUpdate = [];
   var inputFileUpdate = $('#fileInputUpdate').on('change', function() {
-    loadfile(this,inputFileUpdate,selectedFilesUpdate,"imagePreviewUpdate")
+    selectedFilesUpdate = loadfile(this,inputFileUpdate,selectedFilesUpdate,"imagePreviewUpdate")
   });
 
 
 
   var selectedFiles = [];
   var inputFile = $('#fileInput').on('change', function() {
-    loadfile(this,selectedFiles,selectedFiles,"imagePreview")
+    selectedFiles = loadfile(this,inputFile,selectedFiles,"imagePreview")
   });
 
 
@@ -630,35 +630,32 @@ $(document).ready(function() {
       let file = fileList[i];
       selectedFilesx.push(file);
     }
-    updateInputFileValue(inputFilex,selectedFilesx);
+    updateInputFileValue(inputFilex,selectedFilesx)
     imagePreview.empty();
-    console.log(imagePreview)
     // Duyệt qua danh sách các tệp đã chọn
     for (let i = 0; i < selectedFilesx.length; i++) {
       let file = selectedFilesx[i];
       let reader = new FileReader();
 
-
       // Đọc và hiển thị ảnh lên giao diện
       reader.onload = function(event) {
-        var image = $('<img>').attr('src', event.target.result);
+        let image = $('<img>').attr('src', event.target.result);
         image.attr("width","150px");
         image.attr("height","200px");
         var deleteButton = $('<button>').text('x').addClass('delete-button');
         var imageContainer = $('<div>').addClass('image-container p-3 border-dark ').append(image, deleteButton);
         imagePreview.append(imageContainer);
-        console.log("x")
         // Thêm sự kiện click cho nút xóa
         deleteButton.on('click', function() {
           $(this).parent().remove();
-          selectedFilesx.splice(selectedFilesx.indexOf(file), 1);
-          updateInputFileValue(inputFilex, selectedFilesx);
+          selectedFiles.splice(selectedFilesx.indexOf(file), 1);
+          updateInputFileValue(inputFile, selectedFiles);
         });
       };
 
       reader.readAsDataURL(file);
     }
-
+    return selectedFilesx;
   }
   function clearSelectedFiles(inputFilex, selectedFilesx,imagePreviewID) {
     // Xóa các tệp đã chọn
@@ -681,9 +678,8 @@ $(document).ready(function() {
     for (let i = 0; i < selectedFilesx.length; i++) {
       fileList.items.add(selectedFilesx[i]);
     }
-    if (inputFilex.files) {
-      inputFilex.files.clear(); // Xóa tất cả các tệp trong input file
-      inputFilex.files = fileList.files; // Gán lại các tệp từ newFileList vào input file
+    if (inputFilex[0].files) {
+      inputFilex[0].files = fileList.files; // Gán lại các tệp từ newFileList vào input file
     }
   }
 

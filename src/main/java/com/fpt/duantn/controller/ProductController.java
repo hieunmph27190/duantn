@@ -3,9 +3,12 @@ package com.fpt.duantn.controller;
 
 import com.fpt.duantn.domain.Image;
 import com.fpt.duantn.domain.Product;
+import com.fpt.duantn.domain.ProductDetail;
 import com.fpt.duantn.dto.DataTablesResponse;
+import com.fpt.duantn.dto.ProductRequest;
 import com.fpt.duantn.dto.ProductResponse;
 import com.fpt.duantn.service.ImageService;
+import com.fpt.duantn.service.ProductDetailService;
 import com.fpt.duantn.service.ProductService;
 import com.fpt.duantn.util.FileImgUtil;
 import com.fpt.duantn.util.FormErrorUtil;
@@ -36,12 +39,20 @@ import java.util.*;
 @RequestMapping("/product")
 public class ProductController {
     @GetMapping("/view")
-    public String test(Model model){
+    public String view(Model model){
         return "/admin/view/product/product";
+    }
+
+    @GetMapping("/view-add")
+    public String viewAdd(Model model){
+        return "/admin/view/product/add-product";
     }
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private ProductDetailService productDetailService;
 
     @Autowired
     private FileImgUtil fileImgUtil;
@@ -139,6 +150,64 @@ public class ProductController {
         imageService.saveAll(imagesList);
         return ResponseEntity.ok(productSaved);
     }
+
+    @PostMapping ("/add" )
+    public ResponseEntity<?> addProduct(@Valid @ModelAttribute ProductRequest productRequest , BindingResult bindingResult, @RequestPart(value = "imgs",required = false) MultipartFile[] files) {
+
+        if (bindingResult.hasErrors()){
+            Map errors = FormErrorUtil.changeToMapError(bindingResult);
+            return ResponseEntity.badRequest().body(errors);
+        }
+//        Conver dữ liệu sang domain
+        Product product = new Product();
+        product.setCode(productRequest.getCode());
+        product.setName(productRequest.getName());
+        product.setType(productRequest.getType());
+        product.setBrand(productRequest.getBrand());
+        product.setCategory(productRequest.getCategory());
+        product.setSole(productRequest.getSole());
+        product.setDescription(productRequest.getDescription());
+
+        Product productSaved = productService.save(product);
+
+       try{
+           List<ProductDetail> productDetails = productRequest.getDetails();
+           productDetails.stream().forEach(item ->{
+               item.setProduct(product);
+           });
+           productDetailService.saveAll(productDetails);
+
+           //        Thêm ảnh
+           List<Image> imagesList= new ArrayList<>();
+           boolean imgSelect = true;
+           for (MultipartFile multipartFile : files){
+               try {
+                   Blob blob =fileImgUtil.convertMultipartFileToBlob(multipartFile);
+                   Image image = new Image();
+                   image.setProduct(productSaved);
+                   image.setImage(blob);
+                   if (imgSelect){
+                       image.setType(2);
+                       imgSelect=false;
+                   }else {
+                       image.setType(1);
+                   }
+                   imagesList.add(image);
+               } catch (IOException |SQLException e) {
+                   return ResponseEntity.badRequest().body("Không đọc ghi được ảnh (kiểm tra lại sản phảm vừa tạo)");
+               }
+           }
+           imageService.saveAll(imagesList);
+
+
+       }catch (Exception e){
+           return ResponseEntity.badRequest().body("Có lỗi sảy ra (kiểm tra lại sản phảm vừa tạo)");
+       }
+
+
+        return ResponseEntity.ok(productSaved);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable UUID id) {
         if (productService.existsById(id)){
