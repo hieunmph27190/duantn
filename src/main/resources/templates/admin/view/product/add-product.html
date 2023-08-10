@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:encoding="UTF-8"
+      th:replace="~{/admin/layout.html::view(content=~{::content},script=~{::script},style=~{::style})}"
+>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <th:block th:fragment="style">
+        <style>
+            .image-container{
+                position: relative;
+                border: 2px solid black;
+                border-radius: 15px;
+                box-sizing: border-box;
+                margin: 3px;
+            }
+            .image-container>button{
+                position: absolute;
+                right: 0px;
+                top:0px;
+                border: 0;
+                background-color: transparent;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+<div th:fragment="content" class="container-fluid ">
+
+    <!-- Page Heading -->
+    <h1 class="h3 mb-2 text-gray-800">Thêm sản phẩm</h1>
+    <div >
+        <form id="form-product-add" class="row" enctype="multipart/form-data">
+            <div class="form-group col-4">
+                <label >Mã sản phẩm:</label>
+                <input type="text" class="form-control"  name="code">
+            </div>
+            <div class="form-group col-8">
+                <label>Tên sản phẩm:</label>
+                <input type="text" class="form-control"  name="name">
+            </div>
+            <div class="form-group col-4">
+                <label>Thương hiệu:</label>
+                <select class="select2" style="width: 100%" multiple="multiple" name="brand.id">
+
+                </select>
+            </div>
+            <div class="form-group col-4">
+                <label>Loại giày:</label>
+                <select class="form-control" style="width: 100%" multiple="multiple" name="category.id">
+
+                </select>
+            </div>
+            <div class="form-group col-4">
+                <label>Đế giày:</label>
+                <select class="form-control" style="width: 100%" multiple="multiple" name="sole.id">
+                </select>
+            </div>
+            <div class="form-group col-9">
+
+            </div>
+
+            <div class="form-group col-3">
+                <label >Type:</label>
+                <select class="form-control" name="type" >
+                    <option value="" disabled selected>Chọn type</option>
+                    <option value="1">Hoạt động</option>
+                    <option value="0">Không hoạt động</option>
+                </select>
+            </div>
+            <div class="form-group col-12">
+                <h5>Biến thể của sản phẩm </h5>
+            </div>
+            <div class="form-group col-7">
+                <label>Màu sắc:</label>
+                <select class="select2" style="width: 100%" multiple="multiple" name="color.id">
+
+                </select>
+            </div>
+            <div class="form-group col-5">
+                <label>Size:</label>
+                <select class="form-control" style="width: 100%" multiple="multiple" name="size.id">
+
+                </select>
+            </div>
+            <div class="form-group col-12" id="selected-options-table">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Màu sắc</th>
+                        <th>Size</th>
+                        <th>Số lượng</th>
+                        <th>Giá</th>
+                        <th>Type</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Các hàng dữ liệu sẽ được thêm vào đây -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-group col-12 row pl-5 pr-5" >
+                <label >Hình ảnh : (Chọn hình ảnh tỉ lệ 3/4 để không bị biến dạng ảnh)</label>
+                <div id="imagePreview" class="row col-12"></div>
+                <div class="image-container p-1 " style="margin:5px;margin-left:40%;" >
+                    <input name="imgs" type="file" id="fileInput"  multiple accept="image/*">
+                </div>
+            </div>
+
+            <div class="form-group col-12">
+                <label >Mô tả:</label>
+                <textarea class="form-control" name="description" rows="8"></textarea>
+            </div>
+
+
+            <button  type="submit" class=" btn btn-primary">Thêm</button>
+        </form>
+    </div>
+
+
+</div>
+<th:block th:fragment="script">
+    <!-- Page level plugins -->
+    <script th:src="@{/vendor/jquery-validate/jquery.validate.js}"></script>
+    <!-- Page level custom scripts -->
+    <script th:src="@{/js/admin/product/add-product.js}"></script>
+</th:block>
+</body>
+</html>
