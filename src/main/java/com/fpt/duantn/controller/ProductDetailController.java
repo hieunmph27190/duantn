@@ -43,8 +43,8 @@ public class ProductDetailController {
             @RequestParam(value = "idProduct", required = false) Optional<UUID>  idProduct,
             HttpServletRequest request,Model model
     ) {
-        String orderColumnName = request.getParameter("columns["+orderColumn.orElse(0)+"][data]");
-        Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10), Sort.by(orderDir.orElse("asc").equals("desc")?Sort.Direction.DESC:Sort.Direction.ASC,orderColumnName==null?"code":orderColumnName));
+        String orderColumnName = request.getParameter("columns["+orderColumn.orElse(-1)+"][data]");
+        Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10),  Sort.by(orderDir.orElse("desc").equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderColumnName == null ? "createDate" : orderColumnName));
         Page<ProductDetail> page = productDetailService.searchByKeyAndType(searchValue.orElse(""),null,idProduct.orElse(null), pageable);
         DataTablesResponse response = new DataTablesResponse(draw,page);
         return response;

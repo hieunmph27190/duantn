@@ -46,6 +46,7 @@ $(document).ready(function() {
   var table = $(`#${tableName}`).DataTable({
     "processing": true,
     "serverSide": true,
+    order: [],
     "ajax": {
       "url": urlBase,
       "type": "GET",
@@ -208,6 +209,7 @@ $(document).ready(function() {
         success: function (response) {
           // Xử lý thành công
           alert('Dữ liệu đã được thêm thành công!');
+          table.order([])
           table.ajax.reload(null, false);
           clearForm(`form-${objectName}-add`, response)
           selectedFiles = clearSelectedFiles(inputFile,selectedFiles,"imagePreview")
@@ -359,6 +361,7 @@ $(document).ready(function() {
   var tableChiTiet = $(`#tableChiTiet`).DataTable({
     "processing": true,
     "serverSide": true,
+    order: [],
     "ajax": {
       "url": urlBaseDetail,
       "type": "GET",
@@ -499,6 +502,7 @@ $(document).ready(function() {
         success: function (response) {
           // Xử lý thành công
           alert('Dữ liệu đã được cập nhật thành công!');
+          tableChiTiet.order([])
           tableChiTiet.ajax.reload(null, false);
           clearForm(`form-${objectNameDetail}-add`, response)
           $('#view-detail-add').modal('hide');

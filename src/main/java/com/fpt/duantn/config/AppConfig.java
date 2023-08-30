@@ -10,6 +10,9 @@ import org.springframework.web.multipart.support.StandardServletMultipartResolve
 public class AppConfig {
     @Bean
     public MultipartResolver multipartResolver() {
-        return new StandardServletMultipartResolver();
+        StandardServletMultipartResolver resolver = new StandardServletMultipartResolver();
+
+        return  resolver;
     }
+
 }

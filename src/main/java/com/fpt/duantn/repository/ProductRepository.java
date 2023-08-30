@@ -3,6 +3,7 @@ package com.fpt.duantn.repository;
 import com.fpt.duantn.domain.Brand;
 import com.fpt.duantn.domain.Color;
 import com.fpt.duantn.domain.Product;
+import com.fpt.duantn.dto.ProductBanHangResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,4 +24,16 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             "or c.sole.name like concat('%',:key,'%')) " +
             "and (:type is null or c.type = :type)")
     Page<Product> searchByKeyAndType(@Param("key") String key, @Param("type") Integer type, Pageable pageable);
+
+
+
+    @Query(value = "select product.id,product.code,product.productname,min(productdetail.price) 'minPrice' ,max(productdetail.price) 'maxPrice' ,images.id 'imageId'  from product \n" +
+            " join productdetail on product.id = productdetail.productid \n" +
+            "join (SELECT id, productid,type,ROW_NUMBER() OVER (PARTITION BY productid ORDER BY NEWID()) as RowNum \n" +
+            "FROM images \n" +
+            "where images.type =2 ) images on product.id = images.productid\n" +
+            "where images.RowNum =1 \n" +
+            "GROUP BY product.id,product.code,product.productname,images.id ", nativeQuery = true)
+    Page<ProductBanHangResponse> searchResponseByKeyAndType(@Param("key") String key, @Param("type") Integer type, Pageable pageable);
+
 }
