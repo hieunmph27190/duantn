@@ -64,7 +64,10 @@
 <div th:fragment="tablex" class="container-fluid ">
 
     <!-- Page Heading -->
-    <h1 class="h3 mb-2 text-gray-800">Sản phẩm</h1>
+    <div class="d-flex justify-content-between align-content-center mb-2">
+        <h1 class="h3 mb-2 text-gray-800">Sản phẩm</h1>
+        <a href="/product/view-add" class="btn btn-primary btn-circle-sm" id="btn" >Thêm sản phẩm</a>
+    </div>
     <div class="row">
         <div class="col-7">
             <div id="view-add" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"

@@ -71,8 +71,8 @@ public class ProductController {
             @RequestParam(value = "order[0][dir]", required = false) Optional<String>  orderDir,
             HttpServletRequest request,Model model
     ) {
-        String orderColumnName = request.getParameter("columns["+orderColumn.orElse(0)+"][data]");
-        Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10), Sort.by(orderDir.orElse("asc").equals("desc")?Sort.Direction.DESC:Sort.Direction.ASC,orderColumnName==null?"code":orderColumnName));
+        String orderColumnName = request.getParameter("columns["+orderColumn.orElse(-1)+"][data]");
+        Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10),  Sort.by(orderDir.orElse("desc").equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderColumnName == null ? "createDate" : orderColumnName));
         Page<Product> page = productService.searchByKeyAndType(searchValue.orElse(""),null, pageable);
         DataTablesResponse response = new DataTablesResponse(draw,page);
         List<Product> products = (List<Product>) response.getData();
@@ -133,16 +133,18 @@ public class ProductController {
         for (MultipartFile multipartFile : files){
             try {
                 Blob blob =fileImgUtil.convertMultipartFileToBlob(multipartFile);
-                Image image = new Image();
-                image.setProduct(productSaved);
-                image.setImage(blob);
-                if (imgSelect){
-                    image.setType(2);
-                    imgSelect=false;
-                }else {
-                    image.setType(1);
+                if (blob!=null){
+                    Image image = new Image();
+                    image.setProduct(productSaved);
+                    image.setImage(blob);
+                    if (imgSelect){
+                        image.setType(2);
+                        imgSelect=false;
+                    }else {
+                        image.setType(1);
+                    }
+                    imagesList.add(image);
                 }
-                imagesList.add(image);
             } catch (IOException |SQLException e) {
                 return ResponseEntity.badRequest().body("Không đọc ghi được ảnh (kiểm tra lại sản phảm vừa tạo)");
             }
@@ -151,7 +153,7 @@ public class ProductController {
         return ResponseEntity.ok(productSaved);
     }
 
-    @PostMapping ("/add" )
+    @PostMapping ( value = "/add" )
     public ResponseEntity<?> addProduct(@Valid @ModelAttribute ProductRequest productRequest , BindingResult bindingResult, @RequestPart(value = "imgs",required = false) MultipartFile[] files) {
 
         if (bindingResult.hasErrors()){
@@ -163,6 +165,7 @@ public class ProductController {
         product.setCode(productRequest.getCode());
         product.setName(productRequest.getName());
         product.setType(productRequest.getType());
+        System.out.println(productRequest.getType());
         product.setBrand(productRequest.getBrand());
         product.setCategory(productRequest.getCategory());
         product.setSole(productRequest.getSole());
@@ -183,16 +186,19 @@ public class ProductController {
            for (MultipartFile multipartFile : files){
                try {
                    Blob blob =fileImgUtil.convertMultipartFileToBlob(multipartFile);
-                   Image image = new Image();
-                   image.setProduct(productSaved);
-                   image.setImage(blob);
-                   if (imgSelect){
-                       image.setType(2);
-                       imgSelect=false;
-                   }else {
-                       image.setType(1);
+                   if (blob!=null){
+                       Image image = new Image();
+                       image.setProduct(productSaved);
+                       image.setImage(blob);
+                       if (imgSelect){
+                           image.setType(2);
+                           imgSelect=false;
+                       }else {
+                           image.setType(1);
+                       }
+                       imagesList.add(image);
                    }
-                   imagesList.add(image);
+
                } catch (IOException |SQLException e) {
                    return ResponseEntity.badRequest().body("Không đọc ghi được ảnh (kiểm tra lại sản phảm vừa tạo)");
                }

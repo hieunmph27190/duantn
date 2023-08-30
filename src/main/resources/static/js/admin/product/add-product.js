@@ -66,8 +66,6 @@ $(document).ready(function() {
         delete selectedVariants[variantId];
       }
     }
-    console.log(getDataFromTable())
-    getDataFromForm()
   }
 
   $(document).on("click", ".delete-button-row-table", function () {
@@ -79,26 +77,40 @@ $(document).ready(function() {
 
 
   function getDataFromTable() {
+    let check = true;
     const data = [];
 
     $("#selected-options-table tbody tr").each(function () {
       const row = $(this);
-      const idColor = row.data("idColor");
-      const idSize = row.data("idSize");
       const amount = row.find(".quantity-input").val();
       const price = row.find(".price-input").val();
-      const type = row.find("select[name='type-input']").val();
+      if (amount==""||price==""){
+        check=false;
+      }
+    })
+    if (check){
+      $("#selected-options-table tbody tr").each(function () {
+        const row = $(this);
+        const idColor = row.data("idColor");
+        const idSize = row.data("idSize");
+        const amount = row.find(".quantity-input").val();
+        const price = row.find(".price-input").val();
+        const type = row.find("select[name='type-input']").val();
 
-      data.push({
-        "color.id": idColor,
-        "size.id": idSize,
-        amount: amount,
-        price: price,
-        type: type
+        data.push({
+          "color.id": idColor,
+          "size.id": idSize,
+          amount: amount,
+          price: price,
+          type: type
+        });
       });
-    });
+      return data;
+    }else {
+      return undefined;
+    }
 
-    return data;
+
   }
 
   function getOptionText(selectName, optionId) {
@@ -109,7 +121,7 @@ $(document).ready(function() {
 
   var selectedFiles = [];
   var inputFile = $('#fileInput').on('change', function() {
-    loadfile(this,selectedFiles,selectedFiles,"imagePreview")
+    loadfile(this,inputFile,selectedFiles,"imagePreview")
   });
 
   function loadfile(thiss,inputFilex,selectedFilesx,imagePreviewID){
@@ -121,7 +133,6 @@ $(document).ready(function() {
     }
     updateInputFileValue(inputFilex,selectedFilesx);
     imagePreview.empty();
-    console.log(imagePreview)
     // Duyệt qua danh sách các tệp đã chọn
     for (let i = 0; i < selectedFilesx.length; i++) {
       let file = selectedFilesx[i];
@@ -158,30 +169,47 @@ $(document).ready(function() {
     for (let i = 0; i < selectedFilesx.length; i++) {
       fileList.items.add(selectedFilesx[i]);
     }
-    if (inputFilex.files) {
-      inputFilex.files.clear(); // Xóa tất cả các tệp trong input file
-      inputFilex.files = fileList.files; // Gán lại các tệp từ newFileList vào input file
+    if (inputFilex[0].files) {
+      inputFilex[0].files = fileList.files; // Gán lại các tệp từ newFileList vào input file
+    }
+  }
+  function appendDetailsData(formData, detailsArray, index) {
+    var detail = detailsArray[index];
+    for (var key in detail) {
+      if (detail.hasOwnProperty(key)) {
+        var fieldName = "details[" + index + "]." + key;
+        formData.append(fieldName, detail[key]);
+      }
     }
   }
 
+
+
   function getDataFromForm() {
     let formData = new FormData($("#form-product-add")[0]);
-    formData.delete("quantity-input");
-    formData.delete("price-input");
     formData.delete("type-input");
     formData.delete("color.id");
     formData.delete("size.id");
-
-    formData.append("details", JSON.stringify(getDataFromTable()));
-
+    let details = getDataFromTable()
+    if (!details){
+      $("#error-table").text("Nhập đủ thông tin trong bảng")
+      return undefined;
+    }else {
+      $("#error-table").text("")
+    }
+    // Thêm dữ liệu từ mảng details vào FormData
+    for (let i = 0; i < details.length; i++) {
+      appendDetailsData(formData, details, i);
+    }
 
     return formData;
   }
 
+
   $("#form-product-add").on('submit', function(e) {
-    e.preventDefault();
-    let data = getDataFromForm()
-    if ($(this).valid()) {
+      e.preventDefault();
+      let data = getDataFromForm()
+     if ($(this).valid()&&data) {
       $.ajax({
         url: "/product/add",
         type: 'POST',
@@ -210,4 +238,63 @@ $(document).ready(function() {
       });
     }
   });
+
+  var configValidate = {
+    rules: {
+      code: {
+        required: true,
+        minlength: 3
+      },
+      name: {
+        required: true
+      },
+      "brand.id": {
+        required: true
+      },
+      "category.id": {
+        required: true
+      },
+      "sole.id": {
+        required: true
+      },
+      type: {
+        required: true
+      },
+      "color.id": {
+        required: true
+      },
+      "size.id": {
+        required: true
+      }
+    },
+    messages: {
+      code: {
+        required: "Vui lòng nhập mã sản phẩm",
+        minlength: "Mã sản phẩm phải có ít nhất 3 ký tự"
+      },
+      name: {
+        required: "Vui lòng nhập tên sản phẩm"
+      },
+      "brand.id": {
+        required: "Vui lòng chọn thương hiệu"
+      },
+      "category.id": {
+        required: "Vui lòng chọn loại giày"
+      },
+      "sole.id": {
+        required: "Vui lòng chọn đế giày"
+      },
+      type: {
+        required: "Vui lòng chọn type"
+      },
+      "color.id": {
+        required: "Vui lòng chọn màu sắc"
+      },
+      "size.id": {
+        required: "Vui lòng chọn size"
+      }
+    }
+  };
+
+  $("#form-product-add").validate(configValidate);
 })

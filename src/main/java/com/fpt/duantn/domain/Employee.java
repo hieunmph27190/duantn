@@ -1,14 +1,19 @@
 package com.fpt.duantn.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 
 
 import java.sql.Blob;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -26,60 +31,56 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @NotBlank
     @Column(name = "password")
     private String password;
 
+    @NotNull
     @Column(name = "type")
     private Integer type;
 
+    @NotBlank
     @Column(name = "user_name")
-    private String user_name;
+    private String userName;
 
-    //bi-directional many-to-one association to Person
+    @NotBlank
     @Column(name = "address")
     private String address;
 
-    @Column(name = "dateof_birth")
-    private Timestamp dateOfBirth;
 
+
+    @NotNull
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "dateof_birth")
+    private Date dateOfBirth;
+
+    @NotBlank
     @Column(name = "email")
     private String email;
 
     @Column(name = "gender")
     private Boolean gender;
 
+
+    @JsonIgnore
     @Lob
-    @Column(name = "image")
+    @Column(name = "image",updatable = false)
     private Blob image;
 
 
+    @NotBlank
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "last_name")
-    private String lastName;
+    @NotBlank
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "first_name")
-    private String firstName;
+    @CreationTimestamp
+    @Column(name = "create_date",updatable = false)
+    private Timestamp createDate;
 
-    @Column(name = "buffer_name")
-    private String bufferName;
-
-
-//    bi-directional many-to-one association to Role
     @ManyToOne
     @JoinColumn(name = "roleid")
     private Role role;
-
-
-
-//    //bi-directional many-to-one association to Bill
-//    @OneToMany(mappedBy = "employee")
-//    private List<Bill> bills;
-//
-//
-//
-//    //bi-directional many-to-one association to Exchange
-//    @OneToMany(mappedBy = "employee")
-//    private List<Exchange> exchanges;
 }
