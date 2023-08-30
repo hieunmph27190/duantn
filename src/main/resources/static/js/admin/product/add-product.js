@@ -66,6 +66,7 @@ $(document).ready(function() {
         delete selectedVariants[variantId];
       }
     }
+
   }
 
   $(document).on("click", ".delete-button-row-table", function () {
@@ -77,11 +78,14 @@ $(document).ready(function() {
 
 
   function getDataFromTable() {
+
     let check = true;
+
     const data = [];
 
     $("#selected-options-table tbody tr").each(function () {
       const row = $(this);
+
       const amount = row.find(".quantity-input").val();
       const price = row.find(".price-input").val();
       if (amount==""||price==""){
@@ -121,7 +125,9 @@ $(document).ready(function() {
 
   var selectedFiles = [];
   var inputFile = $('#fileInput').on('change', function() {
+
     loadfile(this,inputFile,selectedFiles,"imagePreview")
+
   });
 
   function loadfile(thiss,inputFilex,selectedFilesx,imagePreviewID){
@@ -133,6 +139,7 @@ $(document).ready(function() {
     }
     updateInputFileValue(inputFilex,selectedFilesx);
     imagePreview.empty();
+
     // Duyệt qua danh sách các tệp đã chọn
     for (let i = 0; i < selectedFilesx.length; i++) {
       let file = selectedFilesx[i];
@@ -169,6 +176,7 @@ $(document).ready(function() {
     for (let i = 0; i < selectedFilesx.length; i++) {
       fileList.items.add(selectedFilesx[i]);
     }
+
     if (inputFilex[0].files) {
       inputFilex[0].files = fileList.files; // Gán lại các tệp từ newFileList vào input file
     }
@@ -202,14 +210,17 @@ $(document).ready(function() {
       appendDetailsData(formData, details, i);
     }
 
+
     return formData;
   }
+
 
 
   $("#form-product-add").on('submit', function(e) {
       e.preventDefault();
       let data = getDataFromForm()
      if ($(this).valid()&&data) {
+
       $.ajax({
         url: "/product/add",
         type: 'POST',
@@ -297,4 +308,5 @@ $(document).ready(function() {
   };
 
   $("#form-product-add").validate(configValidate);
+
 })

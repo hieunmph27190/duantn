@@ -153,7 +153,9 @@ public class ProductController {
         return ResponseEntity.ok(productSaved);
     }
 
+
     @PostMapping ( value = "/add" )
+
     public ResponseEntity<?> addProduct(@Valid @ModelAttribute ProductRequest productRequest , BindingResult bindingResult, @RequestPart(value = "imgs",required = false) MultipartFile[] files) {
 
         if (bindingResult.hasErrors()){
@@ -165,7 +167,6 @@ public class ProductController {
         product.setCode(productRequest.getCode());
         product.setName(productRequest.getName());
         product.setType(productRequest.getType());
-        System.out.println(productRequest.getType());
         product.setBrand(productRequest.getBrand());
         product.setCategory(productRequest.getCategory());
         product.setSole(productRequest.getSole());
@@ -186,6 +187,7 @@ public class ProductController {
            for (MultipartFile multipartFile : files){
                try {
                    Blob blob =fileImgUtil.convertMultipartFileToBlob(multipartFile);
+
                    if (blob!=null){
                        Image image = new Image();
                        image.setProduct(productSaved);
@@ -198,6 +200,7 @@ public class ProductController {
                        }
                        imagesList.add(image);
                    }
+
 
                } catch (IOException |SQLException e) {
                    return ResponseEntity.badRequest().body("Không đọc ghi được ảnh (kiểm tra lại sản phảm vừa tạo)");
