@@ -33,6 +33,7 @@ $(document).ready(function() {
   var objectName = "sole"
   var tableName = "dataTable"
   var table = $(`#${tableName}`).DataTable({
+    order: [],
     "processing": true,
     "serverSide": true,
     "ajax": {
@@ -171,6 +172,7 @@ $(document).ready(function() {
         success: function (response) {
           // Xử lý thành công
           alert('Dữ liệu đã được cập nhật thành công!');
+          table.order([])
           table.ajax.reload(null, false);
           $('#view-update').modal('hide');
         },

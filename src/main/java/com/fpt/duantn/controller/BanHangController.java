@@ -23,12 +23,11 @@ import java.util.*;
 public class BanHangController {
     @Autowired
     private ProductService productService;
-
     @GetMapping("")
-    public String home(Model model) {
-        model.addAttribute("sps",productService.findAll());
+    public String home() {
         return "banhang/view/index";
     }
+
     @GetMapping("/ban-hang/product")
     @ResponseBody
     public DataTablesResponse getProduct(

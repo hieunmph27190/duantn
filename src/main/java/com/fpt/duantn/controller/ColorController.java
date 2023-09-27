@@ -46,8 +46,12 @@ public class ColorController {
             @RequestParam(value = "callAll", required = false,defaultValue = "false") Optional<Boolean> all,
             HttpServletRequest request,Model model
     ) {
-        String orderColumnName = request.getParameter("columns["+orderColumn.orElse(0)+"][data]");
-        Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10), Sort.by(orderDir.orElse("asc").equals("desc")?Sort.Direction.DESC:Sort.Direction.ASC,orderColumnName==null?"code":orderColumnName));
+        String orderColumnName = request.getParameter("columns["+orderColumn.orElse(-1)+"][data]");
+//        Sort.Order order = new Sort.Order(orderDir.orElse("asc").equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, orderColumnName == null ? "id" : orderColumnName);
+//        Sort.Order createDateOrder = new Sort.Order(Sort.Direction.DESC, "createDate");
+//        Sort.by(order, createDateOrder);
+
+        Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10), Sort.by(orderDir.orElse("desc").equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderColumnName == null ? "createDate" : orderColumnName));
         Page<Color> page = colorService.searchByKeyAndType(searchValue.orElse(""),all.get()?null:1, pageable);
         DataTablesResponse response = new DataTablesResponse(draw,page);
         return response;

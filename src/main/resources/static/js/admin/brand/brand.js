@@ -33,6 +33,7 @@ $(document).ready(function() {
   var objectName = "brand"
   var tableName = "dataTable"
   var table = $(`#${tableName}`).DataTable({
+    order: [],
     "processing": true,
     "serverSide": true,
     "ajax": {
@@ -131,6 +132,7 @@ $(document).ready(function() {
         success: function (response) {
           // Xử lý thành công
           alert('Dữ liệu đã được thêm thành công!');
+          order: [],
           table.ajax.reload(null, false);
           clearForm(`form-${objectName}-add`, response)
           $('#view-add').modal('hide');

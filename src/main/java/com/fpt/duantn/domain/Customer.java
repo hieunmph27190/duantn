@@ -38,7 +38,7 @@ public class Customer {
     @Column(name="type")
     private Integer type;
 
-    @NotBlank
+    @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "dateof_birth")
     private Date dateOfBirth;
@@ -79,5 +79,9 @@ public class Customer {
     @CreationTimestamp
     @Column(name = "create_date",updatable = false)
     private Timestamp createDate;
+
+    @NotBlank
+    @Column(name = "password")
+    private String password;
 
 }

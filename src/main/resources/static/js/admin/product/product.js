@@ -690,7 +690,7 @@ $(document).ready(function() {
 
 
 
-  $(`select[name*=".id"]`).each((index,element)=>{
+  $(`.modal-body select[name*=".id"]`).each((index,element)=>{
     $(element).select2({
       maximumSelectionLength: 1,
       ajax: {
@@ -718,6 +718,36 @@ $(document).ready(function() {
       }
     });
   })
+
+  $(`#filter select[name*=".id"]`).each((index,element)=>{
+    $(element).select2({
+      ajax: {
+        url: '/'+element.name.replace(".id",""),
+        type: 'GET',
+        dataType: 'json',
+        delay: 250,
+        data: function(params) {
+          return {
+            "search[value]": params.term
+          };
+        },
+        processResults: function(data) {
+
+          return {
+            results: data.data.map(item => {
+              return {
+                id: item.id,
+                text: (item.name||item.size)+"("+item.code+")"
+              };
+            })
+          };
+        },
+        cache: true
+      }
+    });
+  })
+
+
 
   var configValidateDetail = {
     rules: {

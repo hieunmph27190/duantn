@@ -1,3 +1,33 @@
+function converArrayToObject(dataForm){
+  if (Array.isArray(dataForm))
+    var dataFormObject = {}
+  for (const data of dataForm) {
+    dataFormObject[data.name]=data.value
+  }
+  return dataFormObject;
+}
+function pullDataToForm(idForm,data){
+  if (typeof data === 'object' && data !== null) {
+    for (var key in data) {
+      if (data.hasOwnProperty(key)) {
+        $(`#${idForm} [name="${key}"]`).val(data[key]);
+      }
+    }
+  }
+}
+
+function clearForm(idForm,data){
+  if (typeof data === 'object' && data !== null) {
+    for (var key in data) {
+      if (data.hasOwnProperty(key)) {
+        data[key]=""
+      }
+    }
+    pullDataToForm(idForm,data)
+  }
+}
+
+
 $(document).ready(function() {
   $(`select[name*=".id"]`).each((index,element)=>{
     $(element).select2({
@@ -308,5 +338,97 @@ $(document).ready(function() {
   };
 
   $("#form-product-add").validate(configValidate);
+
+
+  $(`button[id*="btn-view-add-"]`).each((index,element)=>{
+    $(element).click(function (){
+      $("#"+$(element).attr("id").replace("btn-","")).modal('show');
+    })
+  })
+
+
+
+  var configValidateFormAdd = {
+    rules: {
+      code: {
+        required: true,
+        minlength: 3
+      },
+      name: {
+        required: true
+      },
+      size: {
+        required: true
+      },
+      type: {
+        required: true
+      }
+    },
+    messages: {
+      code: {
+        required: "Vui lòng nhập trường này",
+        minlength: "Trường này phải có ít nhất 3 ký tự"
+      },
+      name: {
+        required: "Vui lòng nhập trường này"
+      },
+      size: {
+        required: "Vui lòng nhập trường này"
+      },
+      type: {
+        required: "Vui lòng chọn trường này"
+      }
+    }
+  }
+
+  $(`form[id*="form-add-"]`).each((index,element)=>{
+    // Validate form add
+    $(element).validate(configValidate);
+    // Validate form update
+    $(element).validate({
+      rules:{...configValidate.rules,id:{required:true}},
+      messages:{...configValidate.messages,id:{required:"Vui lòng nhập trường này"}}
+    });
+
+  })
+
+  $(`form[id*="form-add-"]`).each((index,element)=>{
+    $(element).on('submit', function(e) {
+      e.preventDefault();
+      if ($(this).valid()) {
+        // Gửi AJAX request để cập nhật dữ liệu
+        $.ajax({
+          url: "/"+$(element).attr("id").replace("form-add-",""),
+          type: 'POST',
+          data: JSON.stringify(converArrayToObject($(this).serializeArray())),
+          contentType: 'application/json',
+          processData: true,
+          success: function (response) {
+            // Xử lý thành công
+            alert('Dữ liệu đã được thêm thành công!');
+            clearForm($(element).attr("id"), response)
+            $('#view-add-'+$(element).attr("id").replace("form-add-","")).modal('hide');
+          },
+          error: function (xhr, status, error) {
+            if(xhr.status==400){
+              let errorResponse = xhr.responseJSON;
+              if (errorResponse){
+                $(this).validate().showErrors(errorResponse);
+              }else {
+                alert('Lỗi khi thêm dữ liệu: ' + xhr.responseText);
+              }
+            }else {
+              alert('Lỗi :' + error);
+            }
+          }
+        });
+      }
+    });
+  })
+
+
+
+
+
 
 })

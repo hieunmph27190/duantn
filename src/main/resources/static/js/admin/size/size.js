@@ -33,6 +33,7 @@ $(document).ready(function() {
   var objectName = "size"
   var tableName = "dataTable"
   var table = $(`#${tableName}`).DataTable({
+    order: [],
     "processing": true,
     "serverSide": true,
     "ajax": {
@@ -131,6 +132,7 @@ $(document).ready(function() {
         success: function (response) {
           // Xử lý thành công
           alert('Dữ liệu đã được thêm thành công!');
+          table.order([])
           table.ajax.reload(null, false);
           clearForm(`form-${objectName}-add`, response)
           $('#view-add').modal('hide');
@@ -218,7 +220,7 @@ $(document).ready(function() {
         required: true,
         minlength: 3
       },
-      name: {
+      size: {
         required: true
       },
       type: {
@@ -230,7 +232,7 @@ $(document).ready(function() {
         required: "Vui lòng nhập trường này",
         minlength: "Trường này phải có ít nhất 3 ký tự"
       },
-      name: {
+      size: {
         required: "Vui lòng nhập trường này"
       },
       type: {

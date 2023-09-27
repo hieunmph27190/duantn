@@ -68,6 +68,45 @@
         <h1 class="h3 mb-2 text-gray-800">Sản phẩm</h1>
         <a href="/product/view-add" class="btn btn-primary btn-circle-sm" id="btn" >Thêm sản phẩm</a>
     </div>
+    <div class="row" id="filter">
+            <div class="form-group col-2">
+                <label>Thương hiệu:</label>
+                <select class="select2" style="width: 100%" multiple="multiple" name="brand.id">
+
+                </select>
+            </div>
+            <div class="form-group col-2">
+                <label>Loại giày:</label>
+                <select class="form-control" style="width: 100%" multiple="multiple" name="category.id">
+
+                </select>
+            </div>
+            <div class="form-group col-2">
+                <label>Đế giày:</label>
+                <select class="form-control" style="width: 100%" multiple="multiple" name="sole.id">
+                </select>
+            </div>
+        <div class="form-group col-2">
+            <label>Màu sắc:</label>
+            <select class="select2" style="width: 100%" multiple="multiple" name="color.id">
+
+            </select>
+        </div>
+        <div class="form-group col-2">
+            <label>Size:</label>
+            <select class="form-control" style="width: 100%" multiple="multiple" name="size.id">
+
+            </select>
+        </div>
+        <div class="form-group col-1">
+            <label>Giá:</label>
+            <input type="number" step="10000" class="form-control"  name="price">
+        </div>
+        <div class="form-group col-1">
+            <label>Tìm kiếm :</label>
+            <button type="button"  class="form-control"  >Tìm kiếm</button>
+        </div>
+    </div>
     <div class="row">
         <div class="col-7">
             <div id="view-add" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"

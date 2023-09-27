@@ -33,13 +33,14 @@ public class BillDetail {
     @Column(name = "type")
     private Integer type;
 
-    //bi-directional many-to-one association to Bill
+
     @ManyToOne
     @JoinColumn(name = "billid")
     private Bill bill;
 
-    //bi-directional many-to-one association to ProductDetail
+
     @ManyToOne
     @JoinColumn(name = "product_detailid")
     private ProductDetail productDetail;
+
 }

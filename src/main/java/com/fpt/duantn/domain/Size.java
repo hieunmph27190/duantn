@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +35,8 @@ public class Size {
     @Column(name = "type")
     private Integer type;
 
-
+    @CreationTimestamp
+    @Column(name = "create_date",updatable = false)
+    private Timestamp createDate;
 
 }
