@@ -41,7 +41,66 @@ $(document).ready(function() {
   var objectNameDetail = "product-detail"
   var tableNameDetail = "tableChiTiet"
 
+  var filterOptions = {}
+  
+  $("#view-filter #btn-filter").click(function (event) {
+    $("#view-filter select[name*='.id']").each(function() {
+      if ($(this).val()!=""){
+        filterOptions[$(this).attr("name")]=$(this).val()
+      }else{
+        filterOptions[$(this).attr("name")]=null
+      }
+    })
+    $("#view-filter input[name*='Price']").each(function() {
+      if ($(this).val()!=""){
+        filterOptions[$(this).attr("name")]=$(this).val()
+      }else{
+        filterOptions[$(this).attr("name")]=null
+      }
+    })
+    let check = false;
+    for (let key in filterOptions) {
+      if (filterOptions.hasOwnProperty(key)) {
+        if(filterOptions[key]){
+          check=true;
+        }
+      }
+    }
+    if (check){
+      $('#btn-view-filter').addClass("filter-active")
+    }else {
+      $('#btn-view-filter').removeClass("filter-active")
+    }
 
+    $('#view-filter').modal('hide');
+  })
+
+  function fillFilter(filterOptions){
+    for (let key in filterOptions) {
+      if (filterOptions.hasOwnProperty(key)) {
+        let value = filterOptions[key];
+        let formElement = $('#view-filter [name="' + key + '"]');
+        formElement.val(value);
+        formElement.trigger('change');
+      }
+    }
+  }
+  $('#btn-view-filter').click(function (){
+    fillFilter(filterOptions);
+    $('#view-filter').modal('show');
+  });
+  $("#view-filter #btn-clear").click(function (){
+    let filterOptionsClone = {}
+    for (let key in filterOptions) {
+      if (filterOptions.hasOwnProperty(key)) {
+        filterOptionsClone[key]=null;
+      }
+    }
+    fillFilter(filterOptionsClone)
+  })
+  $("#view-filter #btn-restore").click(function (){
+    fillFilter(filterOptions)
+  })
 
   var table = $(`#${tableName}`).DataTable({
     "processing": true,
@@ -50,7 +109,13 @@ $(document).ready(function() {
     "ajax": {
       "url": urlBase,
       "type": "GET",
-      "data": function(d) {},
+      "data": function(d) {
+        for (let key in filterOptions) {
+          if (filterOptions.hasOwnProperty(key)) {
+            d[key] = filterOptions[key];
+          }
+        }
+      },
       "dataSrc": function(json) {
         return json.data;
       }
@@ -152,6 +217,7 @@ $(document).ready(function() {
   $('#btn-view-add').click(function (){
     $('#view-add').modal('show');
   });
+
 
   function showImg(){
       let row = table.row($(this).closest('tr'))

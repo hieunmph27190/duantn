@@ -56,6 +56,19 @@
             border: 0;
             background-color: transparent;
         }
+        #view-filter {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: auto;
+            margin: auto;
+            max-width: 40vw;
+        }
+        #btn-view-filter.filter-active {
+            background: green;
+            color: #fadf9b;
+        }
 
     </style>
     </th:block>
@@ -68,45 +81,73 @@
         <h1 class="h3 mb-2 text-gray-800">Sản phẩm</h1>
         <a href="/product/view-add" class="btn btn-primary btn-circle-sm" id="btn" >Thêm sản phẩm</a>
     </div>
-    <div class="row" id="filter">
-            <div class="form-group col-2">
-                <label>Thương hiệu:</label>
-                <select class="select2" style="width: 100%" multiple="multiple" name="brand.id">
+    <div class="row d-flex pr-3 justify-content-between align-content-center">
+        <div></div>
+        <button id="btn-view-filter" type="button"  class="btn btn-secondary btn-filter" >Lọc</button>
+    </div>
+    <div id="view-filter" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+         aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 40vw" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Lọc</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="" id="filter">
+                        <div class="form-group col-12">
+                            <label>Thương hiệu:</label>
+                            <select id="brandFilter" class="select2" style="width: 100%" multiple="multiple" name="brand.id">
 
-                </select>
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label>Loại giày:</label>
+                            <select class="form-control" style="width: 100%" multiple="multiple" name="category.id">
+
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label>Đế giày:</label>
+                            <select class="form-control" style="width: 100%" multiple="multiple" name="sole.id">
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label>Màu sắc:</label>
+                            <select class="select2" style="width: 100%" multiple="multiple" name="color.id">
+
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label>Size:</label>
+                            <select class="form-control" style="width: 100%" multiple="multiple" name="size.id">
+
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label >Giá:</label>
+                            <div class="col-12 d-flex justify-content-between" style="padding: 0px">
+                                <input type="number" step="100000" class="form-control col-6" style="width: 100%" name="minPrice">
+                                <input type="number" step="100000"  class="form-control col-6" style="width: 100%" name="maxPrice">
+                            </div>
+
+                        </div>
+                        <div class="form-group col-12">
+                            <button type="button" id="btn-filter" class="form-control btn btn-primary "  >Lọc</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-around">
+                    <button id="btn-clear" class="btn btn-info" type="button" >Làm mới</button>
+                    <button id="btn-restore" class="btn btn-primary" type="button" >khôi phục</button>
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                </div>
             </div>
-            <div class="form-group col-2">
-                <label>Loại giày:</label>
-                <select class="form-control" style="width: 100%" multiple="multiple" name="category.id">
-
-                </select>
-            </div>
-            <div class="form-group col-2">
-                <label>Đế giày:</label>
-                <select class="form-control" style="width: 100%" multiple="multiple" name="sole.id">
-                </select>
-            </div>
-        <div class="form-group col-2">
-            <label>Màu sắc:</label>
-            <select class="select2" style="width: 100%" multiple="multiple" name="color.id">
-
-            </select>
-        </div>
-        <div class="form-group col-2">
-            <label>Size:</label>
-            <select class="form-control" style="width: 100%" multiple="multiple" name="size.id">
-
-            </select>
-        </div>
-        <div class="form-group col-1">
-            <label>Giá:</label>
-            <input type="number" step="10000" class="form-control"  name="price">
-        </div>
-        <div class="form-group col-1">
-            <label>Tìm kiếm :</label>
-            <button type="button"  class="form-control"  >Tìm kiếm</button>
         </div>
     </div>
+
     <div class="row">
         <div class="col-7">
             <div id="view-add" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
@@ -494,6 +535,7 @@
     <script th:src="@{/vendor/jquery-validate/jquery.validate.js}"></script>
     <!-- Page level custom scripts -->
     <script th:src="@{/js/admin/product/product.js}"></script>
+
 </th:block>
 </body>
 </html>

@@ -106,6 +106,7 @@
             var linkPath = $(this).attr("href");
             if (linkPath === currentPath) {
                 $(this).addClass("active");
+                $(this).closest('li').addClass("active");
                 $(this).closest(".collapse")?.collapse("show")
             }
         });

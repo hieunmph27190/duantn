@@ -5,6 +5,7 @@ import com.fpt.duantn.domain.Image;
 import com.fpt.duantn.domain.Product;
 import com.fpt.duantn.domain.ProductDetail;
 import com.fpt.duantn.dto.DataTablesResponse;
+import com.fpt.duantn.dto.ProductFilterRequest;
 import com.fpt.duantn.dto.ProductRequest;
 import com.fpt.duantn.dto.ProductResponse;
 import com.fpt.duantn.service.ImageService;
@@ -60,6 +61,8 @@ public class ProductController {
     @Autowired
     private ImageService imageService;
 
+
+
     @GetMapping()
     @ResponseBody
     public DataTablesResponse getProduct(
@@ -69,6 +72,7 @@ public class ProductController {
             @RequestParam(value = "search[value]", required = false) Optional<String> searchValue,
             @RequestParam(value = "order[0][column]", required = false) Optional<Integer> orderColumn,
             @RequestParam(value = "order[0][dir]", required = false) Optional<String>  orderDir,
+            @ModelAttribute() ProductFilterRequest productFilterRequest,
             HttpServletRequest request,Model model
     ) {
         String orderColumnName = request.getParameter("columns["+orderColumn.orElse(-1)+"][data]");
@@ -90,6 +94,39 @@ public class ProductController {
         response.setData(productResponses);
         return response;
     }
+
+
+    @GetMapping("/a")
+    @ResponseBody
+    public Object getProduct2(){
+        Pageable pageable = PageRequest.of(0,10);
+            return productService.searchResponseByKeyAndType("",1,pageable);
+}
+
+
+//    @GetMapping()
+//    @ResponseBody
+//    public DataTablesResponse getProduct(
+//            @RequestParam(value = "draw", required = false) Optional<Integer> draw,
+//            @RequestParam(value = "start", required = false) Optional<Integer> start,
+//            @RequestParam(value = "length", required = false) Optional<Integer> length,
+//            @RequestParam(value = "search[value]", required = false) Optional<String> searchValue,
+//            @RequestParam(value = "order[0][column]", required = false) Optional<Integer> orderColumn,
+//            @RequestParam(value = "order[0][dir]", required = false) Optional<String>  orderDir,
+//            @ModelAttribute() ProductFilterRequest productFilterRequest,
+//            HttpServletRequest request,Model model
+//    ) {
+//        String orderColumnName = request.getParameter("columns["+orderColumn.orElse(-1)+"][data]");
+//        Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10),  Sort.by(orderDir.orElse("desc").equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderColumnName == null ? "code" : orderColumnName));
+//        Page<ProductResponse> page = productService.searchResponseByKeyAndTypeAndFilter(searchValue.orElse(""),null, pageable);
+//        DataTablesResponse response = new DataTablesResponse(draw,page);
+//        response.setData(page.getContent());
+//        return response;
+//    }
+
+
+
+
     @GetMapping("/{id}")
     public ResponseEntity getProductById(@PathVariable UUID id) {
         if (productService.existsById(id)){
@@ -155,7 +192,6 @@ public class ProductController {
 
 
     @PostMapping ( value = "/add" )
-
     public ResponseEntity<?> addProduct(@Valid @ModelAttribute ProductRequest productRequest , BindingResult bindingResult, @RequestPart(value = "imgs",required = false) MultipartFile[] files) {
 
         if (bindingResult.hasErrors()){

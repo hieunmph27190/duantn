@@ -3,6 +3,8 @@ package com.fpt.duantn.service.impl;
 import com.fpt.duantn.domain.Color;
 import com.fpt.duantn.domain.Product;
 import com.fpt.duantn.dto.ProductBanHangResponse;
+import com.fpt.duantn.dto.ProductFilterRequest;
+import com.fpt.duantn.dto.ProductResponse;
 import com.fpt.duantn.repository.ProductRepository;
 import com.fpt.duantn.service.ColorService;
 import com.fpt.duantn.service.ProductService;
@@ -29,6 +31,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductBanHangResponse> searchResponseByKeyAndType(String key, Integer type, Pageable pageable) {
         return productRepository.searchResponseByKeyAndType(key, type, pageable);
+    }
+
+    @Override
+    public Page<ProductResponse> searchResponseByKeyAndTypeAndFilter(String key, Integer type, Pageable pageable) {
+        return productRepository.searchResponseByKeyAndTypeAndFilter(key, type, pageable);
     }
 
     @Override

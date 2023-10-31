@@ -2,6 +2,8 @@ package com.fpt.duantn.service;
 
 import com.fpt.duantn.domain.Product;
 import com.fpt.duantn.dto.ProductBanHangResponse;
+import com.fpt.duantn.dto.ProductFilterRequest;
+import com.fpt.duantn.dto.ProductResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,9 @@ public interface ProductService {
     Page<Product> findByType(Integer type, Pageable pageable);
 
     Page<ProductBanHangResponse> searchResponseByKeyAndType(String key, Integer type, Pageable pageable);
+
+
+    Page<ProductResponse> searchResponseByKeyAndTypeAndFilter(String key, Integer type, Pageable pageable);
 
     Page<Product> searchByKeyAndType(String key, Integer type, Pageable pageable);
 

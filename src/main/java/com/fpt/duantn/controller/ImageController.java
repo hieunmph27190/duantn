@@ -13,6 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +32,8 @@ import java.util.*;
 public class ImageController {
     @Autowired
     private ImageService imageService;
+    @Autowired
+    private FileImgUtil fileImgUtil;
     @ResponseBody
     @GetMapping("")
     public DataTablesResponse getProductDetail(
@@ -47,7 +52,22 @@ public class ImageController {
         DataTablesResponse response = new DataTablesResponse(draw,images);
         return response;
     }
-
+    @GetMapping("/{id}/")
+    public ResponseEntity<?> getImage(@PathVariable UUID id) {
+        Optional<Image> image = imageService.findById(id);
+        if (!image.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tồn tại");
+        }
+        byte[] imageBytes = new byte[0];
+        try {
+            imageBytes = fileImgUtil.convertBlobToByteArray(image.get().getImage());
+        } catch (SQLException |IOException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lỗi đọc ảnh");
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+    }
     @PostMapping ( )
     public ResponseEntity<?> add(@Valid @RequestParam("id") UUID idProduct , @RequestPart(value = "imgs",required = false) MultipartFile[] files) {
         FileImgUtil fileImgUtil = new FileImgUtil();
