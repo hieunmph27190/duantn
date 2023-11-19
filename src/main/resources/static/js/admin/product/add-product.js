@@ -260,7 +260,7 @@ $(document).ready(function() {
         success: function (response) {
           // Xử lý thành công
           alert('Dữ liệu đã được thêm thành công!');
-
+          window.location.href = "/product/view";
         },
         error: function (xhr, status, error) {
           if(xhr.status==400){

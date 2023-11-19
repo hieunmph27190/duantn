@@ -11,7 +11,6 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 @Data
-
 @NoArgsConstructor
 public class EmployeeReponse {
 
@@ -34,8 +33,6 @@ public class EmployeeReponse {
     private Integer type;
 
     private String userName;
-    private String password;
-
 
     public EmployeeReponse(UUID id, String name, Boolean gender, Timestamp dateOfBirth, String address, String email, String phoneNumber,Boolean image, Integer type) {
         this.id = id;

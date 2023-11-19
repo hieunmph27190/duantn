@@ -111,6 +111,10 @@ public class EmployeeController {
             }
         }
         employee.setRole(roleService.findByCode("NV"));
+        Employee oldEmployee =  employeeService.findById(employee.getId()).orElse(null);
+        if (oldEmployee!=null){
+            employee.setPassword(oldEmployee.getPassword());
+        }
         employeeService.updateEmployeeWithoutImage(employee);
         Employee employeeSaved =employeeService.findById(employee.getId()).get();
         return ResponseEntity.ok(employeeSaved);
@@ -136,7 +140,11 @@ public class EmployeeController {
                 }
             }
         }
-        employee.setRole(roleService.findByCode("Nv"));
+        employee.setRole(roleService.findByCode("NV"));
+        Employee oldEmployee =  employeeService.findById(employee.getId()).orElse(null);
+        if (oldEmployee!=null){
+            employee.setPassword(oldEmployee.getPassword());
+        }
         Employee employeeSaved = employeeService.save(employee);
         return ResponseEntity.ok(employeeSaved);
     }

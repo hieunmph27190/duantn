@@ -34,19 +34,17 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @NotNull
     @Column(name="type")
     private Integer type;
 
-    @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "dateof_birth")
     private Date dateOfBirth;
 
-    @NotBlank
     @Column(name="email")
     private String email;
 
+    @NotNull
     @Column(name="gender")
     private Boolean gender;
 
@@ -80,7 +78,7 @@ public class Customer {
     @Column(name = "create_date",updatable = false)
     private Timestamp createDate;
 
-    @NotBlank
+
     @Column(name = "password")
     private String password;
 

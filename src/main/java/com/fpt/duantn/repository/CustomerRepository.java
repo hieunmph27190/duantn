@@ -30,6 +30,9 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
             "and (:type is null or e.type = :type)")
     public Page<CustomerReponse> searchByKeyword(String key , Integer type, Pageable pageable);
 
+    @Query("SELECT new com.fpt.duantn.dto.CustomerReponse(e.id,e.name,e.gender,e.dateOfBirth,e.address,e.email,e.phoneNumber,CASE WHEN e.image IS NOT NULL THEN TRUE ELSE FALSE END,e.type,e.county,e.city,e.district) from  Customer e where e.phoneNumber like :phoneNumber" )
+    public CustomerReponse findByPhoneNumber(String phoneNumber);
+
 
     @Query("SELECT e.image from Customer e where e.id = :id")
     public Optional<Blob> findImageById(UUID id);

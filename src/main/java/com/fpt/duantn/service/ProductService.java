@@ -16,6 +16,8 @@ import java.util.UUID;
 public interface ProductService {
     Page<Product> findByType(Integer type, Pageable pageable);
 
+    Page<Product> searchByKeyAndTypeAndFilter(String key, Integer type, ProductFilterRequest productFilterRequest, Pageable pageable);
+
     Page<ProductBanHangResponse> searchResponseByKeyAndType(String key, Integer type, Pageable pageable);
 
 

@@ -73,11 +73,13 @@ public class ProductController {
             @RequestParam(value = "order[0][column]", required = false) Optional<Integer> orderColumn,
             @RequestParam(value = "order[0][dir]", required = false) Optional<String>  orderDir,
             @ModelAttribute() ProductFilterRequest productFilterRequest,
+            @RequestParam(value = "type", required = false) Optional<Integer> type,
             HttpServletRequest request,Model model
     ) {
         String orderColumnName = request.getParameter("columns["+orderColumn.orElse(-1)+"][data]");
         Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10),  Sort.by(orderDir.orElse("desc").equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderColumnName == null ? "createDate" : orderColumnName));
-        Page<Product> page = productService.searchByKeyAndType(searchValue.orElse(""),null, pageable);
+        Integer typeInt = type.orElse(-1);
+        Page<Product> page = productService.searchByKeyAndTypeAndFilter(searchValue.orElse(""),typeInt==-1?null:typeInt,productFilterRequest, pageable);
         DataTablesResponse response = new DataTablesResponse(draw,page);
         List<Product> products = (List<Product>) response.getData();
         List<ProductResponse> productResponses = new ArrayList<>();
@@ -96,12 +98,7 @@ public class ProductController {
     }
 
 
-    @GetMapping("/a")
-    @ResponseBody
-    public Object getProduct2(){
-        Pageable pageable = PageRequest.of(0,10);
-            return productService.searchResponseByKeyAndType("",1,pageable);
-}
+
 
 
 //    @GetMapping()

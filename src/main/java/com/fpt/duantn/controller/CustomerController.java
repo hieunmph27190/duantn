@@ -1,8 +1,10 @@
 package com.fpt.duantn.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpt.duantn.domain.Customer;
 import com.fpt.duantn.domain.Employee;
 import com.fpt.duantn.dto.CustomerReponse;
+import com.fpt.duantn.dto.CustomerResquest;
 import com.fpt.duantn.dto.DataTablesResponse;
 import com.fpt.duantn.dto.EmployeeReponse;
 import com.fpt.duantn.service.CustomerService;
@@ -70,6 +72,14 @@ public class CustomerController {
         DataTablesResponse response = new DataTablesResponse(draw, page);
         return response;
     }
+    @GetMapping("/phone-number")
+    @ResponseBody
+    public CustomerReponse findByPhone(
+            @RequestParam(value = "phoneNumber") Optional<String> phoneNumber
+    ) {
+        CustomerReponse customerReponse = customerService.findByPhoneNumber(phoneNumber.orElse(null));
+        return customerReponse;
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity getCustomerById(@PathVariable UUID id) {
@@ -110,15 +120,35 @@ public class CustomerController {
                 }
             }
         }
+        Customer oldCustomer =  customerService.findById(customer.getId()).orElse(null);
+        if (oldCustomer!=null){
+            customer.setPassword(oldCustomer.getPassword());
+        }
+
         customerService.updateCustomerWithoutImage(customer);
         Customer customerSaved =customerService.findById(customer.getId()).get();
         return ResponseEntity.ok(customerSaved);
     }
 
     @PostMapping ( )
-    public ResponseEntity<?> addCustomer(@Valid @ModelAttribute Customer customer, BindingResult bindingResult, @RequestPart(value = "images",required = false) MultipartFile[] files) {
+    public ResponseEntity<?> addCustomer(@Valid @ModelAttribute CustomerResquest customerResquest, BindingResult bindingResult, @RequestPart(value = "images",required = false) MultipartFile[] files) {
         if (bindingResult.hasErrors()){
             Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
+            return ResponseEntity.badRequest().body(errors);
+        }
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.addConverter(new AbstractConverter<Blob, Boolean>() {
+            @Override
+            protected Boolean convert(Blob source) {
+                return source!=null;
+            }
+        });
+        Customer customer= new Customer();
+        modelMapper.map(customerResquest,customerResquest);
+
+        if (customerService.findByPhoneNumber(customer.getPhoneNumber())!=null){
+            Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
+            errors.put("phoneNumber","Số điện thoại đã tồn tại");
             return ResponseEntity.badRequest().body(errors);
         }
         customer.setId(null);
@@ -135,6 +165,36 @@ public class CustomerController {
                 }
             }
         }
+        if (customer.getId()!=null){
+            Customer oldCustomer =  customerService.findById(customer.getId()).orElse(null);
+            if (oldCustomer!=null){
+                customer.setPassword(oldCustomer.getPassword());
+            }
+        }
+        Customer customerSaved = customerService.save(customer);
+        return ResponseEntity.ok(customerSaved);
+    }
+    @PostMapping ( "/fast")
+    public ResponseEntity<?> addCustomerFast(@Valid @ModelAttribute Customer customer, BindingResult bindingResult) {
+        if (bindingResult.getFieldError("phoneNumber")!=null||bindingResult.getFieldError("name")!=null||bindingResult.getFieldError("gender")!=null){
+            Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
+            return ResponseEntity.badRequest().body(errors);
+        }
+        if (customerService.findByPhoneNumber(customer.getPhoneNumber())!=null){
+            Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
+            errors.put("phoneNumber","Số điện thoại đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
+        customer.setId(null);
+
+        if (customer.getId()!=null){
+            Customer oldCustomer =  customerService.findById(customer.getId()).orElse(null);
+            if (oldCustomer!=null){
+                customer.setPassword(oldCustomer.getPassword());
+            }
+        }
+        customer.setDateOfBirth(null);
+        customer.setType(2);
         Customer customerSaved = customerService.save(customer);
         return ResponseEntity.ok(customerSaved);
     }

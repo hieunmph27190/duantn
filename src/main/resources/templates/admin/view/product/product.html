@@ -99,40 +99,49 @@
                     <div class="" id="filter">
                         <div class="form-group col-12">
                             <label>Thương hiệu:</label>
-                            <select id="brandFilter" class="select2" style="width: 100%" multiple="multiple" name="brand.id">
+                            <select id="brandFilter" class="select2" style="width: 100%" multiple="multiple" name="brandIDs">
 
                             </select>
                         </div>
                         <div class="form-group col-12">
                             <label>Loại giày:</label>
-                            <select class="form-control" style="width: 100%" multiple="multiple" name="category.id">
+                            <select class="form-control" style="width: 100%" multiple="multiple" name="categoryIDs">
 
                             </select>
                         </div>
                         <div class="form-group col-12">
                             <label>Đế giày:</label>
-                            <select class="form-control" style="width: 100%" multiple="multiple" name="sole.id">
+                            <select class="form-control" style="width: 100%" multiple="multiple" name="soleIDs">
                             </select>
                         </div>
                         <div class="form-group col-12">
                             <label>Màu sắc:</label>
-                            <select class="select2" style="width: 100%" multiple="multiple" name="color.id">
+                            <select class="select2" style="width: 100%" multiple="multiple" name="colorIDs">
 
                             </select>
                         </div>
                         <div class="form-group col-12">
                             <label>Size:</label>
-                            <select class="form-control" style="width: 100%" multiple="multiple" name="size.id">
+                            <select class="form-control" style="width: 100%" multiple="multiple" name="sizeIDs">
 
                             </select>
                         </div>
                         <div class="form-group col-12">
                             <label >Giá:</label>
                             <div class="col-12 d-flex justify-content-between" style="padding: 0px">
-                                <input type="number" step="100000" class="form-control col-6" style="width: 100%" name="minPrice">
-                                <input type="number" step="100000"  class="form-control col-6" style="width: 100%" name="maxPrice">
+                                <input type="number" step="1" class="form-control col-6" style="width: 100%" name="minPrice">
+                                <input type="number" step="1"  class="form-control col-6" style="width: 100%" name="maxPrice">
                             </div>
 
+                        </div>
+                        <div class="form-group col-12">
+                            <label >Type:</label>
+                            <select class="form-control" name="type" >
+                                <option value="" disabled selected>Chọn type</option>
+                                <option value="-1">Tất cả</option>
+                                <option value="1">Hoạt động</option>
+                                <option value="0">Không hoạt động</option>
+                            </select>
                         </div>
                         <div class="form-group col-12">
                             <button type="button" id="btn-filter" class="form-control btn btn-primary "  >Lọc</button>
@@ -352,7 +361,7 @@
                                 </div>
                                 <div class="form-group col-4">
                                     <label>Giá:</label>
-                                    <input type="number" step="10000" class="form-control"  name="price">
+                                    <input type="number" step="1" class="form-control"  name="price">
                                 </div>
                                 <div class="form-group col-4">
                                     <label>Màu sắc:</label>
@@ -413,7 +422,7 @@
                                 </div>
                                 <div class="form-group col-3">
                                     <label>Giá:</label>
-                                    <input type="number" step="10000" class="form-control"  name="price">
+                                    <input type="number" step="1" class="form-control"  name="price">
                                 </div>
                                 <div class="form-group col-3">
                                     <label>Màu sắc:</label>

@@ -11,6 +11,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -23,8 +26,43 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             "or c.brand.name like concat('%',:key,'%') " +
             "or c.sole.code like concat('%',:key,'%') " +
             "or c.sole.name like concat('%',:key,'%')) " +
-            "and (:type is null or c.type = :type)")
+            "and (:type is null or c.type = :type) ")
     Page<Product> searchByKeyAndType(@Param("key") String key, @Param("type") Integer type, Pageable pageable);
+
+    @Query(value ="SELECT c FROM Product c " +
+            "outer JOIN ProductDetail pd on c.id = pd.product.id " +
+            "WHERE ((CAST(c.id AS string) LIKE :key " +
+            "OR CAST(pd.id AS string) LIKE :key " +
+            "OR c.code LIKE CONCAT('%', :key, '%') " +
+            "OR c.name LIKE CONCAT('%', :key, '%') " +
+            "OR c.brand.code LIKE CONCAT('%', :key, '%') " +
+            "OR c.brand.name LIKE CONCAT('%', :key, '%') " +
+            "OR c.sole.code LIKE CONCAT('%', :key, '%') " +
+            "OR c.sole.name LIKE CONCAT('%', :key, '%')) " +
+            "AND ( :type IS null OR c.type = :type) " +
+            "AND (( :brandIDsSize = 0  OR c.brand.id IN :brandIDs) " +
+            "AND (  :categoryIDsSize  = 0 OR c.category.id IN :categoryIDs) " +
+            "AND (  :soleIDsSize  = 0 OR c.sole.id IN :soleIDs) " +
+            "AND (  :colorIDsSize  = 0 OR pd.color.id IN :colorIDs) " +
+            "AND (  :sizeIDsSize  = 0 OR pd.size.id IN :sizeIDs)) " +
+            "AND ( ( :minPrice is null or :minPrice <= (SELECT MAX(pd1.price) FROM ProductDetail pd1 WHERE pd1.product = c)) " +
+            "and    ( :maxPrice is null or :maxPrice >= (SELECT MIN(pd2.price) FROM ProductDetail pd2 WHERE pd2.product = c)) )) ")
+    Page<Product> searchByKeyAndTypeAndFilter(
+            @Param("key") String key,
+            @Param("type") Integer type,
+            @Param("brandIDs") List<UUID> brandIDs,
+            @Param("brandIDsSize") Integer brandSize,
+            @Param("categoryIDs") List<UUID> categoryIDs,
+            @Param("categoryIDsSize") Integer categorySize,
+            @Param("soleIDs") List<UUID> soleIDs,
+            @Param("soleIDsSize") Integer soleIDsSize,
+            @Param("colorIDs") List<UUID> colorIDs,
+            @Param("colorIDsSize") Integer colorIDsSize,
+            @Param("sizeIDs") List<UUID> sizeIDs,
+            @Param("sizeIDsSize") Integer sizeIDsSize,
+            @Param("minPrice") BigDecimal minPrice,
+            @Param("maxPrice") BigDecimal maxPrice,
+            Pageable pageable);
 
 
 

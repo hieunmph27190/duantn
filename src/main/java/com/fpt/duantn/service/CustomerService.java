@@ -22,6 +22,8 @@ public interface CustomerService {
 
     Page<CustomerReponse> searchByKeyword(String key, Integer type, Pageable pageable);
 
+    CustomerReponse findByPhoneNumber(String phoneNumber);
+
     Optional<Blob> findImageById(UUID id);
 
     Integer updateCustomerWithoutImage(Customer customer);

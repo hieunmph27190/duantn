@@ -1,5 +1,6 @@
 package com.fpt.duantn.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -48,6 +49,7 @@ public class ProductDetail {
     @JoinColumn(name = "colorid")
     private Color color;
 
+    @JsonIgnore
     @ManyToOne
 //    @Cascade({CascadeType.PERSIST,CascadeType.MERGE})
     @JoinColumn(name = "productid")

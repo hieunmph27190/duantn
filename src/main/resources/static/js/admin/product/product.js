@@ -42,9 +42,10 @@ $(document).ready(function() {
   var tableNameDetail = "tableChiTiet"
 
   var filterOptions = {}
-  
+  var table ;
+  var tableChiTiet;
   $("#view-filter #btn-filter").click(function (event) {
-    $("#view-filter select[name*='.id']").each(function() {
+    $("#view-filter select[name*='IDs']").each(function() {
       if ($(this).val()!=""){
         filterOptions[$(this).attr("name")]=$(this).val()
       }else{
@@ -52,6 +53,13 @@ $(document).ready(function() {
       }
     })
     $("#view-filter input[name*='Price']").each(function() {
+      if ($(this).val()!=""){
+        filterOptions[$(this).attr("name")]=$(this).val()
+      }else{
+        filterOptions[$(this).attr("name")]=null
+      }
+    })
+    $("#view-filter select[name*='type']").each(function() {
       if ($(this).val()!=""){
         filterOptions[$(this).attr("name")]=$(this).val()
       }else{
@@ -71,7 +79,7 @@ $(document).ready(function() {
     }else {
       $('#btn-view-filter').removeClass("filter-active")
     }
-
+    table.ajax.reload(null, false);
     $('#view-filter').modal('hide');
   })
 
@@ -102,7 +110,7 @@ $(document).ready(function() {
     fillFilter(filterOptions)
   })
 
-  var table = $(`#${tableName}`).DataTable({
+   table = $(`#${tableName}`).DataTable({
     "processing": true,
     "serverSide": true,
     order: [],
@@ -112,9 +120,14 @@ $(document).ready(function() {
       "data": function(d) {
         for (let key in filterOptions) {
           if (filterOptions.hasOwnProperty(key)) {
-            d[key] = filterOptions[key];
+            if (filterOptions[key] && Array.isArray(filterOptions[key])){
+              d[key] = filterOptions[key];
+            }else {
+              d[key] = filterOptions[key];
+            }
           }
         }
+        console.log(d)
       },
       "dataSrc": function(json) {
         return json.data;
@@ -424,7 +437,7 @@ $(document).ready(function() {
 
 
 
-  var tableChiTiet = $(`#tableChiTiet`).DataTable({
+  tableChiTiet = $(`#tableChiTiet`).DataTable({
     "processing": true,
     "serverSide": true,
     order: [],
@@ -651,7 +664,6 @@ $(document).ready(function() {
         var data = response;
         $('#view-detail-update').modal('show');
         pullDataToForm(`form-${objectNameDetail}-update`,data)
-        $(`#form-${objectNameDetail}-update input[name='product.id']`).val(data.product.id)
         for(let item of ["color.id","size.id"] ) {
           let bien = item.replace(".id","")
           if(data[bien] &&  $(`#form-${objectNameDetail}-update select[name="${item}"]`).find(`option[value="${data[bien]?.id}"]`).length == 0){
@@ -660,6 +672,7 @@ $(document).ready(function() {
           }
           $(`#form-${objectNameDetail}-update select[name="${item}"]`).val(data[bien]?.id).trigger('change')
         }
+        $(`#form-${objectNameDetail}-update input[name='product.id']`).val(dataProductSelected.id)
       },
       error: function(xhr, status, error) {
         alert("Không thể lấy dữ liệu")
@@ -668,6 +681,9 @@ $(document).ready(function() {
 
   }
 
+  table.on('draw.dt', function () {
+    tableChiTiet.clear().draw();
+  });
 
   // chọn row
   function selectRow(row){
@@ -785,10 +801,10 @@ $(document).ready(function() {
     });
   })
 
-  $(`#filter select[name*=".id"]`).each((index,element)=>{
+  $(`#filter select[name*="IDs"]`).each((index,element)=>{
     $(element).select2({
       ajax: {
-        url: '/'+element.name.replace(".id",""),
+        url: '/'+element.name.replace("IDs",""),
         type: 'GET',
         dataType: 'json',
         delay: 250,

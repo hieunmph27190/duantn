@@ -29,6 +29,24 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Page<Product> searchByKeyAndTypeAndFilter(String key, Integer type, ProductFilterRequest productFilterRequest, Pageable pageable) {
+        return productRepository.searchByKeyAndTypeAndFilter(key, type,
+                productFilterRequest.getBrandIDs(),
+                productFilterRequest.getBrandIDs()==null?0:productFilterRequest.getBrandIDs().size(),
+                productFilterRequest.getCategoryIDs(),
+                productFilterRequest.getCategoryIDs()==null?0:productFilterRequest.getCategoryIDs().size(),
+                productFilterRequest.getSoleIDs(),
+                productFilterRequest.getSoleIDs()==null?0:productFilterRequest.getSoleIDs().size(),
+                productFilterRequest.getColorIDs(),
+                productFilterRequest.getColorIDs()==null?0:productFilterRequest.getColorIDs().size(),
+                productFilterRequest.getSizeIDs(),
+                productFilterRequest.getSizeIDs()==null?0:productFilterRequest.getSizeIDs().size(),
+                productFilterRequest.getMinPrice(),
+                productFilterRequest.getMaxPrice(),
+                pageable);
+    }
+
+    @Override
     public Page<ProductBanHangResponse> searchResponseByKeyAndType(String key, Integer type, Pageable pageable) {
         return productRepository.searchResponseByKeyAndType(key, type, pageable);
     }

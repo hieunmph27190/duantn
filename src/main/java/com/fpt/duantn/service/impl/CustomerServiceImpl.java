@@ -36,6 +36,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public CustomerReponse findByPhoneNumber(String phoneNumber) {
+        return customerRepository.findByPhoneNumber(phoneNumber);
+    }
+
+    @Override
     public Optional<Blob> findImageById(UUID id) {
         return customerRepository.findImageById(id);
     }

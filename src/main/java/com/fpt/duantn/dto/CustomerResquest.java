@@ -1,9 +1,11 @@
-package com.fpt.duantn.domain;
+package com.fpt.duantn.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fpt.duantn.domain.Customer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,10 +13,9 @@ import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
 
-
 import java.sql.Blob;
-import java.util.Date;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -22,64 +23,48 @@ import java.util.UUID;
 @ToString
 @Data
 
-@Entity
-@Table (name = "employees")
-public class Employee {
 
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    
-    @Column(name = "password")
-    private String password;
+public class CustomerResquest {
+
 
     @NotNull
-    @Column(name = "type")
     private Integer type;
-
-    @NotBlank
-    @Column(name = "user_name")
-    private String userName;
-
-    @NotBlank
-    @Column(name = "address")
-    private String address;
-
-
 
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "dateof_birth")
     private Date dateOfBirth;
 
     @NotBlank
-    @Column(name = "email")
     private String email;
 
-    @Column(name = "gender")
+    @NotNull
     private Boolean gender;
-
 
     @JsonIgnore
     @Lob
-    @Column(name = "image",updatable = false)
     private Blob image;
 
+    @NotBlank
+    private String name;
 
     @NotBlank
-    @Column(name = "phone_number")
+    @Pattern(regexp = "^(0|\\+\\d{2})\\d{9}$")
     private String phoneNumber;
 
+    private String county;
+
+    private String city;
+
+    private String district;
+
     @NotBlank
-    @Column(name = "name")
-    private String name;
+    private String address;
 
     @CreationTimestamp
     @Column(name = "create_date",updatable = false)
     private Timestamp createDate;
 
-    @ManyToOne
-    @JoinColumn(name = "roleid")
-    private Role role;
+    @Column(name = "password")
+    private String password;
+
 }

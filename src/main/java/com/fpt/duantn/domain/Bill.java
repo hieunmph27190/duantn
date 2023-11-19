@@ -1,13 +1,18 @@
 package com.fpt.duantn.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,17 +25,40 @@ import java.util.UUID;
 @Table (name = "bill")
 public class Bill {
 
-
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @CreationTimestamp
     @Column(name = "create_date")
-    private Date createDate;
+    private Timestamp billCreateDate;
+
+    @Column(name = "payment_time")
+    private Timestamp paymentTime;
+
+    @Column(name = "payment_type")
+    private Integer paymentType;
 
     @Column(name = "type")
     private Integer type;
+
+    @Column(name = "shipe_fee")
+    private BigDecimal shipeFee = new BigDecimal(0);
+
+    @Column(name = "payment_amount")
+    private BigDecimal paymentAmount = new BigDecimal(0);
+
+    @NotBlank
+    @Pattern(regexp = "^(0|\\+\\d{2})\\d{9}$")
+    @Column(name="phone_number")
+    private String phoneNumber;
+
+    @Column(name="address")
+    private String address;
+
+    @Column(name="note")
+    private String note;
 
     //bi-directional many-to-one association to Customer
     @ManyToOne
@@ -39,15 +67,11 @@ public class Bill {
 
     //bi-directional many-to-one association to Employee
     @ManyToOne
-    @JoinColumn(name = "paymenttypeid")
+    @JoinColumn(name = "employeeid")
     private Employee employee;
 
-    //bi-directional many-to-one association to BillDetail
-    @OneToMany(mappedBy = "bill")
-    private List<BillDetail> billDetails;
-
-    //bi-directional many-to-one association to Exchange
-    @OneToMany(mappedBy = "bill")
-    private List<Exchange> exchanges;
+    @ManyToOne
+    @JoinColumn(name = "payment_employee")
+    private Employee paymentEmployee;
 
 }

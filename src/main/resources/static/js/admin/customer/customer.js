@@ -33,6 +33,9 @@ $(document).ready(function() {
   var objectName = "customer"
   var tableName = "dataTable"
   function formatDate(inputDate) {
+    if (inputDate==null){
+      return "null";
+    }
     const date = new Date(inputDate);
     const day = ("0" + date.getDate()).slice(-2);
     const month = ("0" + (date.getMonth() + 1)).slice(-2);
@@ -103,6 +106,8 @@ $(document).ready(function() {
             return "Không hoạt động";
           } else if (data == 1) {
             return "Hoạt động";
+          } else if (data == 2) {
+            return "Chưa đăng kí";
           } else {
             return "";
           }
