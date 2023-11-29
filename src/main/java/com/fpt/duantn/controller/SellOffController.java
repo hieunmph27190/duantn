@@ -3,6 +3,8 @@ package com.fpt.duantn.controller;
 import com.fpt.duantn.domain.*;
 import com.fpt.duantn.dto.SellOffProductRequest;
 import com.fpt.duantn.dto.SellOffRequest;
+import com.fpt.duantn.models.User;
+import com.fpt.duantn.security.services.AuthenticationService;
 import com.fpt.duantn.service.BillDetailService;
 import com.fpt.duantn.service.BillService;
 import com.fpt.duantn.service.CustomerService;
@@ -12,18 +14,18 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
+@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 @RequestMapping("/selloff")
 public class SellOffController {
     @Autowired
@@ -34,9 +36,13 @@ public class SellOffController {
     private BillDetailService billDetailService;
     @Autowired
     private ProductDetailService productDetailService;
+    @Autowired
+    private AuthenticationService authenticationService;
+
 
     @GetMapping("/view")
     public String getView (){
+
         return "/admin/view/selloff/view";
     }
 
@@ -57,8 +63,17 @@ public class SellOffController {
         return ResponseEntity.ok(sum);
     }
 
+    @GetMapping ("/calculate-money/{billID}")
+    public ResponseEntity<?> calculateMoney(@PathVariable Optional<UUID> billID){
+        if (!billService.existsById(billID.orElse(null))){
+            return ResponseEntity.badRequest().body("Hóa đơn "+billID.orElse(null)+" không tồn tại");
+        }
+        Optional<Double> sumMoney = billDetailService.sumMoneyByBillIdAndAndType(billID.orElse(null),1);
+        return ResponseEntity.ok(sumMoney.orElse(null));
+    }
+
     @PostMapping ()
-    public ResponseEntity<?> add(@ModelAttribute() SellOffRequest sellOffRequest) {
+    public ResponseEntity<?> add(@ModelAttribute() SellOffRequest sellOffRequest, Authentication authentication) {
         if (sellOffRequest.getIdKhachHang()==null||sellOffRequest.getThanhToan()==null||sellOffRequest.getTrangThaiTT()==null||sellOffRequest.getSanPhams()==null){
             return ResponseEntity.badRequest().body("Thông tin Không đầy đủ");
         }
@@ -88,9 +103,10 @@ public class SellOffController {
             billDetails.add(billDetail);
             sum+=request.getQuantity()*productDetail.getPrice().doubleValue();
         }
-
         Bill newBill = new Bill();
-        newBill.setEmployee(null);
+        User user = authenticationService.loadUserByUsername(authentication.getName());
+        newBill.setEmployee(Employee.builder().id(user.getId()).build());
+
         newBill.setType(3);
         newBill.setCustomer(customer);
         newBill.setPhoneNumber(customer.getPhoneNumber());

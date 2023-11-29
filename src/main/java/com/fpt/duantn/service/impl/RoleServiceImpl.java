@@ -2,6 +2,7 @@ package com.fpt.duantn.service.impl;
 
 import com.fpt.duantn.domain.Brand;
 import com.fpt.duantn.domain.Role;
+import com.fpt.duantn.models.ERole;
 import com.fpt.duantn.repository.BrandRepository;
 import com.fpt.duantn.repository.RoleRepository;
 import com.fpt.duantn.service.BrandService;
@@ -23,6 +24,11 @@ import java.util.function.Function;
 public class RoleServiceImpl implements RoleService {
     @Autowired
     private RoleRepository roleRepository;
+
+    @Override
+    public Optional<Role> findByName(ERole name) {
+        return roleRepository.findByName(name);
+    }
 
     @Override
     public Role findByCode(String code) {

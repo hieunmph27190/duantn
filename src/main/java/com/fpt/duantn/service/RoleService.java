@@ -2,6 +2,7 @@ package com.fpt.duantn.service;
 
 import com.fpt.duantn.domain.Brand;
 import com.fpt.duantn.domain.Role;
+import com.fpt.duantn.models.ERole;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,8 @@ import java.util.function.Function;
 
 @Service
 public interface RoleService {
+
+    Optional<Role> findByName(ERole name);
 
     Role findByCode(String code);
 

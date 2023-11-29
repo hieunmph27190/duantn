@@ -22,6 +22,8 @@ public interface BillDetailService {
 
     Page<BillDetailReponse> searchByKeyword(String key, Integer type, UUID billId, Pageable pageable);
 
+    Optional<Double> sumMoneyByBillIdAndAndType(UUID id, Integer type);
+
     <S extends BillDetail> S saveAndFlush(S entity);
 
     <S extends BillDetail> List<S> saveAllAndFlush(Iterable<S> entities);

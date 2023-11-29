@@ -33,6 +33,12 @@ public class BillDetailServiceImpl implements BillDetailService {
         return billDetailRepository.searchByKeyword(key, type, billId, pageable);
     }
 
+
+    @Override
+    public Optional<Double> sumMoneyByBillIdAndAndType(UUID id, Integer type) {
+        return billDetailRepository.sumMoneyByBillIdAndAndType(id, type);
+    }
+
     @Override
     public <S extends BillDetail> S saveAndFlush(S entity) {
         return billDetailRepository.saveAndFlush(entity);

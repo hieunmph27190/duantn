@@ -26,6 +26,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -33,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.Map;
@@ -40,8 +43,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Controller
+@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 @RequestMapping("/customer")
-public class CustomerController {
+public class CustomerController implements Serializable {
     @GetMapping("/view")
     public String test(Model model){
         return "/admin/view/customer/customer";
@@ -49,6 +53,12 @@ public class CustomerController {
 
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private EmployeeService employeeService;
+
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping()
     @ResponseBody
@@ -124,9 +134,14 @@ public class CustomerController {
         if (oldCustomer!=null){
             customer.setPassword(oldCustomer.getPassword());
         }
-
+        if ((employeeService.findByEmail(customer.getEmail()).isPresent()||customerService.findByEmail(customer.getEmail()).isPresent())&&(!oldCustomer.getEmail().equalsIgnoreCase(customer.getEmail()))){
+            Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
+            errors.put("email","Email đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
         customerService.updateCustomerWithoutImage(customer);
         Customer customerSaved =customerService.findById(customer.getId()).get();
+        customerSaved.setPassword(null);
         return ResponseEntity.ok(customerSaved);
     }
 
@@ -136,6 +151,7 @@ public class CustomerController {
             Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.addConverter(new AbstractConverter<Blob, Boolean>() {
             @Override
@@ -145,6 +161,11 @@ public class CustomerController {
         });
         Customer customer= new Customer();
         modelMapper.map(customerResquest,customerResquest);
+        if ((employeeService.findByEmail(customer.getEmail()).isPresent()||customerService.findByEmail(customer.getEmail()).isPresent())){
+            Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
+            errors.put("email","Email đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
 
         if (customerService.findByPhoneNumber(customer.getPhoneNumber())!=null){
             Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
@@ -165,6 +186,7 @@ public class CustomerController {
                 }
             }
         }
+        customer.setPassword(passwordEncoder.encode(customerResquest.getPassword()));
         if (customer.getId()!=null){
             Customer oldCustomer =  customerService.findById(customer.getId()).orElse(null);
             if (oldCustomer!=null){
@@ -172,6 +194,7 @@ public class CustomerController {
             }
         }
         Customer customerSaved = customerService.save(customer);
+        customerSaved.setPassword(null);
         return ResponseEntity.ok(customerSaved);
     }
     @PostMapping ( "/fast")
@@ -186,7 +209,7 @@ public class CustomerController {
             return ResponseEntity.badRequest().body(errors);
         }
         customer.setId(null);
-
+        customer.setPassword(passwordEncoder.encode(customer.getPassword()));
         if (customer.getId()!=null){
             Customer oldCustomer =  customerService.findById(customer.getId()).orElse(null);
             if (oldCustomer!=null){
@@ -196,6 +219,7 @@ public class CustomerController {
         customer.setDateOfBirth(null);
         customer.setType(2);
         Customer customerSaved = customerService.save(customer);
+        customerSaved.setPassword(null);
         return ResponseEntity.ok(customerSaved);
     }
 

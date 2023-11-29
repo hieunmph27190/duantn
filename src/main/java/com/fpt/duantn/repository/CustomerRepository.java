@@ -61,4 +61,8 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
             "WHERE e.id = :id")
     public Integer updateCustomerImage(@Param("id") UUID id,@Param("image") Blob image);
 
+
+    public Boolean existsByEmail(String email);
+    public Optional<Customer> findByEmail(String email);
+
 }

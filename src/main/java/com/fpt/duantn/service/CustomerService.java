@@ -20,6 +20,10 @@ import java.util.function.Function;
 @Service
 public interface CustomerService {
 
+    Boolean existsByEmail(String email);
+
+    Optional<Customer> findByEmail(String email);
+
     Page<CustomerReponse> searchByKeyword(String key, Integer type, Pageable pageable);
 
     CustomerReponse findByPhoneNumber(String phoneNumber);

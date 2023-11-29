@@ -194,6 +194,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public Boolean existsByEmail(String email) {
+        return employeeRepository.existsByEmail(email);
+    }
+
+    @Override
+    public Optional<Employee> findByEmail(String email) {
+        return employeeRepository.findByEmail(email);
+    }
+
+    @Override
     public <S extends Employee> boolean exists(Example<S> example) {
         return employeeRepository.exists(example);
     }

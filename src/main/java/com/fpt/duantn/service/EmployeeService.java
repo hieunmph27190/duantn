@@ -86,6 +86,10 @@ public interface EmployeeService {
 
     <S extends Employee> long count(Example<S> example);
 
+    Boolean existsByEmail(String email);
+
+    Optional<Employee> findByEmail(String email);
+
     <S extends Employee> boolean exists(Example<S> example);
 
     <S extends Employee, R> R findBy(Example<S> example, Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction);

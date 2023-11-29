@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Controller
+@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 @RequestMapping("/size")
 public class SizeController {
     @GetMapping("/view")

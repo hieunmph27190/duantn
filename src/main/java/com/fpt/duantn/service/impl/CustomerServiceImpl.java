@@ -31,6 +31,16 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
 
     @Override
+    public Boolean existsByEmail(String email) {
+        return customerRepository.existsByEmail(email);
+    }
+
+    @Override
+    public Optional<Customer> findByEmail(String email) {
+        return customerRepository.findByEmail(email);
+    }
+
+    @Override
     public Page<CustomerReponse> searchByKeyword(String key, Integer type, Pageable pageable) {
         return customerRepository.searchByKeyword(key, type, pageable);
     }

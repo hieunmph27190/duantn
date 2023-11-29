@@ -1,6 +1,7 @@
 package com.fpt.duantn.repository;
 
 import com.fpt.duantn.domain.Brand;
+import com.fpt.duantn.domain.Customer;
 import com.fpt.duantn.domain.Employee;
 import com.fpt.duantn.dto.EmployeeReponse;
 import org.springframework.data.domain.Page;
@@ -55,5 +56,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
             "e.image = :image " +
             "WHERE e.id = :id")
     public Integer updateEmployeeImage(@Param("id") UUID id,@Param("image") Blob image);
+
+    public Boolean existsByEmail(String email);
+    public Optional<Employee> findByEmail(String email);
 
 }

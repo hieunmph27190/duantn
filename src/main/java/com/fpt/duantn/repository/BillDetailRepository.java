@@ -8,9 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -25,4 +28,7 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, UUID> {
             "and (:type is null or bd.type = :type) " +
             "and bd.bill.id = :billId")
     public Page<BillDetailReponse> searchByKeyword(String key , Integer type, UUID billId, Pageable pageable);
+
+    @Query("SELECT sum(bd.price * bd.quantity) as summoney FROM BillDetail bd WHERE (:type IS NULL OR bd.type = :type) AND bd.bill.id = :billId ORDER BY summoney DESC")
+    Optional<Double> sumMoneyByBillIdAndAndType(@Param("billId") UUID billId, @Param("type") Integer type);
 }

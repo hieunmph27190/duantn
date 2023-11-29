@@ -1,5 +1,6 @@
 package com.fpt.duantn.domain;
 
+import com.fpt.duantn.models.ERole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,8 +28,9 @@ public class Role {
     @Column(name="code")
     private String code;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="name")
-    private String name;
+    private ERole name;
 
 
     @Column(name="type")

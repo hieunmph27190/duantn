@@ -33,7 +33,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="form-bill-update" class="row" enctype="multipart/form-data">
+                    <form id="form-bill-update" class="row mb-4" enctype="multipart/form-data">
                         <input type="text" readonly  class="form-control mb-3"  name="id">
                         <div class="form-group col-4">
                             <label >ID nhân viên :</label>
@@ -71,13 +71,17 @@
                             <label >Tên thu ngân:</label>
                             <input type="text" readonly class="form-control"  name="paymentEmployee.name">
                         </div>
-                        <div class="form-group col-4">
+                        <div class="form-group col-2">
                             <label >Số tiền thu:</label>
-                            <input type="text" class="form-control"  name="paymentAmount">
+                            <input type="number" class="form-control"  name="paymentAmount">
+                        </div>
+                        <div class="form-group col-2">
+                            <label >Số tiền của đơn:</label>
+                            <input type="text" readonly class="form-control"  name="soTienCuaDon">
                         </div>
                         <div class="form-group col-4">
-                            <label >Số điện thoại :</label>
-                            <input type="text" class="form-control"  name="phoneNumber">
+                            <label >Số điện thoại:</label>
+                            <input type="text" readonly class="form-control"  name="phoneNumber">
                         </div>
                         <div class="form-group col-4">
                             <label >Thời gian thanh toán:</label>
@@ -102,17 +106,15 @@
                             <label >Địa chỉ:</label>
                             <input type="text" class="form-control"  name="address">
                         </div>
-                        <div class="form-floating col-12 mb-5">
+                        <div class="form-floating col-12 mb-3">
                             <label >Note :</label>
                             <textarea class="form-control" placeholder="note" name="note" style="height: 100px"></textarea>
                         </div>
 
-
-
-                        <button  type="submit" class=" btn btn-primary">Cập nhật</button>
+                        <button  type="submit" class="mb-1 btn btn-primary">Cập nhật</button>
                     </form>
 
-                    <table class="table table-bordered table-hover" id="tableBillDetail" width="100%" cellspacing="0">
+                    <table class="table table-bordered table-hover mt-5" id="tableBillDetail" width="100%" cellspacing="0">
                         <thead>
                         <tr>
                             <th>ID SP</th>
@@ -122,7 +124,6 @@
                             <th>Slượng</th>
                             <th>Giá</th>
                             <th>Type</th>
-                            <th></th>
                         </tr>
                         </thead>
 
@@ -141,7 +142,6 @@
         <div class="card-header py-3">
             <div class="d-flex justify-content-between align-content-center" >
                 <h6 class="m-0 font-weight-bold text-center text-primary">Dữ liệu</h6>
-                <button class="btn btn-info btn-circle-sm view-add-btn" id="btn-view-add">Thêm</button>
             </div>
         </div>
         <div class="card-body">
@@ -172,8 +172,6 @@
     <!-- Page level plugins -->
     <script th:src="@{/vendor/datatables/jquery.dataTables.min.js}"></script>
     <script th:src="@{/vendor/datatables/dataTables.bootstrap4.min.js}"></script>
-    <script th:src="@{/vendor/jquery-validate/jquery.validate.js}"></script>
-    <script th:src="@{/vendor/jquery-validate/additional-methods.js}"></script>
     <!-- Page level custom scripts -->
     <script th:src="@{/js/admin/bill/bill.js}"></script>
 </th:block>

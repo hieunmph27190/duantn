@@ -11,8 +11,6 @@ public class AppConfig {
     @Bean
     public MultipartResolver multipartResolver() {
         StandardServletMultipartResolver resolver = new StandardServletMultipartResolver();
-
         return  resolver;
     }
-
 }

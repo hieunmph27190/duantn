@@ -138,8 +138,6 @@ $(document).ready(function() {
   });
 
 
-
-
   // Show form update
   $(`#${tableName} tbody`).on('dblclick', 'tr', loadDataModal);
 
@@ -157,8 +155,6 @@ $(document).ready(function() {
         pullDataToForm(`form-${objectName}-update`,data)
         $(`#view-update input[name="paymentTime"]`).val(formatDateTime(data.paymentTime))
 
-
-
         $(`#view-update input[name="employee.id"]`).val((data?.employee?.id))
         $(`#view-update input[name="employee.name"]`).val((data?.employee?.name))
 
@@ -168,11 +164,29 @@ $(document).ready(function() {
         $(`#view-update input[name="paymentEmployee.id"]`).val((data?.paymentEmployee?.id))
         $(`#view-update input[name="paymentEmployee.name"]`).val((data?.paymentEmployee?.name))
 
+      },
+      error: function(xhr, status, error) {
+        alert("Không thể lấy dữ liệu ")
+      }
+    });
 
+    $.ajax({
+      url: "/selloff/calculate-money"+'/' + rowData.id,
+      type: 'GET',
+      success: function(response) {
+        // Lấy dữ liệu từ response và hiển thị trên modal
+        let data = response;
+        $(`#view-update input[name="soTienCuaDon"]`).val((data))
 
       },
       error: function(xhr, status, error) {
-        alert("Không thể lấy dữ liệu")
+        if (xhr.status === 400) {
+          // Nếu là lỗi Bad Request, hiển thị thông báo lỗi
+          alert("Lỗi: " + xhr.responseText);
+        } else {
+          // Xử lý các trường hợp lỗi khác nếu cần
+          alert("Không thể lấy dữ liệu");
+        }
       }
     });
 
@@ -252,15 +266,6 @@ $(document).ready(function() {
             return "";
           }
         }
-      },
-      {
-        "data": null,
-        "orderable": false,
-        "render": function(data, type, row) {
-          // Nội dung HTML của cột tiếp theo
-          return `<button class="btn btn-info btn-circle-sm btn-view-update"><i class="fas fa-info-circle"></i></button>
-                    <button class="btn btn-info btn btn-danger btn-circle-sm btn-delete"><i class="fas fa-trash"></i></button>`;
-        }
       }
     ],
     "drawCallback": function(settings) {
@@ -278,13 +283,18 @@ $(document).ready(function() {
   $(`#form-${objectName}-update`).on('submit', function(e) {
     e.preventDefault();
     let formData = new FormData(this);
-    if (formData.getAll('imgs')[0] && !formData.getAll('imgs')[0].name) {
-      formData.set('imgs', null);
-    }
-    if ($(this).valid()) {
-      // Gửi AJAX request để cập nhật dữ liệu
+    formData.delete("employee.id")
+    formData.delete("employee.name")
+    formData.delete("customer.id")
+    formData.delete("customer.name")
+    formData.delete("paymentEmployee.id")
+    formData.delete("paymentEmployee.name")
+    formData.delete("soTienCuaDon")
+    formData.delete("phoneNumber")
+    formData.delete("paymentTime")
+
       $.ajax({
-        url: urlBase+"/"+ formData.get("id"),
+        url: urlBase+"/update/"+ formData.get("id"),
         type: 'PUT',
         data: formData,
         contentType: false,
@@ -309,7 +319,7 @@ $(document).ready(function() {
           }
         }
       });
-    }
+
   });
 
 

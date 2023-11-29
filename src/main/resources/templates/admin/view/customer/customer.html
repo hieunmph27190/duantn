@@ -203,6 +203,7 @@
                             <label >Type:</label>
                             <select class="form-control" name="type" >
                                 <option value="" disabled selected>Chọn type</option>
+                                <option value="2">Chưa đăng kí</option>
                                 <option value="1">Hoạt động</option>
                                 <option value="0">Không hoạt động</option>
                             </select>
@@ -257,8 +258,6 @@
     <!-- Page level plugins -->
     <script th:src="@{/vendor/datatables/jquery.dataTables.min.js}"></script>
     <script th:src="@{/vendor/datatables/dataTables.bootstrap4.min.js}"></script>
-    <script th:src="@{/vendor/jquery-validate/jquery.validate.js}"></script>
-    <script th:src="@{/vendor/jquery-validate/additional-methods.js}"></script>
     <!-- Page level custom scripts -->
     <script th:src="@{/js/admin/customer/customer.js}"></script>
 </th:block>

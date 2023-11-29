@@ -6,6 +6,9 @@ import com.fpt.duantn.domain.Product;
 import com.fpt.duantn.domain.Role;
 import com.fpt.duantn.dto.DataTablesResponse;
 import com.fpt.duantn.dto.EmployeeReponse;
+import com.fpt.duantn.models.ERole;
+import com.fpt.duantn.security.services.AuthenticationService;
+import com.fpt.duantn.service.CustomerService;
 import com.fpt.duantn.service.EmployeeService;
 import com.fpt.duantn.service.RoleService;
 import com.fpt.duantn.util.FileImgUtil;
@@ -24,6 +27,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -31,22 +37,30 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.*;
 
 @Controller
+@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/employee")
-public class EmployeeController {
+public class EmployeeController implements Serializable {
     @GetMapping("/view")
     public String test(Model model){
         return "/admin/view/employee/employee";
     }
 
     @Autowired
+    private AuthenticationService authenticationService;
+    @Autowired
     private EmployeeService employeeService;
     @Autowired
+    private CustomerService customerService;
+    @Autowired
     private RoleService roleService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping()
     @ResponseBody
@@ -90,6 +104,7 @@ public class EmployeeController {
         }
     }
 
+
     @PutMapping ("/{id}")
     public ResponseEntity<?> updateEmployee(@PathVariable("id") UUID id, @Valid @ModelAttribute Employee employee, BindingResult bindingResult, @RequestPart(value = "images",required = false) MultipartFile[] files) {
         if (bindingResult.hasErrors()){
@@ -115,8 +130,14 @@ public class EmployeeController {
         if (oldEmployee!=null){
             employee.setPassword(oldEmployee.getPassword());
         }
+        if ((employeeService.findByEmail(employee.getEmail()).isPresent()||customerService.findByEmail(employee.getEmail()).isPresent())&&(!oldEmployee.getEmail().equalsIgnoreCase(employee.getEmail()))){
+            Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
+            errors.put("email","Email đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
         employeeService.updateEmployeeWithoutImage(employee);
-        Employee employeeSaved =employeeService.findById(employee.getId()).get();
+        Employee employeeSaved = employeeService.findById(employee.getId()).get();
+        employeeSaved.setPassword(null);
         return ResponseEntity.ok(employeeSaved);
     }
 
@@ -124,6 +145,11 @@ public class EmployeeController {
     public ResponseEntity<?> addEmployee(@Valid @ModelAttribute Employee employee, BindingResult bindingResult, @RequestPart(value = "images",required = false) MultipartFile[] files) {
         if (bindingResult.hasErrors()){
             Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
+            return ResponseEntity.badRequest().body(errors);
+        }
+        if (employeeService.findByEmail(employee.getEmail()).isPresent()||customerService.findByEmail(employee.getEmail()).isPresent()){
+            Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
+            errors.put("email","Email đã tồn tại");
             return ResponseEntity.badRequest().body(errors);
         }
         employee.setId(null);
@@ -140,12 +166,10 @@ public class EmployeeController {
                 }
             }
         }
-        employee.setRole(roleService.findByCode("NV"));
-        Employee oldEmployee =  employeeService.findById(employee.getId()).orElse(null);
-        if (oldEmployee!=null){
-            employee.setPassword(oldEmployee.getPassword());
-        }
+        employee.setRole(roleService.findByName(ERole.ROLE_MODERATOR).get());
+        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
         Employee employeeSaved = employeeService.save(employee);
+        employeeSaved.setPassword(null);
         return ResponseEntity.ok(employeeSaved);
     }
 
