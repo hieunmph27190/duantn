@@ -22,7 +22,11 @@ public interface BillDetailService {
 
     Page<BillDetailReponse> searchByKeyword(String key, Integer type, UUID billId, Pageable pageable);
 
-    Optional<Double> sumMoneyByBillIdAndAndType(UUID id, Integer type);
+    List<BillDetail> findByBillId(UUID id);
+
+    Optional<Long> sumQuantityByBillIdAndType(UUID billId, Integer type);
+
+    Optional<Double> sumMoneyByBillIdAndType(UUID id, Integer type);
 
     <S extends BillDetail> S saveAndFlush(S entity);
 

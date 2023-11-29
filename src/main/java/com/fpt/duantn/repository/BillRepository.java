@@ -2,6 +2,7 @@ package com.fpt.duantn.repository;
 
 
 import com.fpt.duantn.domain.Bill;
+import com.fpt.duantn.domain.Customer;
 import com.fpt.duantn.dto.BillReponse;
 import com.fpt.duantn.dto.CustomerReponse;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -21,4 +24,6 @@ public interface BillRepository extends JpaRepository<Bill, UUID> {
             "or b.phoneNumber like concat('%', :key, '%')) " +
             "and (:type is null or b.type = :type)")
     public Page<BillReponse> searchByKeyword(String key, Integer type, Pageable pageable);
+
+    public List<Bill> findByCustomer(Customer customer);
 }

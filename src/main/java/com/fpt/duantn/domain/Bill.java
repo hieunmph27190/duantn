@@ -3,10 +3,7 @@ package com.fpt.duantn.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -21,6 +18,7 @@ import java.util.UUID;
 @ToString
 @Data
 
+@Builder
 @Entity
 @Table (name = "bill")
 public class Bill {

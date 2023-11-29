@@ -68,7 +68,7 @@ public class SellOffController {
         if (!billService.existsById(billID.orElse(null))){
             return ResponseEntity.badRequest().body("Hóa đơn "+billID.orElse(null)+" không tồn tại");
         }
-        Optional<Double> sumMoney = billDetailService.sumMoneyByBillIdAndAndType(billID.orElse(null),1);
+        Optional<Double> sumMoney = billDetailService.sumMoneyByBillIdAndType(billID.orElse(null),1);
         return ResponseEntity.ok(sumMoney.orElse(null));
     }
 

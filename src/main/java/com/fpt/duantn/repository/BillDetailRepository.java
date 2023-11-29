@@ -30,5 +30,11 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, UUID> {
     public Page<BillDetailReponse> searchByKeyword(String key , Integer type, UUID billId, Pageable pageable);
 
     @Query("SELECT sum(bd.price * bd.quantity) as summoney FROM BillDetail bd WHERE (:type IS NULL OR bd.type = :type) AND bd.bill.id = :billId ORDER BY summoney DESC")
-    Optional<Double> sumMoneyByBillIdAndAndType(@Param("billId") UUID billId, @Param("type") Integer type);
+    Optional<Double> sumMoneyByBillIdAndType(@Param("billId") UUID billId, @Param("type") Integer type);
+
+    @Query("SELECT sum(bd.quantity) as sumquantity FROM BillDetail bd WHERE (:type IS NULL OR bd.type = :type) AND bd.bill.id = :billId ORDER BY sumquantity DESC")
+    Optional<Long> sumQuantityByBillIdAndType(@Param("billId") UUID billId, @Param("type") Integer type);
+
+
+    List<BillDetail> findByBillId(UUID id);
 }

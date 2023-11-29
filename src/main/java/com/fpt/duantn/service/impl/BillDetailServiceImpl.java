@@ -33,10 +33,20 @@ public class BillDetailServiceImpl implements BillDetailService {
         return billDetailRepository.searchByKeyword(key, type, billId, pageable);
     }
 
+    @Override
+    public List<BillDetail> findByBillId(UUID id) {
+        return billDetailRepository.findByBillId(id);
+    }
+
 
     @Override
-    public Optional<Double> sumMoneyByBillIdAndAndType(UUID id, Integer type) {
-        return billDetailRepository.sumMoneyByBillIdAndAndType(id, type);
+    public Optional<Long> sumQuantityByBillIdAndType(UUID billId, Integer type) {
+        return billDetailRepository.sumQuantityByBillIdAndType(billId, type);
+    }
+
+    @Override
+    public Optional<Double> sumMoneyByBillIdAndType(UUID id, Integer type) {
+        return billDetailRepository.sumMoneyByBillIdAndType(id, type);
     }
 
     @Override

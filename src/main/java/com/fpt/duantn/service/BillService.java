@@ -22,6 +22,8 @@ public interface BillService {
 
     Page<BillReponse> searchByKeyword(String key, Integer type, Pageable pageable);
 
+    List<Bill> findByCustomer(Customer customer);
+
     <S extends Bill> S saveAndFlush(S entity);
 
     <S extends Bill> List<S> saveAllAndFlush(Iterable<S> entities);

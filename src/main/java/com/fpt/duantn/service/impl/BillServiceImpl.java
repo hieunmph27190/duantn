@@ -33,6 +33,11 @@ public class BillServiceImpl implements BillService {
         return billRepository.searchByKeyword(key, type, pageable);
     }
 
+    @Override
+    public List<Bill> findByCustomer(Customer customer) {
+        return billRepository.findByCustomer(customer);
+    }
+
     public void flush() {
         billRepository.flush();
     }
