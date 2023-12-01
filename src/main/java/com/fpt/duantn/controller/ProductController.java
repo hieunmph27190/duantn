@@ -38,7 +38,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 @Controller
-@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/product")
 public class ProductController {
     @GetMapping("/view")
@@ -79,7 +79,7 @@ public class ProductController {
             HttpServletRequest request,Model model
     ) {
         String orderColumnName = request.getParameter("columns["+orderColumn.orElse(-1)+"][data]");
-        Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10),  Sort.by(orderDir.orElse("desc").equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderColumnName == null ? "createDate" : orderColumnName));
+        Pageable pageable = PageRequest.of((int) (start.orElse(0) / length.orElse(10)), length.orElse(10),  Sort.by(orderDir.orElse("desc").equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderColumnName == null ? "createDate" : orderColumnName));
         Integer typeInt = type.orElse(-1);
         Page<Product> page = productService.searchByKeyAndTypeAndFilter(searchValue.orElse(""),typeInt==-1?null:typeInt,productFilterRequest, pageable);
         DataTablesResponse response = new DataTablesResponse(draw,page);

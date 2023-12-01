@@ -1,12 +1,15 @@
 package com.fpt.duantn.service.impl;
 
+import com.fpt.duantn.domain.Color;
 import com.fpt.duantn.domain.ProductDetail;
+import com.fpt.duantn.domain.Size;
 import com.fpt.duantn.repository.ProductDetailRepository;
 
 import com.fpt.duantn.service.ProductDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +20,21 @@ import java.util.UUID;
 public class ProductDetailServiceImpl implements ProductDetailService {
     @Autowired
     private ProductDetailRepository productDetailRepository;
+
+    @Override
+    public List<Color> getColorsByProductID(UUID productid, Integer type) {
+        return productDetailRepository.getColorsByProductID(productid, type);
+    }
+
+    @Override
+    public Optional<ProductDetail> findByProductIdAndColorIdAndSizeIdAndType(UUID productid, UUID colorid, UUID sizeid, Integer type) {
+        return productDetailRepository.findByProductIdAndColorIdAndSizeIdAndType(productid, colorid, sizeid, type);
+    }
+
+    @Override
+     public List<Size> getSizesByProductIDAndColorID(UUID productid, UUID colorid, Integer type) {
+        return productDetailRepository.getSizesByProductIDAndColorID(productid, colorid, type);
+    }
 
     @Override
     public Page<ProductDetail> findByType(Integer type, Pageable pageable) {

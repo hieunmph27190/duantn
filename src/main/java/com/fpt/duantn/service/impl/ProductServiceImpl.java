@@ -51,6 +51,7 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.searchResponseByKeyAndType(key, type, pageable);
     }
 
+
     @Override
     public Page<ProductResponse> searchResponseByKeyAndTypeAndFilter(String key, Integer type, Pageable pageable) {
         return productRepository.searchResponseByKeyAndTypeAndFilter(key, type, pageable);

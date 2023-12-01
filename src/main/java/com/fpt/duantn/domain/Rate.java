@@ -17,7 +17,7 @@ import java.util.Date;
 public class Rate implements Serializable {
 
     @Id
-    @Column(name = "rateid")
+    @Column(name = "rate_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

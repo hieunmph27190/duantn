@@ -13,12 +13,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.*;
 
+@CrossOrigin(origins = "*")
 @Controller
 public class BanHangController {
     @Autowired
@@ -37,7 +39,7 @@ public class BanHangController {
             @RequestParam(value = "search[value]", required = false) Optional<String> searchValue,
             @RequestParam(value = "order[0][column]", required = false) Optional<Integer> orderColumn,
             @RequestParam(value = "order[0][dir]", required = false) Optional<String>  orderDir,
-            HttpServletRequest request, Model model
+            HttpServletRequest request
     ) {
         String orderColumnName = request.getParameter("columns["+orderColumn.orElse(0)+"][data]");
         Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10));

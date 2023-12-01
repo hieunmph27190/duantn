@@ -1,6 +1,8 @@
 package com.fpt.duantn.controller;
 
+import com.fpt.duantn.domain.Color;
 import com.fpt.duantn.domain.ProductDetail;
+import com.fpt.duantn.domain.Size;
 import com.fpt.duantn.dto.DataTablesResponse;
 import com.fpt.duantn.service.ProductDetailService;
 import com.fpt.duantn.service.ProductService;
@@ -20,12 +22,13 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 @Controller
-@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+@CrossOrigin(origins = "*")
 @RequestMapping("/product-detail")
 public class ProductDetailController {
 
@@ -51,6 +54,23 @@ public class ProductDetailController {
         DataTablesResponse response = new DataTablesResponse(draw,page);
         return response;
     }
+
+    @GetMapping("/colors")
+    public ResponseEntity getColors(@RequestParam UUID productid) {
+        List<Color> colors = productDetailService.getColorsByProductID(productid,1);
+        return ResponseEntity.ok(colors);
+    }
+    @GetMapping("/sizes")
+    public ResponseEntity getColors(@RequestParam UUID productid,@RequestParam UUID colorid) {
+        List<Size> sizes = productDetailService.getSizesByProductIDAndColorID(productid,colorid,1);
+        return ResponseEntity.ok(sizes);
+    }
+    @GetMapping("/getOne")
+    public ResponseEntity getColors(@RequestParam UUID productid,@RequestParam UUID colorid,@RequestParam UUID sizeid) {
+        Optional<ProductDetail> productDetail = productDetailService.findByProductIdAndColorIdAndSizeIdAndType(productid,colorid,sizeid,1);
+        return ResponseEntity.ok(productDetail.orElse(null));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity getCategoryById(@PathVariable UUID id) {
         if (productDetailService.existsById(id)){
