@@ -2,7 +2,7 @@ package com.fpt.duantn.controller;
 
 
 import com.fpt.duantn.domain.*;
-import com.fpt.duantn.repository.CartRepository;
+
 import com.fpt.duantn.repository.CartdetailRepository;
 import com.fpt.duantn.repository.ProductDetailRepository;
 import com.fpt.duantn.service.BillDetailService;
@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-@CrossOrigin("*")
+
 @RestController
 @RequestMapping("api/orders")
 public class Odercontroller {
@@ -38,8 +38,6 @@ public class Odercontroller {
     @Autowired
     ProductDetailRepository productDetailRepository;
 
-    @Autowired
-    CartRepository cartRepository;
 
     @Autowired
     CartdetailRepository cartdetailRepository;
@@ -58,13 +56,6 @@ public class Odercontroller {
     }
 
 
-    @GetMapping("/user/{email}")
-    public ResponseEntity<List<?>>getByUser(@PathVariable("email") String email) {
-        if(!customerService.existsByEmail(email)) {
-            return  ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(billService.findByCustomer(customerService.findByEmail(email).get()));
-    }
 
 
 //

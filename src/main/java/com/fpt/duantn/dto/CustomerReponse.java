@@ -27,7 +27,7 @@ public class CustomerReponse {
 
     private Integer type;
 
-    private String county;
+    private String ward;
 
     private String city;
 
@@ -37,7 +37,7 @@ public class CustomerReponse {
 
 
 
-    public CustomerReponse(UUID id, String name, Boolean gender, Timestamp dateOfBirth, String address, String email, String phoneNumber, Boolean image, Integer type,String county,String city,String district) {
+    public CustomerReponse(UUID id, String name, Boolean gender, Timestamp dateOfBirth, String address, String email, String phoneNumber, Boolean image, Integer type,String ward,String city,String district) {
         this.id = id;
         this.name = name;
         this.gender = gender;
@@ -47,7 +47,7 @@ public class CustomerReponse {
         this.phoneNumber = phoneNumber;
         this.image=image;
         this.type = type;
-        this.county = county;
+        this.ward = ward;
         this.city = city;
         this.district = district;
     }

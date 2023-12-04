@@ -38,7 +38,6 @@ import java.sql.SQLException;
 import java.util.*;
 
 @Controller
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/product")
 public class ProductController {
     @GetMapping("/view")
@@ -269,13 +268,35 @@ public class ProductController {
 
     @GetMapping("/imageID/{id}")
     public ResponseEntity<?> getProductIDImage(@PathVariable UUID id) {
-        List<UUID> ids = imageService.findIDByProductId(id,null);
+        List<UUID> ids = imageService.findIDByProductId(id,1);
         return ResponseEntity.ok(ids);
     }
     @GetMapping("/image/{id}")
     public ResponseEntity<?> getProductImage(@PathVariable UUID id) {
         List<Image> images = imageService.findByProductIdAndProductType(id,null);
         return ResponseEntity.ok(images);
+    }
+
+    @GetMapping("/{productId}/image-main")
+    public ResponseEntity<?> getImageMain(@PathVariable UUID productId) {
+        List<UUID> ids =  imageService.findIDByProductId(productId,null);
+        if (ids.size()<=0) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tồn tại");
+        }
+
+        Optional<Image> image = imageService.findById(ids.get(0));
+        if (!image.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tồn tại");
+        }
+        byte[] imageBytes = new byte[0];
+        try {
+            imageBytes = fileImgUtil.convertBlobToByteArray(image.get().getImage());
+        } catch (SQLException |IOException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lỗi đọc ảnh");
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
     }
 
 

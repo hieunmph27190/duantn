@@ -4,6 +4,7 @@ package com.fpt.duantn.repository;
 import com.fpt.duantn.domain.Bill;
 import com.fpt.duantn.domain.Customer;
 import com.fpt.duantn.dto.BillReponse;
+import com.fpt.duantn.dto.BillSellOnReponse;
 import com.fpt.duantn.dto.CustomerReponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,11 @@ public interface BillRepository extends JpaRepository<Bill, UUID> {
             "or b.phoneNumber like concat('%', :key, '%')) " +
             "and (:type is null or b.type = :type)")
     public Page<BillReponse> searchByKeyword(String key, Integer type, Pageable pageable);
+
+    @Query("SELECT new com.fpt.duantn.dto.BillSellOnReponse(b.id, b.billCreateDate, b.shipeFee, b.phoneNumber, b.address, b.paymentAmount, b.type) from Bill b " +
+            " where ( CAST(:customerId AS string) like b.customer.id)" +
+            "and (:type is null or b.type = :type)")
+    public Page<BillSellOnReponse> searchByKeyword(UUID customerId, Integer type, Pageable pageable);
 
     public List<Bill> findByCustomer(Customer customer);
 }

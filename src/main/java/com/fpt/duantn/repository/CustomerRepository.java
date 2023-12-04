@@ -19,10 +19,10 @@ import java.util.Optional;
 import java.util.UUID;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
-    @Query("SELECT new com.fpt.duantn.dto.CustomerReponse(e.id,e.name,e.gender,e.dateOfBirth,e.address,e.email,e.phoneNumber,CASE WHEN e.image IS NOT NULL THEN TRUE ELSE FALSE END,e.type,e.county,e.city,e.district) from  Customer e where  ( CAST(e.id AS string) like :key " +
+    @Query("SELECT new com.fpt.duantn.dto.CustomerReponse(e.id,e.name,e.gender,e.dateOfBirth,e.address,e.email,e.phoneNumber,CASE WHEN e.image IS NOT NULL THEN TRUE ELSE FALSE END,e.type,e.ward,e.city,e.district) from  Customer e where  ( CAST(e.id AS string) like :key " +
             "or e.name like concat('%',:key,'%') " +
             "or e.phoneNumber like concat('%',:key,'%') " +
-            "or e.county like concat('%',:key,'%') " +
+            "or e.ward like concat('%',:key,'%') " +
             "or e.city like concat('%',:key,'%') " +
             "or e.district like concat('%',:key,'%') " +
             "or e.address like concat('%',:key,'%') " +
@@ -30,7 +30,7 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
             "and (:type is null or e.type = :type)")
     public Page<CustomerReponse> searchByKeyword(String key , Integer type, Pageable pageable);
 
-    @Query("SELECT new com.fpt.duantn.dto.CustomerReponse(e.id,e.name,e.gender,e.dateOfBirth,e.address,e.email,e.phoneNumber,CASE WHEN e.image IS NOT NULL THEN TRUE ELSE FALSE END,e.type,e.county,e.city,e.district) from  Customer e where e.phoneNumber like :phoneNumber" )
+    @Query("SELECT new com.fpt.duantn.dto.CustomerReponse(e.id,e.name,e.gender,e.dateOfBirth,e.address,e.email,e.phoneNumber,CASE WHEN e.image IS NOT NULL THEN TRUE ELSE FALSE END,e.type,e.ward,e.city,e.district) from  Customer e where e.phoneNumber like :phoneNumber" )
     public CustomerReponse findByPhoneNumber(String phoneNumber);
 
 
@@ -44,7 +44,7 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
             "e.name = :#{#updatedCustomer.name}, " +
             "e.type = :#{#updatedCustomer.type}, " +
             "e.address = :#{#updatedCustomer.address}, " +
-            "e.county = :#{#updatedCustomer.county}, " +
+            "e.ward = :#{#updatedCustomer.county}, " +
             "e.city = :#{#updatedCustomer.city}, " +
             "e.district = :#{#updatedCustomer.district}, " +
             "e.dateOfBirth = :#{#updatedCustomer.dateOfBirth}, " +

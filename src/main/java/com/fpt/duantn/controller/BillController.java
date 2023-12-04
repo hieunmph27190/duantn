@@ -4,10 +4,7 @@ import com.fpt.duantn.domain.Bill;
 import com.fpt.duantn.domain.Customer;
 import com.fpt.duantn.domain.Employee;
 import com.fpt.duantn.domain.Product;
-import com.fpt.duantn.dto.BillReponse;
-import com.fpt.duantn.dto.BillUpdateResquest;
-import com.fpt.duantn.dto.CustomerReponse;
-import com.fpt.duantn.dto.DataTablesResponse;
+import com.fpt.duantn.dto.*;
 import com.fpt.duantn.models.User;
 import com.fpt.duantn.security.services.AuthenticationService;
 import com.fpt.duantn.service.BillService;
@@ -46,7 +43,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Controller
-@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
 @RequestMapping("/bill")
 public class BillController {
     @GetMapping("/view")
@@ -81,6 +78,29 @@ public class BillController {
         DataTablesResponse response = new DataTablesResponse(draw, page);
         return response;
     }
+
+    @PreAuthorize("hasRole('USER')")
+            @GetMapping("/sellon")
+    @ResponseBody
+    public DataTablesResponse getBillSellOn(
+            @RequestParam(value = "draw", required = false) Optional<Integer> draw,
+            @RequestParam(value = "start", required = false) Optional<Integer> start,
+            @RequestParam(value = "length", required = false) Optional<Integer> length,
+            @RequestParam(value = "search[value]", required = false) Optional<String> searchValue,
+            @RequestParam(value = "order[0][column]", required = false) Optional<Integer> orderColumn,
+            @RequestParam(value = "order[0][dir]", required = false) Optional<String>  orderDir,
+            @RequestParam(value = "type", required = false) Optional<Integer> type,
+            HttpServletRequest request, Authentication authentication
+    ) {
+        User user = authenticationService.loadUserByUsername(authentication.getName());
+        Integer typeInt = type.orElse(-1);
+        String orderColumnName = request.getParameter("columns["+orderColumn.orElse(-1)+"][data]");
+        Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10), Sort.by(orderDir.orElse("desc").equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderColumnName == null ? "billCreateDate" : orderColumnName));
+        Page<BillSellOnReponse> page = billService.searchByKeyword(user.getId(),typeInt==-1?null:typeInt, pageable);
+        DataTablesResponse response = new DataTablesResponse(draw, page);
+        return response;
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity getBillById(@PathVariable UUID id) {

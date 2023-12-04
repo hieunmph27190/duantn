@@ -1,13 +1,18 @@
 package com.fpt.duantn.controller;
 
+import com.fpt.duantn.domain.Customer;
 import com.fpt.duantn.domain.Employee;
+import com.fpt.duantn.dto.CustomerReponse;
 import com.fpt.duantn.dto.EmployeeReponse;
+import com.fpt.duantn.payload.request.SignupRequest;
+import com.fpt.duantn.payload.response.MessageResponse;
 import com.fpt.duantn.security.services.AuthenticationService;
 import com.fpt.duantn.service.CustomerService;
 import com.fpt.duantn.service.EmployeeService;
 import com.fpt.duantn.service.RoleService;
 import com.fpt.duantn.util.FileImgUtil;
 import com.fpt.duantn.util.FormErrorUtil;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.ModelMapper;
@@ -44,10 +49,28 @@ public class ProfileController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
     @GetMapping("")
     public ResponseEntity getEmployee(Authentication authentication) {
         UUID id =  authenticationService.loadUserByUsername(authentication.getName()).getId();
+        if (authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_USER"))){
+            if (customerService.existsById(id)){
+                ModelMapper modelMapper = new ModelMapper();
+                modelMapper.addConverter(new AbstractConverter<Blob, Boolean>() {
+                    @Override
+                    protected Boolean convert(Blob source) {
+                        return source!=null;
+                    }
+                });
+                Customer customer = customerService.findById(id).get();
+                CustomerReponse customerReponse = new CustomerReponse();
+                modelMapper.map(customer,customerReponse);
+                return ResponseEntity.ok(customerReponse);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        }
+
         if (employeeService.existsById(id)){
             ModelMapper modelMapper = new ModelMapper();
             modelMapper.addConverter(new AbstractConverter<Blob, Boolean>() {
@@ -96,6 +119,27 @@ public class ProfileController {
         Employee employeeSaved = employeeService.findById(employee.getId()).get();
         employeeSaved.setPassword(null);
         return ResponseEntity.ok(employeeSaved);
+    }
+    @PutMapping("/change-profile-user")
+    public ResponseEntity<?> updateCustomer(@Valid @RequestBody SignupRequest signUpRequest, BindingResult bindingResult, Authentication authentication) {
+        UUID idLogin =  authenticationService.loadUserByUsername(authentication.getName()).getId();
+        if (bindingResult.hasErrors()){
+            Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
+            return ResponseEntity.badRequest().body(errors);
+        }
+        Customer customer =  customerService.findById(idLogin).orElse(null);
+        if (customer==null){
+            return ResponseEntity.badRequest().body("Không thể xác định thông tin đăng nhâp");
+        }
+        customer.setName(signUpRequest.getName());
+        customer.setPhoneNumber(signUpRequest.getPhoneNumber());
+        customer.setGender(signUpRequest.getGender());
+        customer.setCity(signUpRequest.getCity());
+        customer.setWard(signUpRequest.getWard());
+        customer.setAddress(signUpRequest.getAddress());
+        customer.setDistrict(signUpRequest.getDistrict());
+        Customer customerSaved = customerService.save(customer);
+        return ResponseEntity.ok(new MessageResponse("Customer change profile successfully!"));
     }
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestParam(required = true) String password,

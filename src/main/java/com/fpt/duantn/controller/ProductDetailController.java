@@ -28,7 +28,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Controller
-@CrossOrigin(origins = "*")
 @RequestMapping("/product-detail")
 public class ProductDetailController {
 

@@ -60,8 +60,8 @@ public class Customer {
     @Column(name="phone_number")
     private String phoneNumber;
 
-    @Column(name="county")
-    private String county;
+    @Column(name="ward")
+    private String ward;
 
     @Column(name="city")
     private String city;

@@ -3,6 +3,7 @@ package com.fpt.duantn.service.impl;
 import com.fpt.duantn.domain.Bill;
 import com.fpt.duantn.domain.Customer;
 import com.fpt.duantn.dto.BillReponse;
+import com.fpt.duantn.dto.BillSellOnReponse;
 import com.fpt.duantn.dto.CustomerReponse;
 import com.fpt.duantn.repository.BillRepository;
 import com.fpt.duantn.repository.CustomerRepository;
@@ -31,6 +32,12 @@ public class BillServiceImpl implements BillService {
     @Override
     public Page<BillReponse> searchByKeyword(String key, Integer type, Pageable pageable) {
         return billRepository.searchByKeyword(key, type, pageable);
+    }
+
+
+    @Override
+    public Page<BillSellOnReponse> searchByKeyword(UUID customerId, Integer type, Pageable pageable) {
+        return billRepository.searchByKeyword(customerId, type, pageable);
     }
 
     @Override

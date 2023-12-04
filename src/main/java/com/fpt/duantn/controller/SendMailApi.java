@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin("*")
+
 @RestController
 @RequestMapping("api/send-mail")
 public class SendMailApi {
@@ -34,10 +34,11 @@ public class SendMailApi {
 		return ResponseEntity.ok(random_otp);
 	}
 
+
 	// sendmail
-	public void sendMailOtp(String email, int Otp, String title) {
-		String body = "<div>\r\n" + "        <h3>Mã OTP của bạn là: <span style=\"color:red; font-weight: bold;\">"
-				+ Otp + "</span></h3>\r\n" + "    </div>";
+	public void sendMailOtp(String email, int password, String title) {
+		String body = "<div>\r\n" + "<h3>Mật khẩu của bạn là: <span style=\"color:red; font-weight: bold;\">"
+				+ password + "</span></h3>\r\n" + "    </div>";
 		sendMail.queue(email, title, body);
 	}
 

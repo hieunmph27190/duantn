@@ -3,6 +3,7 @@ package com.fpt.duantn.service;
 import com.fpt.duantn.domain.Bill;
 import com.fpt.duantn.domain.Customer;
 import com.fpt.duantn.dto.BillReponse;
+import com.fpt.duantn.dto.BillSellOnReponse;
 import com.fpt.duantn.dto.CustomerReponse;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,8 @@ import java.util.function.Function;
 public interface BillService {
 
     Page<BillReponse> searchByKeyword(String key, Integer type, Pageable pageable);
+
+    Page<BillSellOnReponse> searchByKeyword(UUID customerId, Integer type, Pageable pageable);
 
     List<Bill> findByCustomer(Customer customer);
 

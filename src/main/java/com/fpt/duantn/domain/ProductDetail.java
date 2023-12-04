@@ -47,7 +47,6 @@ public class ProductDetail {
     @JoinColumn(name = "colorid")
     private Color color;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "productid")
     private Product product;

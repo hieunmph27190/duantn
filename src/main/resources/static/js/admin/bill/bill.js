@@ -69,7 +69,9 @@ $(document).ready(function() {
       { "data": "customerName","orderable": false, },
       { "data": "paymentType" ,
         "render": function(data, type, row) {
-          if (data == 0) {
+          if (data == -1) {
+            return "Chưa chọn";
+          } else  if (data == 0) {
             return "Tiền mặt";
           } else if (data == 1) {
             return "Chuyển khoản";
