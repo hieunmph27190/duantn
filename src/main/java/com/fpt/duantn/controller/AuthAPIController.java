@@ -169,7 +169,7 @@ public class AuthAPIController {
 
   // sendmail
   public void sendMailPassword(String email, String password, String title) throws IOException, MessagingException {
-    String body = "<div>\r\n" + "        <h3>Mã OTP của bạn là: <span style=\"color:red; font-weight: bold;\">"
+    String body = "<div>\r\n" + "        <h3>Mật khẩu của bạn là: <span style=\"color:red; font-weight: bold;\">"
             + password + "</span></h3>\r\n" + "    </div>";
     sendMail.send( new MailInfo(email,title,body));
   }

@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.stereotype.Service;
 
 import java.sql.Blob;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,6 +23,8 @@ import java.util.function.Function;
 public interface BillService {
 
     Page<BillReponse> searchByKeyword(String key, Integer type, Pageable pageable);
+
+    Page<BillReponse> searchByKeyword(String key, String phoneNumber, Timestamp startTime, Timestamp endTime, Integer paymentType, Integer type, UUID employeeID, Pageable pageable);
 
     Page<BillSellOnReponse> searchByKeyword(UUID customerId, Integer type, Pageable pageable);
 

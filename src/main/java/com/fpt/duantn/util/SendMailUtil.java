@@ -27,6 +27,7 @@ public class SendMailUtil {
     SendMailService sendMailService;
 
 
+
 	public void sendMailOrder(Bill bill) {
 		SimpleDateFormat dt = new SimpleDateFormat("dd-MM-yyyy");
 		List<BillDetail> listOrderDetails = billDetailService.findByBillId(bill.getId());
@@ -91,12 +92,6 @@ public class SendMailUtil {
 		content.append(FOOTER);
 		sendMailService.queue(bill.getCustomer().getEmail(), "Đặt hàng thành công", content.toString());
 	}
-
-
-
-
-
-
 
 
 

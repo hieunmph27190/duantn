@@ -38,6 +38,9 @@ public class Bill {
     @Column(name = "payment_type")
     private Integer paymentType;
 
+    @Column(name = "transactionno")
+    private String transactionNo;
+
     @Column(name = "type")
     private Integer type;
 

@@ -19,6 +19,7 @@ import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.stereotype.Service;
 
 import java.sql.Blob;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,6 +35,11 @@ public class BillServiceImpl implements BillService {
         return billRepository.searchByKeyword(key, type, pageable);
     }
 
+
+    @Override
+    public Page<BillReponse> searchByKeyword(String key, String phoneNumber, Timestamp startTime, Timestamp endTime, Integer paymentType, Integer type, UUID employeeID, Pageable pageable) {
+        return billRepository.searchByKeyword(key, phoneNumber, startTime, endTime, paymentType, type, employeeID, pageable);
+    }
 
     @Override
     public Page<BillSellOnReponse> searchByKeyword(UUID customerId, Integer type, Pageable pageable) {

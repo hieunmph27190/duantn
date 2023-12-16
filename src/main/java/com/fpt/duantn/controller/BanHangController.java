@@ -26,7 +26,7 @@ public class BanHangController {
     private ProductService productService;
     @GetMapping("")
     public String home() {
-        return "banhang/view/index";
+        return "redirect:/login";
     }
 
     @GetMapping("/ban-hang/product")
@@ -38,50 +38,14 @@ public class BanHangController {
             @RequestParam(value = "search[value]", required = false) Optional<String> searchValue,
             @RequestParam(value = "order[0][column]", required = false) Optional<Integer> orderColumn,
             @RequestParam(value = "order[0][dir]", required = false) Optional<String>  orderDir,
+            @RequestParam(value = "categoryId", required = false) Optional<UUID>  categoryId,
             HttpServletRequest request
     ) {
         String orderColumnName = request.getParameter("columns["+orderColumn.orElse(0)+"][data]");
         Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10));
-        Page<ProductBanHangResponse> page = productService.searchResponseByKeyAndType(searchValue.orElse(""),null, pageable);
-        DataTablesResponse response = new DataTablesResponse(draw,page);
+        List<ProductBanHangResponse> list = productService.searchResponseByKeyAndType(searchValue.orElse(""),categoryId.orElse(null),null);
+        DataTablesResponse response = new DataTablesResponse(draw.orElse(10),list.size(),(long)list.size(),list);
         return response;
     }
-
-    @GetMapping("/about")
-    public String about() {
-        return "banhang/view/about";
-    }
-
-    @GetMapping("/blog")
-    public String blog() {
-        return "banhang/view/blog";
-    }
-
-    @GetMapping("/cart")
-    public String cart() {
-        return "banhang/view/cart";
-    }
-
-    @GetMapping("/checkout")
-    public String checkout() {
-        return "banhang/view/checkout";
-    }
-
-    @GetMapping("/contact")
-    public String contact() {
-        return "banhang/view/contact";
-    }
-
-    @GetMapping("/shop")
-    public String shop() {
-        return "banhang/view/shop";
-    }
-
-    @GetMapping("/blogsingle")
-    public String blogsingle() {
-        return "banhang/view/blog-single";
-    }
-
-
 
 }

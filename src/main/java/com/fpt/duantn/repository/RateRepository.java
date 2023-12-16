@@ -17,6 +17,6 @@ public interface RateRepository extends JpaRepository<Rate, Long> {
 
 	Rate findByBillDetail(BillDetail billDetail);
 
-	List<Rate> findByProductdetailOrderByIdDesc(ProductDetail productdetail);
+	List<Rate> findByProductOrderByIdDesc(ProductDetail productdetail);
 
 }

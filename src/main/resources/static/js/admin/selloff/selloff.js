@@ -421,7 +421,7 @@ $(document).ready(function() {
         },
         searchDelay: 1500,
         "paging": true,
-        "pageLength": 10,
+        "pageLength": 25,
         "lengthMenu": [10, 25, 50, 100],
     });
 

@@ -79,7 +79,7 @@ public class ProductDetailController {
         }
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping( value = "/{id}")
     public ResponseEntity<?> update(@PathVariable UUID id, @Valid @ModelAttribute ProductDetail productDetail , BindingResult bindingResult) {
         if (productDetail.getColor()==null){
@@ -120,7 +120,7 @@ public class ProductDetailController {
 
 
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping ()
     public ResponseEntity<?> add(@Valid @ModelAttribute ProductDetail productDetail , BindingResult bindingResult) {
         if (productDetail.getColor()==null){
@@ -149,7 +149,7 @@ public class ProductDetailController {
         ProductDetail productDetailSaved = productDetailService.save(productDetail);
         return ResponseEntity.ok(productDetailSaved);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable UUID id) {
         if (productDetailService.existsById(id)){

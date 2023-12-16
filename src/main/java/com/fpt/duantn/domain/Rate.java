@@ -35,8 +35,8 @@ public class Rate implements Serializable {
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name = "productdetail_id")
-    private ProductDetail productdetail;
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     @OneToOne
     @JoinColumn(name = "billdetail_id")

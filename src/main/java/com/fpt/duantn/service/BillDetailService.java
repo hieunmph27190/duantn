@@ -22,6 +22,8 @@ public interface BillDetailService {
 
     Page<BillDetailReponse> searchByKeyword(String key, Integer type, UUID billId, Pageable pageable);
 
+    List<BillDetail> findByBillIdAndType(UUID billId, Integer type);
+
     List<BillDetail> findByBillId(UUID id);
 
     Optional<Long> sumQuantityByBillIdAndType(UUID billId, Integer type);

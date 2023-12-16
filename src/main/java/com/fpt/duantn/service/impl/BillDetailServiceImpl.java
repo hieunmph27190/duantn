@@ -34,6 +34,11 @@ public class BillDetailServiceImpl implements BillDetailService {
     }
 
     @Override
+    public List<BillDetail> findByBillIdAndType(UUID billId, Integer type) {
+        return billDetailRepository.findByBillIdAndType(billId, type);
+    }
+
+    @Override
     public List<BillDetail> findByBillId(UUID id) {
         return billDetailRepository.findByBillId(id);
     }

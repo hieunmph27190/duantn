@@ -27,6 +27,7 @@ import java.util.UUID;
 @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 @RequestMapping("/size")
 public class SizeController {
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/view")
     public String test(Model model){
         return "/admin/view/size/size";
@@ -66,7 +67,7 @@ public class SizeController {
         }
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping( value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> update(@PathVariable UUID id, @Valid @RequestBody Size size , BindingResult bindingResult) {
 
@@ -84,7 +85,7 @@ public class SizeController {
 
 
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping ( consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> add(@Valid @RequestBody Size size , BindingResult bindingResult) {
 
@@ -96,6 +97,7 @@ public class SizeController {
         Size sizeSaved= sizeService.save(size);
         return ResponseEntity.ok(sizeSaved);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable UUID id) {
         if (sizeService.existsById(id)){

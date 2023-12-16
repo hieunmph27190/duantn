@@ -40,11 +40,12 @@ import java.util.*;
 @Controller
 @RequestMapping("/product")
 public class ProductController {
+    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
     @GetMapping("/view")
     public String view(Model model){
         return "/admin/view/product/product";
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/view-add")
     public String viewAdd(Model model){
         return "/admin/view/product/add-product";
@@ -69,7 +70,7 @@ public class ProductController {
     public DataTablesResponse getProduct(
             @RequestParam(value = "draw", required = false) Optional<Integer> draw,
             @RequestParam(value = "start", required = false) Optional<Integer> start,
-            @RequestParam(value = "length", required = false) Optional<Integer> length,
+            @RequestParam(value = "length", required = false,defaultValue = "10") Optional<Integer> length,
             @RequestParam(value = "search[value]", required = false) Optional<String> searchValue,
             @RequestParam(value = "order[0][column]", required = false) Optional<Integer> orderColumn,
             @RequestParam(value = "order[0][dir]", required = false) Optional<String>  orderDir,
@@ -134,7 +135,7 @@ public class ProductController {
         }
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping( value = "/{id}")
     public ResponseEntity<?> update(@PathVariable UUID id, @Valid @ModelAttribute Product product , BindingResult bindingResult) {
         if (!productService.existsById(id)){
@@ -154,7 +155,7 @@ public class ProductController {
 
 
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping ( )
     public ResponseEntity<?> add(@Valid @ModelAttribute Product product , BindingResult bindingResult, @RequestPart(value = "imgs",required = false) MultipartFile[] files) {
         if (bindingResult.hasErrors()){
@@ -188,7 +189,7 @@ public class ProductController {
         return ResponseEntity.ok(productSaved);
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping ( value = "/add" )
     public ResponseEntity<?> addProduct(@Valid @ModelAttribute ProductRequest productRequest , BindingResult bindingResult, @RequestPart(value = "imgs",required = false) MultipartFile[] files) {
 
@@ -250,7 +251,7 @@ public class ProductController {
 
         return ResponseEntity.ok(productSaved);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable UUID id) {
         if (productService.existsById(id)){

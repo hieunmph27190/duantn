@@ -28,8 +28,8 @@ public class Favorite implements Serializable{
 
 
 	@ManyToOne()
-	@JoinColumn(name = "productdetail_id")
-	private ProductDetail productdetail;
+	@JoinColumn(name = "product_id")
+	private Product product;
 
 
 	@ManyToOne()

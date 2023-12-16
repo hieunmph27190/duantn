@@ -1,9 +1,6 @@
 package com.fpt.duantn.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fpt.duantn.domain.Employee;
-import com.fpt.duantn.domain.Image;
-import com.fpt.duantn.domain.Product;
-import com.fpt.duantn.domain.Role;
+import com.fpt.duantn.domain.*;
 import com.fpt.duantn.dto.DataTablesResponse;
 import com.fpt.duantn.dto.EmployeeReponse;
 import com.fpt.duantn.models.ERole;
@@ -171,6 +168,28 @@ public class EmployeeController implements Serializable {
         Employee employeeSaved = employeeService.save(employee);
         employeeSaved.setPassword(null);
         return ResponseEntity.ok(employeeSaved);
+    }
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestParam(required = true) UUID id,
+                                            @RequestParam(required = true) String newPassword,Authentication authentication) {
+
+        if (authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))){
+            Employee oldEmployee =  employeeService.findById(id).orElse(null);
+            if (oldEmployee!=null){
+                if (oldEmployee.getRole().getName().equals(ERole.ROLE_ADMIN)){
+                    return ResponseEntity.badRequest().body("Không có quyền thay đổi !");
+                }
+                oldEmployee.setPassword(passwordEncoder.encode(newPassword));
+            }else {
+                return ResponseEntity.badRequest().body("Không thể lấy thông tin ");
+            }
+            employeeService.save(oldEmployee);
+            Employee  employeeSaved = employeeService.findById(oldEmployee.getId()).get();
+            employeeSaved.setPassword(null);
+            return ResponseEntity.ok(employeeSaved);
+        }
+        return ResponseEntity.badRequest().body("Yêu cầu quyền ADMIN !");
     }
 
     @DeleteMapping("/{id}")

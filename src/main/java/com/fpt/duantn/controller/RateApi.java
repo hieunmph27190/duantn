@@ -51,7 +51,7 @@ public class RateApi {
         if (!productDetailRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(rateRepository.findByProductdetailOrderByIdDesc(productDetailRepository.findById(id).get()));
+        return ResponseEntity.ok(rateRepository.findByProductOrderByIdDesc(productDetailRepository.findById(id).get()));
     }
 
 
@@ -73,30 +73,30 @@ public class RateApi {
 //    }
 
 
-    @PostMapping
-    public ResponseEntity<Rate> post(@RequestBody Rate rate) {
-
-        if (rate.getCustomer() == null || rate.getCustomer().getId() == null) {
-            System.out.println("User or User ID is null");
-            return ResponseEntity.notFound().build();
-        }
-        System.out.println("User ID: " + rate.getCustomer().getId());
-
-        if (rate.getProductdetail() == null || rate.getProductdetail().getId() == null) {
-            System.out.println("ProductDetail or ProductDetail ID is null");
-            return ResponseEntity.notFound().build();
-        }
-        System.out.println("producdetail Id: " + rate.getProductdetail().getId());
-
-        if (rate.getBillDetail() == null || rate.getBillDetail().getId() == null) {
-            System.out.println("OrderDetail or OrderDetail ID is null");
-            return ResponseEntity.notFound().build();
-        }
-        System.out.println("getOrderdetail Id: " + rate.getBillDetail().getId());
-
-
-        return ResponseEntity.ok(rateRepository.save(rate));
-    }
+//    @PostMapping
+//    public ResponseEntity<Rate> post(@RequestBody Rate rate) {
+//
+//        if (rate.getCustomer() == null || rate.getCustomer().getId() == null) {
+//            System.out.println("User or User ID is null");
+//            return ResponseEntity.notFound().build();
+//        }
+//        System.out.println("User ID: " + rate.getCustomer().getId());
+//
+//        if (rate.getProductdetail() == null || rate.getProductdetail().getId() == null) {
+//            System.out.println("ProductDetail or ProductDetail ID is null");
+//            return ResponseEntity.notFound().build();
+//        }
+//        System.out.println("producdetail Id: " + rate.getProductdetail().getId());
+//
+//        if (rate.getBillDetail() == null || rate.getBillDetail().getId() == null) {
+//            System.out.println("OrderDetail or OrderDetail ID is null");
+//            return ResponseEntity.notFound().build();
+//        }
+//        System.out.println("getOrderdetail Id: " + rate.getBillDetail().getId());
+//
+//
+//        return ResponseEntity.ok(rateRepository.save(rate));
+//    }
 
 
 

@@ -16,6 +16,9 @@ public class DataTablesResponse {
     private Integer draw;
     private Integer recordsTotal;
     private Long recordsFiltered;
+    private Integer page;
+    private Integer totalPage;
+    private Integer size;
     private List<?> data;
 
     public DataTablesResponse(Integer draw, Integer recordsTotal, Long recordsFiltered, List<?> data) {
@@ -29,6 +32,9 @@ public class DataTablesResponse {
         this.recordsTotal = page.getNumberOfElements();
         this.recordsFiltered = page.getTotalElements();
         this.data = page.getContent();
+        this.page = page.getNumber();
+        this.size = page.getSize();
+        this.totalPage = page.getTotalPages();
     }
 
 }

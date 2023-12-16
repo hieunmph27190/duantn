@@ -146,9 +146,42 @@ $(document).ready(function() {
 
   // Show form update
   $(`#${tableName} tbody`).on('dblclick', 'tr', loadDataModal);
+  $(`#resetPass`).on('click', '', resetPass);
   $('#btn-view-add').click(function (){
     $('#view-add').modal('show');
   });
+
+  function resetPass(){
+    let formData = new FormData();
+    let id = $("#form-customer-update input[name='id']").val();
+    let newPassword = prompt("Vui lòng nhập mật khẩu mới:");
+    if (newPassword!=null&&newPassword!="") {
+      formData.set("id",id);
+      formData.set("newPassword",newPassword);
+      $.ajax({
+        url: urlBase+"/change-password",
+        type: 'PUT',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+          // Xử lý thành công
+          alert('Thay đổi mật khẩu thành công!');
+        },
+        error: function (xhr, status, error) {
+          if(xhr.status==400){
+
+              alert('Lỗi khi sửa dữ liệu: ' + xhr.responseText);
+
+          }else {
+            alert('Lỗi :' + error);
+          }
+        }
+      });
+    } else if (newPassword =='') {
+      alert("Mật khẩu không được để trống");
+    }
+  }
 
   function loadDataModal() {
     let rowData = table.row($(this).closest('tr')).data();

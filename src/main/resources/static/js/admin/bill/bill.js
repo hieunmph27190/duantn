@@ -57,7 +57,11 @@ $(document).ready(function() {
       "url": urlBase,
       "type": "GET",
       "data": function(d) {
-        d.callAll = true
+        d.phoneNumber =$("#form-filter input[name='phoneNumber']").val();
+        d.startTime =$("#form-filter input[name='startTime']").val()
+        d.endTime =$("#form-filter input[name='endTime']").val()
+        d.paymentType =$("#form-filter select[name='paymentType']").val()
+        d.type = $("#form-filter select[name='type']").val();
       },
       "dataSrc": function(json) {
         return json.data;
@@ -87,13 +91,11 @@ $(document).ready(function() {
       },
       { "data": "shipeFee" },
       { "data": "phoneNumber" },
-      { "data": "address" },
-
       {
         "data": "type",
         "render": function(data, type, row) {
           if (data == 0) {
-            return "Không hoạt động";
+            return "Đã hủy";
           } else if (data == 1) {
             return "Chờ xử lí";
           } else if (data == 2) {
@@ -142,9 +144,33 @@ $(document).ready(function() {
 
   // Show form update
   $(`#${tableName} tbody`).on('dblclick', 'tr', loadDataModal);
+  $(`#btnThanhToanVNPAY`).on('click', '', thanhToanVNPAY);
+  $(`#reloadBill`).on('click', '', function (){
+    table.ajax.reload(null,false);
+  });
+
+  function thanhToanVNPAY(){
+    let billId = $("#form-bill-update input[name=id]").val();
+    if (billId){
+      $.ajax({
+        url: "http://localhost:8080/api/vnpay/"+billId,
+        type: 'GET',
+        success: function(response) {
+          console.log(response.message);
+          window.open(response.message, '_blank');
+        },
+        error: function(xhr, status, error) {
+          alert("Lỗi : "+xhr?.responseText)
+        }
+      });
+    }else {
+      alert("Kiểm tra lại hóa đơn !")
+    }
+
+  }
 
   function loadDataModal() {
-    selectRow($(this))
+    selectRow($(this).closest("tr"))
     tableBillDetail.ajax.reload(null,false);
     let rowData = table.row($(this).closest('tr')).data();
     $.ajax({
@@ -271,8 +297,7 @@ $(document).ready(function() {
       }
     ],
     "drawCallback": function(settings) {
-      $(`#tableChiTiet tbody tr`).on('click', '.btn-view-update', null);
-      $(`#tableChiTiet tbody tr`).on('click', '.btn-delete',null);
+
     },
     searchDelay: 1500,
     "paging": true,

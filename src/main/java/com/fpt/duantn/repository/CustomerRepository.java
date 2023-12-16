@@ -44,7 +44,7 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
             "e.name = :#{#updatedCustomer.name}, " +
             "e.type = :#{#updatedCustomer.type}, " +
             "e.address = :#{#updatedCustomer.address}, " +
-            "e.ward = :#{#updatedCustomer.county}, " +
+            "e.ward = :#{#updatedCustomer.ward}, " +
             "e.city = :#{#updatedCustomer.city}, " +
             "e.district = :#{#updatedCustomer.district}, " +
             "e.dateOfBirth = :#{#updatedCustomer.dateOfBirth}, " +

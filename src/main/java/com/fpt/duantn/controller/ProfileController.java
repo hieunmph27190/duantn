@@ -90,6 +90,7 @@ public class ProfileController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEmployee(@PathVariable("id") UUID id, @Valid @ModelAttribute Employee employee, BindingResult bindingResult, @RequestPart(value = "imagesProfile",required = false) MultipartFile[] files,Authentication authentication) {
         UUID idLogin =  authenticationService.loadUserByUsername(authentication.getName()).getId();
+
         if (bindingResult.hasErrors()){
             Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
@@ -145,22 +146,44 @@ public class ProfileController {
     public ResponseEntity<?> changePassword(@RequestParam(required = true) String password,
                                             @RequestParam(required = true) String newPassword,Authentication authentication) {
         UUID idLogin =  authenticationService.loadUserByUsername(authentication.getName()).getId();
-        Employee oldEmployee =  employeeService.findById(idLogin).orElse(null);
-        if (!(password.length()>0&&newPassword.length()>0)){
-            return ResponseEntity.badRequest().body("Mật khẩu không được để trống");
-        }
-        if (oldEmployee!=null){
-            if (passwordEncoder.matches(password,oldEmployee.getPassword())){
-                oldEmployee.setPassword(passwordEncoder.encode(newPassword));
-            }else {
-                return ResponseEntity.badRequest().body("Mật khẩu không đúng");
+        if (authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_USER"))){
+            Customer oldCustomer =  customerService.findById(idLogin).orElse(null);
+            if (!(password.length()>0&&newPassword.length()>0)){
+                return ResponseEntity.badRequest().body("Mật khẩu không được để trống");
             }
+            if (oldCustomer!=null){
+                if (passwordEncoder.matches(password,oldCustomer.getPassword())){
+                    oldCustomer.setPassword(passwordEncoder.encode(newPassword));
+                }else {
+                    return ResponseEntity.badRequest().body("Mật khẩu không đúng");
+                }
+            }else {
+                return ResponseEntity.badRequest().body("Không thể lấy thông tin đăng nhập");
+            }
+            customerService.updateCustomerWithoutImage(oldCustomer);
+            Customer customerSaved = customerService.findById(oldCustomer.getId()).get();
+            customerSaved.setPassword(null);
+            return ResponseEntity.ok(customerSaved);
         }else {
-            return ResponseEntity.badRequest().body("Không thể lấy thông tin đăng nhập");
+            Employee oldEmployee =  employeeService.findById(idLogin).orElse(null);
+            if (!(password.length()>0&&newPassword.length()>0)){
+                return ResponseEntity.badRequest().body("Mật khẩu không được để trống");
+            }
+            if (oldEmployee!=null){
+                if (passwordEncoder.matches(password,oldEmployee.getPassword())){
+                    oldEmployee.setPassword(passwordEncoder.encode(newPassword));
+                }else {
+                    return ResponseEntity.badRequest().body("Mật khẩu không đúng");
+                }
+            }else {
+                return ResponseEntity.badRequest().body("Không thể lấy thông tin đăng nhập");
+            }
+            employeeService.updateEmployeeWithoutImage(oldEmployee);
+            Employee employeeSaved = employeeService.findById(oldEmployee.getId()).get();
+            employeeSaved.setPassword(null);
+            return ResponseEntity.ok(employeeSaved);
         }
-        employeeService.updateEmployeeWithoutImage(oldEmployee);
-        Employee employeeSaved = employeeService.findById(oldEmployee.getId()).get();
-        employeeSaved.setPassword(null);
-        return ResponseEntity.ok(employeeSaved);
+
     }
 }
