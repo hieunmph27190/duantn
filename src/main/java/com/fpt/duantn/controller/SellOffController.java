@@ -83,6 +83,9 @@ public class SellOffController {
             return ResponseEntity.badRequest().body("Thông tin khách hàng không đúng");
         }
         List<SellOffProductRequest>sellOffProductRequests = sellOffRequest.getSanPhams();
+        if (sellOffProductRequests.size()<=0){
+            return ResponseEntity.badRequest().body("Đơn hàng trống !");
+        }
         List<BillDetail> billDetails = new ArrayList<>();
         Double sum =0D;
         for (SellOffProductRequest request : sellOffProductRequests){
