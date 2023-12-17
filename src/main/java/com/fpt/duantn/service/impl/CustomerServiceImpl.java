@@ -30,6 +30,12 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
 
+
+    @Override
+    public Optional<Customer> findCByPhoneNumber(String phoneNumber) {
+        return customerRepository.findCByPhoneNumber(phoneNumber);
+    }
+
     @Override
     public Boolean existsByEmail(String email) {
         return customerRepository.existsByEmail(email);

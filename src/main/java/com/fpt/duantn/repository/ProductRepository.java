@@ -46,7 +46,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             "AND (  :soleIDsSize  = 0 OR c.sole.id IN :soleIDs) " +
             "AND (  :colorIDsSize  = 0 OR pd.color.id IN :colorIDs) " +
             "AND (  :sizeIDsSize  = 0 OR pd.size.id IN :sizeIDs)) " +
-            "AND (  (SELECT COUNT(pd1) FROM ProductDetail pd1 WHERE pd1.product = c and (:minPrice is null or pd1.price >=:minPrice)  and  (:maxPrice is null or  pd1.price <=:maxPrice) ) >0 )) ")
+            "AND ((SELECT COUNT(pd1) FROM ProductDetail pd1 WHERE pd1.product = c)=0 or(  (SELECT COUNT(pd1) FROM ProductDetail pd1 WHERE pd1.product = c and (:minPrice is null or pd1.price >=:minPrice)  and  (:maxPrice is null or  pd1.price <=:maxPrice) ) >0 ))) ")
     Page<Product> searchByKeyAndTypeAndFilter(
             @Param("key") String key,
             @Param("type") Integer type,

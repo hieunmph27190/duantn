@@ -82,7 +82,7 @@ $(document).ready(function() {
       {
         "data": "address",
         "render": function(data, type, row) {
-              return data + " (d):"+ row.district+" (city):"+row.city+" (c):"+row.county
+              return data + " (d):"+ row.district+" (city):"+row.city;
         }
       },
       { "data": "email" },

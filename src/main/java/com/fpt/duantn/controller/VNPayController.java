@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.validator.internal.util.Contracts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class VNPayController {
 
 
     @GetMapping("/payment-callback")
-    public void paymentCallback(@RequestParam Map<String, String> queryParams, HttpServletResponse response) throws IOException, ParseException {
+    public void paymentCallback(@RequestParam Map<String, String> queryParams, HttpServletResponse response, Authentication authentication) throws IOException, ParseException {
         String vnp_ResponseCode = queryParams.get("vnp_ResponseCode");
         String billId = queryParams.get("billId");
         String amount = queryParams.get("vnp_Amount");
@@ -59,7 +60,11 @@ public class VNPayController {
                         + "\nSet PaymentType : "+bill.getPaymentType()+" -> "+1);
                 bill.setPaymentType(1);
                 billService.save(bill);
-                response.sendRedirect("http://localhost:4200/bill");
+                if (queryParams.get("admin") !=null||queryParams.get("admin") !=""){
+                    response.sendRedirect("http://localhost:8080/payment/success?billId="+billId+"&amount="+amount+"&transactionNo="+transactionNo);
+                }else {
+                    response.sendRedirect("http://localhost:4200/bill");
+                }
             } else {
                 // Giao dịch thất bại
                 // Thực hiện các xử lý cần thiết, ví dụ: không cập nhật CSDL\
@@ -85,7 +90,13 @@ public class VNPayController {
                 bill.setTransactionNo(bill.getTransactionNo()==null?"":bill.getTransactionNo()+"|"+transactionNo);
                 bill.setPaymentType(1);
                 billService.save(bill);
-                response.sendRedirect("http://localhost:4200/bill");
+
+                if (queryParams.get("admin") !=null||queryParams.get("admin") !=""){
+                    response.sendRedirect("http://localhost:8080/payment/success?billId="+billId+"&amount="+amount+"&transactionNo="+transactionNo);
+                }else {
+                    response.sendRedirect("http://localhost:4200/bill");
+                }
+
             } else {
                 // Giao dịch thất bại
                 // Thực hiện các xử lý cần thiết, ví dụ: không cập nhật CSDL\
@@ -98,7 +109,7 @@ public class VNPayController {
     }
 
 	@GetMapping("/vnpay/{billID}")
-	public ResponseEntity getPay(@PathVariable UUID billID) throws UnsupportedEncodingException{
+	public ResponseEntity getPay(@PathVariable UUID billID,@RequestParam(required = false) String admin) throws UnsupportedEncodingException{
         Double totalMoney = billDetailService.sumMoneyByBillIdAndType(billID,1).orElse(null);
         Bill bill = billService.findById(billID).orElse(null);
         Double shipfee =  bill.getShipeFee().doubleValue();
@@ -138,7 +149,12 @@ public class VNPayController {
         vnp_Params.put("vnp_OrderType", orderType);
 
         vnp_Params.put("vnp_Locale", "vn");
-        vnp_Params.put("vnp_ReturnUrl", ConfigVNPay.vnp_ReturnUrl+"?billId="+billID);
+        String vnp_ReturnUrl = ConfigVNPay.vnp_ReturnUrl+"?billId="+billID;
+        if (admin!=null){
+            vnp_ReturnUrl+="&admin=x";
+        }
+
+        vnp_Params.put("vnp_ReturnUrl",vnp_ReturnUrl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
@@ -179,13 +195,7 @@ public class VNPayController {
         String paymentUrl = ConfigVNPay.vnp_PayUrl + "?" + queryUrl;
         return ResponseEntity.ok(new MessageResponse(paymentUrl)) ;
 
-//        // Tạo đối tượng DTO để chứa URL
-//        Paymentdto paymentdto = new Paymentdto();
-//        paymentdto.setStatus("OK");
-//        paymentdto.setMessage("Successfully");
-//        paymentdto.setURL(paymentUrl);
-////        return ResponseEntity.status(HttpStatus.OK).body(paymentdto);
-//        return paymentdto;
+
 
 	}
 

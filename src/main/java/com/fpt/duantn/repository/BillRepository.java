@@ -32,7 +32,7 @@ public interface BillRepository extends JpaRepository<Bill, UUID> {
             "and (:type is null or b.type = :type)")
     public Page<BillSellOnReponse> searchByKeyword(UUID customerId, Integer type, Pageable pageable);
 
-    @Query("SELECT new com.fpt.duantn.dto.BillReponse(b.id, e.id, e.name, c.id, c.name, b.paymentType, b.billCreateDate, b.shipeFee, b.phoneNumber, b.address, b.type) from Bill b left JOIN b.employee e LEFT JOIN b.paymentEmployee pe LEFT JOIN b.customer c " +
+    @Query("SELECT new com.fpt.duantn.dto.BillReponse(b.id, e.id, e.name, c.id, c.name, b.paymentType, b.billCreateDate, b.shipeFee,b.paymentAmount, b.phoneNumber, b.address, b.type) from Bill b left JOIN b.employee e LEFT JOIN b.paymentEmployee pe LEFT JOIN b.customer c " +
             " where ( CAST(b.id AS string) like :key " +
             "or CAST(e.id AS string) like :key " +
             "or CAST(pe.id AS string) like :key " +

@@ -33,6 +33,9 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     @Query("SELECT new com.fpt.duantn.dto.CustomerReponse(e.id,e.name,e.gender,e.dateOfBirth,e.address,e.email,e.phoneNumber,CASE WHEN e.image IS NOT NULL THEN TRUE ELSE FALSE END,e.type,e.ward,e.city,e.district) from  Customer e where e.phoneNumber like :phoneNumber" )
     public CustomerReponse findByPhoneNumber(String phoneNumber);
 
+    @Query("SELECT e from  Customer e where e.phoneNumber like :phoneNumber" )
+    public Optional<Customer> findCByPhoneNumber(String phoneNumber);
+
 
     @Query("SELECT e.image from Customer e where e.id = :id")
     public Optional<Blob> findImageById(UUID id);

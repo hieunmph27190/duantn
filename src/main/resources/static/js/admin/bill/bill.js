@@ -90,6 +90,11 @@ $(document).ready(function() {
         }
       },
       { "data": "shipeFee" },
+      { "data": "paymentAmount",
+        "render": function(data, type, row) {
+          return data.toLocaleString('en-US')
+        }
+      },
       { "data": "phoneNumber" },
       {
         "data": "type",
@@ -145,6 +150,7 @@ $(document).ready(function() {
   // Show form update
   $(`#${tableName} tbody`).on('dblclick', 'tr', loadDataModal);
   $(`#btnThanhToanVNPAY`).on('click', '', thanhToanVNPAY);
+  $(`#reloadBillDetail`).on('click', '', reloadBillDetail);
   $(`#reloadBill`).on('click', '', function (){
     table.ajax.reload(null,false);
   });
@@ -153,7 +159,7 @@ $(document).ready(function() {
     let billId = $("#form-bill-update input[name=id]").val();
     if (billId){
       $.ajax({
-        url: "http://localhost:8080/api/vnpay/"+billId,
+        url: "http://localhost:8080/api/vnpay/"+billId+"?admin=x",
         type: 'GET',
         success: function(response) {
           console.log(response.message);
@@ -168,6 +174,56 @@ $(document).ready(function() {
     }
 
   }
+  function reloadBillDetail() {
+
+    tableBillDetail.ajax.reload(null,false);
+    let billId = $("#form-bill-update input[name=id]").val();
+    $.ajax({
+      url: urlBase+'/' + billId,
+      type: 'GET',
+      success: function(response) {
+        // Lấy dữ liệu từ response và hiển thị trên modal
+        let data = response;
+        pullDataToForm(`form-${objectName}-update`,data)
+        $(`#view-update input[name="paymentTime"]`).val(formatDateTime(data.paymentTime))
+
+        $(`#view-update input[name="employee.id"]`).val((data?.employee?.id))
+        $(`#view-update input[name="employee.name"]`).val((data?.employee?.name))
+
+        $(`#view-update input[name="customer.id"]`).val((data?.customer?.id))
+        $(`#view-update input[name="customer.name"]`).val((data?.customer?.name))
+
+        $(`#view-update input[name="paymentEmployee.id"]`).val((data?.paymentEmployee?.id))
+        $(`#view-update input[name="paymentEmployee.name"]`).val((data?.paymentEmployee?.name))
+
+      },
+      error: function(xhr, status, error) {
+        alert("Không thể lấy dữ liệu ")
+      }
+    });
+
+    $.ajax({
+      url: "/selloff/calculate-money"+'/' + rowData.id,
+      type: 'GET',
+      success: function(response) {
+        // Lấy dữ liệu từ response và hiển thị trên modal
+        let data = response;
+        $(`#view-update input[name="soTienCuaDon"]`).val((data))
+
+      },
+      error: function(xhr, status, error) {
+        if (xhr.status === 400) {
+          // Nếu là lỗi Bad Request, hiển thị thông báo lỗi
+          alert("Lỗi: " + xhr.responseText);
+        } else {
+          // Xử lý các trường hợp lỗi khác nếu cần
+          alert("Không thể lấy dữ liệu");
+        }
+      }
+    });
+
+  }
+
 
   function loadDataModal() {
     selectRow($(this).closest("tr"))

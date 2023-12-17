@@ -96,13 +96,13 @@ public class AuthAPIController {
       return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already taken!"));
     }
     boolean tkCDK = false;
-    Customer customerDB = customerService.findByEmail(signUpRequest.getEmail()).orElse(null);
+    Customer customerDB = customerService.findCByPhoneNumber(signUpRequest.getPhoneNumber()).orElse(null);
     Customer customer = new Customer();
     if (customerDB==null){
 
     }else {
       if (customerDB.getType()!=2){
-        return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already taken!"));
+        return ResponseEntity.badRequest().body(new MessageResponse("Error: PhoneNumber is already taken!"));
       }else {
         tkCDK =true;
         customer = customerDB;
@@ -129,24 +129,24 @@ public class AuthAPIController {
     return ResponseEntity.ok(new MessageResponse("Customer registered successfully!"));
   }
 
-  @PostMapping("/signup/employee")
-  public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-    if (customerService.existsByEmail(signUpRequest.getEmail())||employeeService.existsByEmail(signUpRequest.getEmail())) {
-      return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already taken!"));
-    }
-
-
-    // Create new user's account
-    Employee employee = new Employee();
-    employee.setEmail(signUpRequest.getEmail());
-
-    Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
-            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-
-    employee.setRole(modRole);
-    employeeService.save(employee);
-    return ResponseEntity.ok(new MessageResponse("Employee registered successfully!"));
-  }
+//  @PostMapping("/signup/employee")
+//  public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+//    if (customerService.existsByEmail(signUpRequest.getEmail())||employeeService.existsByEmail(signUpRequest.getEmail())) {
+//      return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already taken!"));
+//    }
+//
+//
+//    // Create new user's account
+//    Employee employee = new Employee();
+//    employee.setEmail(signUpRequest.getEmail());
+//
+//    Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
+//            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+//
+//    employee.setRole(modRole);
+//    employeeService.save(employee);
+//    return ResponseEntity.ok(new MessageResponse("Employee registered successfully!"));
+//  }
 
 
   @PostMapping("/signout")

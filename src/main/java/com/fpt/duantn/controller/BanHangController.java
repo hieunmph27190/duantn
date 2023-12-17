@@ -1,9 +1,13 @@
 package com.fpt.duantn.controller;
 
+import com.fpt.duantn.domain.Bill;
+import com.fpt.duantn.domain.Customer;
+import com.fpt.duantn.domain.Employee;
 import com.fpt.duantn.domain.Product;
 import com.fpt.duantn.dto.DataTablesResponse;
 import com.fpt.duantn.dto.ProductBanHangResponse;
 import com.fpt.duantn.dto.ProductResponse;
+import com.fpt.duantn.service.BillService;
 import com.fpt.duantn.service.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +28,39 @@ import java.util.*;
 public class BanHangController {
     @Autowired
     private ProductService productService;
+    @Autowired
+    private BillService billService;
     @GetMapping("")
     public String home() {
         return "redirect:/login";
+    }
+    @GetMapping("/payment/success")
+    public String paymentsuccess(@RequestParam("billId") UUID billId,@RequestParam("amount") Double amount,@RequestParam("transactionNo") String transactionNo,Model model) {
+        Bill bill = billService.findById(billId).get();
+
+        if (bill.getEmployee()!=null){
+            Employee employee =  new Employee();
+            employee.setId(bill.getEmployee().getId());
+            employee.setName(bill.getEmployee().getName());
+            bill.setEmployee(employee);
+        }
+        if (bill.getCustomer()!=null) {
+            Customer customer = new Customer();
+            customer.setId(bill.getCustomer().getId());
+            customer.setName(bill.getCustomer().getName());
+            bill.setCustomer(customer);
+        }
+
+        if (bill.getPaymentEmployee()!=null) {
+            Employee paymentEmployee = new Employee();
+            paymentEmployee.setId(bill.getPaymentEmployee().getId());
+            paymentEmployee.setName(bill.getPaymentEmployee().getName());
+            bill.setPaymentEmployee(paymentEmployee);
+        }
+        model.addAttribute("bill",bill);
+        model.addAttribute("amount",amount/100);
+        model.addAttribute("transactionNo",transactionNo);
+        return "/admin/view/payment/success";
     }
 
     @GetMapping("/ban-hang/product")
