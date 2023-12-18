@@ -196,6 +196,7 @@ public class BillController {
     public ResponseEntity<?> update(@PathVariable UUID id, @Valid @ModelAttribute BillUpdateResquest billUpdateResquest , BindingResult bindingResult, Authentication authentication) {
         Bill bill = billService.findById(id).orElse(null);
         User user = authenticationService.loadUserByUsername(authentication.getName());
+        List<ProductDetail> productDetails = new ArrayList<>();
         if (bindingResult.hasErrors()){
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
@@ -208,11 +209,7 @@ public class BillController {
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))){
             Employee employeeLogin =  employeeService.findById(user.getId()).orElse(null);
             bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo()+"\n\n")+employeeLogin.getId()+" : "+employeeLogin.getName() + " : ADMIN : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")));
-            if (!(bill.getType().equals(billUpdateResquest.getType()))){
-                bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
-                        +"\nSet Type : "+bill.getType()+" -> "+billUpdateResquest.getType());
-                bill.setType(billUpdateResquest.getType());
-            }
+
             if (!(bill.getShipeFee().doubleValue()==billUpdateResquest.getShipeFee().doubleValue())){
                 bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
                         + "\nSet ShipeFee : "+bill.getShipeFee()+" -> "+billUpdateResquest.getShipeFee());
@@ -239,6 +236,45 @@ public class BillController {
                 bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
                         + "\nSet Note : \n"+bill.getNote()+"\n ----> \n"+billUpdateResquest.getNote());
                 bill.setNote(billUpdateResquest.getNote());
+            }
+
+
+            if ((bill.getType()>=0&&bill.getType()<4)&&((billUpdateResquest.getType()>=4)||(billUpdateResquest.getType()==-2))){
+                List<BillDetail> billDetails = billDetailService.findByBillIdAndType(bill.getId(),1);
+                List<ProductDetail> productDetails2  = new ArrayList<>();
+                for (BillDetail billDetail:billDetails) {
+                    ProductDetail productDetail = billDetail.getProductDetail();
+                    productDetail.setAmount(productDetail.getAmount()-billDetail.getQuantity());
+                    productDetails2.add(productDetail);
+                }
+                bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
+                        + "\nTrừ số lượng sản phẩm");
+                Double total = billDetailService.sumMoneyByBillIdAndType(bill.getId(),null).orElse(null);
+                if (total==null){
+                    return ResponseEntity.badRequest().body("Lỗi tính tổng tiền !");
+                }
+                if(bill.getPaymentAmount().doubleValue()<bill.getShipeFee().doubleValue()+total){
+                    return ResponseEntity.badRequest().body("Số tiền thanh toán không đủ !");
+                }
+                productDetailService.saveAll(productDetails2);
+            }
+            if ((billUpdateResquest.getType()>=0&&billUpdateResquest.getType()<4)&&((bill.getType()>=4)||(bill.getType()==-2))){
+                List<BillDetail> billDetails = billDetailService.findByBillIdAndType(bill.getId(),1);
+                List<ProductDetail> productDetails2  = new ArrayList<>();
+                for (BillDetail billDetail:billDetails) {
+                    ProductDetail productDetail = billDetail.getProductDetail();
+                    productDetail.setAmount(productDetail.getAmount()+billDetail.getQuantity());
+                    productDetails2.add(productDetail);
+                }
+                bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
+                        + "\nCộng lại số lượng vào sản phẩm");
+                productDetailService.saveAll(productDetails2);
+            }
+
+            if (!(bill.getType().equals(billUpdateResquest.getType()))){
+                bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
+                        +"\nSet Type : "+bill.getType()+" -> "+billUpdateResquest.getType());
+                bill.setType(billUpdateResquest.getType());
             }
 
 
@@ -277,11 +313,11 @@ public class BillController {
                            +"\nSet Type : "+bill.getType()+" -> "+billUpdateResquest.getType());
                    bill.setType(0);
                    List<BillDetail> billDetails = billDetailService.findByBillIdAndType(bill.getId(),1);
-                   List<ProductDetail> productDetails  = new ArrayList<>();
+                   List<ProductDetail> productDetails2  = new ArrayList<>();
                    for (BillDetail billDetail:billDetails) {
                        ProductDetail productDetail = billDetail.getProductDetail();
                        productDetail.setAmount(productDetail.getAmount()+billDetail.getQuantity());
-                       productDetails.add(productDetail);
+                       productDetails2.add(productDetail);
                    }
                    if (!((bill.getAddress()==null?"":bill.getAddress()).equals(billUpdateResquest.getAddress()))){
                        bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
@@ -296,7 +332,7 @@ public class BillController {
 
                    Bill newBillSaved = null;
                    try {
-                       productDetailService.saveAll(productDetails);
+                       productDetailService.saveAll(productDetails2);
                        bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
                                + "\nĐã hoàn lại sản phẩm !");
                        newBillSaved = billService.save(bill);
@@ -369,25 +405,51 @@ public class BillController {
                     return ResponseEntity.badRequest().body("Chỉ có thể chuyển trạng thái thành \"Đã xác nhận\" hoặc \"Chờ xử lí\"");
                 }
             }else if (bill.getType()==3){
+
                 if(billUpdateResquest.getType()==3){
                     if (!(bill.getShipeFee().doubleValue()==billUpdateResquest.getShipeFee().doubleValue())){
                         bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
                                 + "\nSet ShipeFee : "+bill.getShipeFee()+" -> "+billUpdateResquest.getShipeFee());
                         bill.setShipeFee(new BigDecimal(billUpdateResquest.getShipeFee()));
                     }
-                } else if (billUpdateResquest.getType()==4||billUpdateResquest.getType()==5) {
-                    if (billUpdateResquest.getType()==4){
+                } else if (billUpdateResquest.getType()==4) {
+                        Double total = billDetailService.sumMoneyByBillIdAndType(bill.getId(),null).orElse(null);
+                        if (total==null){
+                            return ResponseEntity.badRequest().body("Lỗi tính tổng tiền !");
+                        }
+                        if(bill.getPaymentAmount().doubleValue()<bill.getShipeFee().doubleValue()+total){
+                            return ResponseEntity.badRequest().body("Số tiền thanh toán không đủ !");
+                        }
+
+                        List<BillDetail> billDetails =  billDetailService.findByBillIdAndType(bill.getId(),1);
+
+                        for (BillDetail billDetail:billDetails) {
+                            ProductDetail productDetail = billDetail.getProductDetail();
+                            if (productDetail == null){
+                                return ResponseEntity.badRequest().body("Sản phẩm "+productDetail.getId()+" không tồn tại hoặc đã ngừng kinh doanh");
+                            }
+                            if (productDetail.getAmount()<billDetail.getQuantity()){
+                                return ResponseEntity.badRequest().body("Sản phẩm "+productDetail.getId()+" không đủ số lượng");
+                            }
+                            if (billDetail.getQuantity()<=0){
+                                return ResponseEntity.badRequest().body("Sản phẩm "+productDetail.getId()+" số lượng phải lớn hơn 0");
+                            }
+                            productDetail.setAmount(productDetail.getAmount()- billDetail.getQuantity());
+                            productDetails.add(productDetail);
+                        }
+
+
                         if (!(bill.getShipeFee().doubleValue()==billUpdateResquest.getShipeFee().doubleValue())){
                             bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
                                     + "\nSet ShipeFee : "+bill.getShipeFee()+" -> "+billUpdateResquest.getShipeFee());
                             bill.setShipeFee(new BigDecimal(billUpdateResquest.getShipeFee()));
                         }
-                    }
+
                     bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
                             +"\nSet Type : "+bill.getType()+" -> "+billUpdateResquest.getType());
                     bill.setType(billUpdateResquest.getType());
                 }else {
-                    return ResponseEntity.badRequest().body("Chỉ có thể chuyển trạng thái thành \"Chờ giao hàng\" hoặc \"Đang giao hàng\"");
+                    return ResponseEntity.badRequest().body("Chỉ có thể chuyển trạng thái thành \"Chờ giao hàng\" ");
                 }
             }else if (bill.getType()==4){
                 if (billUpdateResquest.getType()==4){
@@ -445,9 +507,13 @@ public class BillController {
                         + "\nSet Note : \n"+bill.getNote()+"\n ----> \n"+billUpdateResquest.getNote());
                 bill.setNote(billUpdateResquest.getNote());
             }
-
+            if (productDetails.size()>0){
+                productDetailService.saveAll(productDetails);
+                bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
+                        + "\nĐã trừ số lượng trong sản phẩm !");
+            }
             Bill newBill = billService.save(bill);
-            
+
             return ResponseEntity.ok("Thành công !");
 
         }

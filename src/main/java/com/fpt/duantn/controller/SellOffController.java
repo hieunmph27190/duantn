@@ -103,7 +103,7 @@ public class SellOffController {
                 return ResponseEntity.badRequest().body("Thông tin sản phẩm hoặc số lượng bị thiếu");
             }
             ProductDetail productDetail =  productDetailService.findById(request.getId()).orElse(null);
-            if (productDetail == null||productDetail.getType().equals(0)){
+            if (productDetail == null){
                 return ResponseEntity.badRequest().body("Sản phẩm "+request.getId()+" không tồn tại hoặc đã ngừng kinh doanh");
             }
             if (productDetail.getAmount()<request.getQuantity()){

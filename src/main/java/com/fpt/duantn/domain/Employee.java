@@ -35,7 +35,7 @@ public class Employee {
     @Column(name = "type")
     private Integer type;
 
-    @NotBlank
+
     @Column(name = "user_name")
     private String userName;
 
@@ -45,7 +45,7 @@ public class Employee {
 
 
 
-    @NotNull
+
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "dateof_birth")
     private Date dateOfBirth;
@@ -64,7 +64,7 @@ public class Employee {
     private Blob image;
 
 
-    @NotBlank
+
     @Column(name = "phone_number")
     private String phoneNumber;
 

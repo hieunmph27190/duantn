@@ -164,7 +164,7 @@ public class CustomerController implements Serializable {
             }
         });
         Customer customer= new Customer();
-        modelMapper.map(customerResquest,customerResquest);
+        modelMapper.map(customerResquest,customer);
         if ((employeeService.findByEmail(customer.getEmail()).isPresent()||customerService.findByEmail(customer.getEmail()).isPresent())){
             Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
             errors.put("email","Email đã tồn tại");
@@ -214,7 +214,7 @@ public class CustomerController implements Serializable {
                 return ResponseEntity.badRequest().body(errors);
             }
         }
-        if (customerService.findByPhoneNumber(customer.getPhoneNumber())!=null){
+        if (customerService.findByPhoneNumber(customer.getPhoneNumber())!=null||employeeService.findEByPhoneNumber(customer.getPhoneNumber())!=null){
             Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
             errors.put("phoneNumber","Số điện thoại đã tồn tại");
             return ResponseEntity.badRequest().body(errors);

@@ -329,7 +329,9 @@ $(document).ready(function() {
             success: function (response) {
                 clearAll();
                 alert("Thành công : "+response+" , Cần thanh toán đơn này");
-                thanhToanVNPAY(response);
+                if ($(".donHang input[name='thanhToan']:checked").val()==1){
+                    thanhToanVNPAY(response);
+                }
             },
             error: function (xhr, status, error) {
                 if(xhr.status==400){

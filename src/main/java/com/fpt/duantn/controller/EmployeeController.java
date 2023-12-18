@@ -149,6 +149,11 @@ public class EmployeeController implements Serializable {
             errors.put("email","Email đã tồn tại");
             return ResponseEntity.badRequest().body(errors);
         }
+        if (customerService.findByPhoneNumber(employee.getPhoneNumber())!=null||employeeService.findEByPhoneNumber(employee.getPhoneNumber())!=null){
+            Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
+            errors.put("phoneNumber","Số điện thoại đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
         employee.setId(null);
         if (files!=null){
             if (files.length>0){

@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TransportationFeeDTO {
 
-    public static final Integer heightProduct = 16;
+    public static final Integer heightProduct = 20;
 
-    public static final Integer lengthProduct = 8;
+    public static final Integer lengthProduct = 40;
 
     public static final Integer weightProduct = 500;
 
-    public static final Integer widthProduct = 4;
+    public static final Integer widthProduct = 20;
 
     private  Integer toDistrictId;
 
