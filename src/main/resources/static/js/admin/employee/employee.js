@@ -143,7 +143,7 @@ $(document).ready(function() {
 
   function resetPass(){
     let formData = new FormData();
-    let id = $("#form-customer-update input[name='id']").val();
+    let id = $("#form-employee-update input[name='id']").val();
     let newPassword = prompt("Vui lòng nhập mật khẩu mới:");
     if (newPassword!=null&&newPassword!="") {
       formData.set("id",id);

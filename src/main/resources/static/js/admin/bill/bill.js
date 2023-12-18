@@ -99,25 +99,7 @@ $(document).ready(function() {
       {
         "data": "type",
         "render": function(data, type, row) {
-          if (data == 0) {
-            return "Đã hủy";
-          } else if (data == 1) {
-            return "Chờ xử lí";
-          } else if (data == 2) {
-            return "Chờ xác thực";
-          } else if (data == 3) {
-            return "Đã xác thực";
-          } else if (data == 4) {
-            return "Chờ giao hàng";
-          } else if (data == 5) {
-            return "Đang giao hàng";
-          } else if (data == 6) {
-            return "Đã nhận hàng";
-          } else if (data == 7) {
-            return "Đã hoàn thành";
-          } else {
-            return "";
-          }
+          return genType(data);
         }
       },
       {
@@ -146,6 +128,30 @@ $(document).ready(function() {
     }
   });
 
+
+  function genType(data){
+    if (data == 0) {
+      return "Đã hủy";
+    } else if (data == "1") {
+      return "Chờ xử lí";
+    } else if (data == 2) {
+      return "Chờ xác thực";
+    } else if (data == 3) {
+      return "Đã xác thực";
+    } else if (data == 4) {
+      return "Chờ giao hàng";
+    } else if (data == 5) {
+      return "Đang giao hàng";
+    } else if (data == 6) {
+      return "Đã nhận hàng";
+    } else if (data == 7) {
+      return "Đã hoàn thành";
+    }else if (data == -2) {
+      return "Chờ thanh toán";
+    } else {
+      return "";
+    }
+  }
 
   // Show form update
   $(`#${tableName} tbody`).on('dblclick', 'tr', loadDataModal);
@@ -331,6 +337,14 @@ $(document).ready(function() {
           return data;
         }
       },
+      {"data":"productDetail.amount",
+        "render": function (data, type, row, meta) {
+          if (type === 'display') {
+            return new Intl.NumberFormat('en-US').format(data);
+          }
+          return data;
+        }
+      },
       {"data":"price",
         "render": function (data, type, row, meta) {
           if (type === 'display') {
@@ -376,6 +390,9 @@ $(document).ready(function() {
     formData.delete("phoneNumber")
     formData.delete("paymentTime")
 
+    if (!confirm("Bạn có chắc chắn muốn chuyển trạng thái đơn hàng thành : "+genType(formData.get("type")))){
+      return;
+    }
       $.ajax({
         url: urlBase+"/update/"+ formData.get("id"),
         type: 'PUT',
@@ -384,10 +401,8 @@ $(document).ready(function() {
         processData: false,
         success: function (response) {
           // Xử lý thành công
-          alert('Dữ liệu đã được sửa thành công!');
+          alert('Dữ liệu đã được sửa thành công! '+"\n"+response );
           table.ajax.reload(null, false);
-          clearForm(`form-${objectName}-add`, response)
-          $('#view-update').modal('hide');
         },
         error: function (xhr, status, error) {
           if(xhr.status==400){
@@ -404,10 +419,6 @@ $(document).ready(function() {
       });
 
   });
-
-
-
-
 
 
 

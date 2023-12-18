@@ -1,9 +1,12 @@
 package com.fpt.duantn.controller;
 
 import com.fpt.duantn.domain.Bill;
+import com.fpt.duantn.domain.BillDetail;
+import com.fpt.duantn.domain.ProductDetail;
 import com.fpt.duantn.payload.response.MessageResponse;
 import com.fpt.duantn.service.BillDetailService;
 import com.fpt.duantn.service.BillService;
+import com.fpt.duantn.service.ProductDetailService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.validator.internal.util.Contracts;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +34,8 @@ public class VNPayController {
     private BillService billService;
     @Autowired
     private BillDetailService billDetailService;
+    @Autowired
+    private ProductDetailService productDetailService;
 
 
     @GetMapping("/payment-callback")
@@ -40,7 +45,7 @@ public class VNPayController {
         String amount = queryParams.get("vnp_Amount");
         String registerServiceId = queryParams.get("registerServiceId");
         String transactionNo = queryParams.get("vnp_TransactionNo");
-        if(billId!= null && !billId.equals("")) {
+        if((billId!= null && !billId.equals(""))||(registerServiceId!= null && !registerServiceId.equals(""))) {
             if ("00".equals(vnp_ResponseCode)) {
                 // Giao dịch thành công
                 // Thực hiện các xử lý cần thiết, ví dụ: cập nhật CSDL
@@ -48,12 +53,16 @@ public class VNPayController {
 //                if (bill==null){
 //                    return new MessageResponse("Bill không tồn tại");
 //                }
+
                 BigDecimal paymentAmount =  bill.getPaymentAmount()==null?new BigDecimal(0):bill.getPaymentAmount();
                 Double newAmount =  paymentAmount.doubleValue()+Double.valueOf(amount)/100;
                 bill.setPaymentAmount(BigDecimal.valueOf(newAmount));
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
                 Date parsedDate = dateFormat.parse(queryParams.get("vnp_PayDate"));
                 Timestamp timestamp = new Timestamp(parsedDate.getTime());
+                if (bill.getType().equals(-2)){
+                    bill.setType(7);
+                }
                 bill.setPaymentTime(timestamp);
                 bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo()+"\n\n")+"Đã thanh toán : "+(Double.valueOf(amount)/100)+" : VNP Code : "+transactionNo+" : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")));
                 bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
@@ -68,43 +77,21 @@ public class VNPayController {
             } else {
                 // Giao dịch thất bại
                 // Thực hiện các xử lý cần thiết, ví dụ: không cập nhật CSDL\
-                response.sendRedirect("http://localhost:4200/payment-failed");
-
-            }
-        }
-        if(registerServiceId!= null && !registerServiceId.equals("")) {
-            if ("00".equals(vnp_ResponseCode)) {
-                // Giao dịch thành công
-                // Thực hiện các xử lý cần thiết, ví dụ: cập nhật CSDL
-                Bill bill = billService.findById(UUID.fromString(queryParams.get("billId"))).orElse(null);
-//                if (bill==null){
-//                    return new MessageResponse("Bill không tồn tại");
-//                }
-                BigDecimal paymentAmount =  bill.getPaymentAmount()==null?new BigDecimal(0):bill.getPaymentAmount();
-                Double newAmount =  paymentAmount.doubleValue()+Double.valueOf(amount)/100;
-                bill.setPaymentAmount(BigDecimal.valueOf(newAmount));
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-                Date parsedDate = dateFormat.parse(queryParams.get("vnp_PayDate"));
-                Timestamp timestamp = new Timestamp(parsedDate.getTime());
-                bill.setPaymentTime(timestamp);
-                bill.setTransactionNo(bill.getTransactionNo()==null?"":bill.getTransactionNo()+"|"+transactionNo);
-                bill.setPaymentType(1);
-                billService.save(bill);
-
                 if (queryParams.get("admin") !=null||queryParams.get("admin") !=""){
-                    response.sendRedirect("http://localhost:8080/payment/success?billId="+billId+"&amount="+amount+"&transactionNo="+transactionNo);
+                    response.sendRedirect("http://localhost:8080/payment/error?billId="+billId+"&transactionNo="+transactionNo);
                 }else {
-                    response.sendRedirect("http://localhost:4200/bill");
+                    response.sendRedirect("http://localhost:4200/payment-failed");
                 }
 
-            } else {
-                // Giao dịch thất bại
-                // Thực hiện các xử lý cần thiết, ví dụ: không cập nhật CSDL\
-                response.sendRedirect("http://localhost:4200/payment-failed");
 
             }
+        }else {
+            if (queryParams.get("admin") !=null||queryParams.get("admin") !=""){
+                response.sendRedirect("http://localhost:8080/payment/error?billId="+billId+"&transactionNo="+transactionNo);
+            }else {
+                response.sendRedirect("http://localhost:4200/payment-failed");
+            }
         }
-
 
     }
 

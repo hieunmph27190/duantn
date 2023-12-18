@@ -62,6 +62,33 @@ public class BanHangController {
         model.addAttribute("transactionNo",transactionNo);
         return "/admin/view/payment/success";
     }
+    @GetMapping("/payment/error")
+    public String paymenterror(@RequestParam("billId") UUID billId,@RequestParam("transactionNo") String transactionNo,Model model) {
+        Bill bill = billService.findById(billId).get();
+
+        if (bill.getEmployee()!=null){
+            Employee employee =  new Employee();
+            employee.setId(bill.getEmployee().getId());
+            employee.setName(bill.getEmployee().getName());
+            bill.setEmployee(employee);
+        }
+        if (bill.getCustomer()!=null) {
+            Customer customer = new Customer();
+            customer.setId(bill.getCustomer().getId());
+            customer.setName(bill.getCustomer().getName());
+            bill.setCustomer(customer);
+        }
+
+        if (bill.getPaymentEmployee()!=null) {
+            Employee paymentEmployee = new Employee();
+            paymentEmployee.setId(bill.getPaymentEmployee().getId());
+            paymentEmployee.setName(bill.getPaymentEmployee().getName());
+            bill.setPaymentEmployee(paymentEmployee);
+        }
+        model.addAttribute("bill",bill);
+        model.addAttribute("transactionNo",transactionNo);
+        return "/admin/view/payment/error";
+    }
 
     @GetMapping("/ban-hang/product")
     @ResponseBody
