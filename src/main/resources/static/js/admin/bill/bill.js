@@ -209,7 +209,7 @@ $(document).ready(function() {
     });
 
     $.ajax({
-      url: "/selloff/calculate-money"+'/' + rowData.id,
+      url: "/selloff/calculate-money"+'/' + billId,
       type: 'GET',
       success: function(response) {
         // Lấy dữ liệu từ response và hiển thị trên modal
@@ -402,7 +402,6 @@ $(document).ready(function() {
         success: function (response) {
           // Xử lý thành công
           alert('Dữ liệu đã được sửa thành công! '+"\n"+response );
-          table.ajax.reload(null, false);
         },
         error: function (xhr, status, error) {
           if(xhr.status==400){

@@ -27,6 +27,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
     @Override
+    public Optional<Employee> findEByPhoneNumber(String phoneNumber) {
+        return employeeRepository.findEByPhoneNumber(phoneNumber);
+    }
+
+    @Override
     public Integer updateEmployeeWithoutImage(Employee updatedEmployee) {
         return employeeRepository.updateEmployeeWithoutImage(updatedEmployee);
     }

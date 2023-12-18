@@ -42,7 +42,7 @@ public class Customer {
     @Column(name="email")
     private String email;
 
-    @NotNull
+
     @Column(name="gender")
     private Boolean gender;
 

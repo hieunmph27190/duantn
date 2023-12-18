@@ -41,7 +41,24 @@ $(document).ready(function() {
         contentType: 'application/json',
         processData: true,
         success: function (response) {
-          window.location.href = "/selloff/view"
+          if (response.roles.includes("ROLE_USER")) {
+            $.ajax({
+              url: "/api/auth/signout",
+              type: 'POST',
+              data: {},
+              contentType: 'application/json',
+              processData: true,
+              success: function (response) {
+
+              },
+              error: function (xhr, status, error) {
+
+              }
+            });
+            alert("Tài khoản không có quyên truy cập !")
+          } else {
+            window.location.href = "/selloff/view"
+          }
         },
         error: function (xhr, status, error) {
           if(xhr.status==401){
