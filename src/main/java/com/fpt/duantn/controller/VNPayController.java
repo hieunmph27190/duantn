@@ -69,7 +69,7 @@ public class VNPayController {
                         + "\nSet PaymentType : "+bill.getPaymentType()+" -> "+1);
                 bill.setPaymentType(1);
                 billService.save(bill);
-                if (queryParams.get("admin") !=null||queryParams.get("admin") !=""){
+                if (queryParams.get("admin") !=null&&queryParams.get("admin") !=""){
                     response.sendRedirect("http://localhost:8080/payment/success?billId="+billId+"&amount="+amount+"&transactionNo="+transactionNo);
                 }else {
                     response.sendRedirect("http://localhost:4200/bill");
@@ -77,7 +77,7 @@ public class VNPayController {
             } else {
                 // Giao dịch thất bại
                 // Thực hiện các xử lý cần thiết, ví dụ: không cập nhật CSDL\
-                if (queryParams.get("admin") !=null||queryParams.get("admin") !=""){
+                if (queryParams.get("admin") !=null&&queryParams.get("admin") !=""){
                     response.sendRedirect("http://localhost:8080/payment/error?billId="+billId+"&transactionNo="+transactionNo);
                 }else {
                     response.sendRedirect("http://localhost:4200/payment-failed");
@@ -86,7 +86,7 @@ public class VNPayController {
 
             }
         }else {
-            if (queryParams.get("admin") !=null||queryParams.get("admin") !=""){
+            if (queryParams.get("admin") !=null&&queryParams.get("admin") !=""){
                 response.sendRedirect("http://localhost:8080/payment/error?billId="+billId+"&transactionNo="+transactionNo);
             }else {
                 response.sendRedirect("http://localhost:4200/payment-failed");
