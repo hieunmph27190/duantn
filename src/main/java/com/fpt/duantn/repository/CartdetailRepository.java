@@ -24,4 +24,7 @@ public interface CartdetailRepository extends JpaRepository<CartDetail,Long> {
     @Transactional
     @Modifying
     int deleteByCartDetailIdAndCustomerId(Long id ,UUID customerId);
+    @Transactional
+    @Modifying
+    int deleteByProductDetailIdAndCustomerId(UUID productDetailID ,UUID customerId);
 }

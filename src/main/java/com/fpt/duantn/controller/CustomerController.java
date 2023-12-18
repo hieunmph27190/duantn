@@ -171,7 +171,7 @@ public class CustomerController implements Serializable {
             return ResponseEntity.badRequest().body(errors);
         }
 
-        if (customerService.findByPhoneNumber(customer.getPhoneNumber())!=null){
+        if (customerService.findByPhoneNumber(customer.getPhoneNumber())!=null||employeeService.findEByPhoneNumber(customer.getPhoneNumber()).isPresent()){
             Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
             errors.put("phoneNumber","Số điện thoại đã tồn tại");
             return ResponseEntity.badRequest().body(errors);

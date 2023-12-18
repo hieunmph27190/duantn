@@ -214,7 +214,7 @@ $(document).ready(function() {
       success: function(response) {
         // Lấy dữ liệu từ response và hiển thị trên modal
         let data = response;
-        $(`#view-update input[name="soTienCuaDon"]`).val((data))
+        $(`#view-update input[name="soTienCuaDon"]`).val(Intl.NumberFormat('en-US').format(data));
 
       },
       error: function(xhr, status, error) {
@@ -244,7 +244,6 @@ $(document).ready(function() {
         $('#view-update').modal('show');
         pullDataToForm(`form-${objectName}-update`,data)
         $(`#view-update input[name="paymentTime"]`).val(formatDateTime(data.paymentTime))
-
         $(`#view-update input[name="employee.id"]`).val((data?.employee?.id))
         $(`#view-update input[name="employee.name"]`).val((data?.employee?.name))
 
@@ -266,7 +265,7 @@ $(document).ready(function() {
       success: function(response) {
         // Lấy dữ liệu từ response và hiển thị trên modal
         let data = response;
-        $(`#view-update input[name="soTienCuaDon"]`).val((data))
+        $(`#view-update input[name="soTienCuaDon"]`).val(Intl.NumberFormat('en-US').format(data));
 
       },
       error: function(xhr, status, error) {

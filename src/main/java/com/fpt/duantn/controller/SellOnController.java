@@ -1,18 +1,23 @@
 package com.fpt.duantn.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpt.duantn.domain.*;
 import com.fpt.duantn.dto.SellOffProductRequest;
 import com.fpt.duantn.dto.SellOffRequest;
 import com.fpt.duantn.dto.SellOnRequest;
 import com.fpt.duantn.models.User;
 import com.fpt.duantn.payload.response.MessageResponse;
+import com.fpt.duantn.repository.CartdetailRepository;
 import com.fpt.duantn.security.services.AuthenticationService;
 import com.fpt.duantn.service.BillDetailService;
 import com.fpt.duantn.service.BillService;
 import com.fpt.duantn.service.CustomerService;
 import com.fpt.duantn.service.ProductDetailService;
+import com.fpt.duantn.service.impl.GiaoHangTietKiemServiceImpl;
 import com.fpt.duantn.util.SendMailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -41,9 +46,13 @@ public class SellOnController {
     private ProductDetailService productDetailService;
     @Autowired
     private AuthenticationService authenticationService;
+    @Autowired
+    private GiaoHangTietKiemServiceImpl giaoHangTietKiemService;
 
     @Autowired
     private SendMailUtil sendMailUtil;
+    @Autowired
+    private CartdetailRepository cartdetailRepository;
 
     @PostMapping ("/calculate-money")
     public ResponseEntity<?> calculateMoney(@RequestBody SellOnRequest sellOnRequest){
@@ -79,15 +88,17 @@ public class SellOnController {
     @PostMapping ()
     public ResponseEntity<?> add(@RequestBody() SellOnRequest sellOnRequest, Authentication authentication) {
 
-        if (sellOnRequest.getAddress()==null||sellOnRequest.getNote()==null||sellOnRequest.getPhoneNumber()==null||sellOnRequest.getSanPhams()==null) {
+        if (sellOnRequest.getAddress()==null||sellOnRequest.getCity()==null||sellOnRequest.getDistrict()==null||sellOnRequest.getWard()==null||sellOnRequest.getNote()==null||sellOnRequest.getPhoneNumber()==null||sellOnRequest.getSanPhams()==null) {
             return ResponseEntity.badRequest().body("Thông tin Không đầy đủ");
         }
         List<SellOffProductRequest>sellOffProductRequests = sellOnRequest.getSanPhams();
         if (sellOffProductRequests.size()<=0){
             return ResponseEntity.badRequest().body("Đơn hàng trống !");
         }
+
         List<BillDetail> billDetails = new ArrayList<>();
         Double sum =0D;
+        Integer sumQ =0;
         for (SellOffProductRequest request : sellOffProductRequests){
             if (request.getId()==null||request.getQuantity()==null){
                 return ResponseEntity.badRequest().body("Thông tin sản phẩm hoặc số lượng bị thiếu");
@@ -109,13 +120,29 @@ public class SellOnController {
             billDetail.setType(1);
             billDetails.add(billDetail);
             sum+=request.getQuantity()*productDetail.getPrice().doubleValue();
+            sumQ+=request.getQuantity();
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        Double shipFee = 0D;
+        try {
+            ResponseEntity responseEntity = giaoHangTietKiemService.tinhShip(sellOnRequest.getCity(),sellOnRequest.getDistrict(),sellOnRequest.getWard(),sumQ,((long)sum.doubleValue()));
+            if (responseEntity.getStatusCode()== HttpStatus.OK){
+                JsonNode jsonNode = objectMapper.readTree(responseEntity.getBody().toString());
+                shipFee = jsonNode.get("data").get("total").asDouble();
+            }else {
+                return responseEntity;
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Lỗi tính tiên ship !");
         }
         Bill newBill = new Bill();
         User user = authenticationService.loadUserByUsername(authentication.getName());
         Customer customer =  customerService.findById(user.getId()).orElse(null);
         newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo()+"\n\n")+customer.getId()+" :Khách hàng: "+customer.getName() + " : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy"))+" Đã Tạo Bill : ");
-
-
+        newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
+                +"\nSet ShipeFee : "+newBill.getShipeFee()+" -> "+shipFee);
+        newBill.setType(1);
+        newBill.setShipeFee(new BigDecimal(shipFee));
         newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
                 +"\nSet Type : "+newBill.getType()+" -> "+1);
         newBill.setType(1);
@@ -139,6 +166,9 @@ public class SellOnController {
                 billDetail.setBill(newBillSaved);
             }
             billDetailService.saveAll(billDetails);
+            for (SellOffProductRequest request : sellOffProductRequests){
+                cartdetailRepository.deleteByProductDetailIdAndCustomerId(request.getId(),customer.getId());
+            }
 
         }catch (Exception e){
             System.out.println(e);

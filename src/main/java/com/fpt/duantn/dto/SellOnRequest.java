@@ -16,5 +16,8 @@ public class SellOnRequest {
     private List<SellOffProductRequest> sanPhams;
     private String phoneNumber;
     private String address;
+    private String city;
+    private String district;
+    private String ward;
     private String note;
 }
