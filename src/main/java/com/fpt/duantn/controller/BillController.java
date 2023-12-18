@@ -1,16 +1,11 @@
 package com.fpt.duantn.controller;
 
-import com.fpt.duantn.domain.Bill;
-import com.fpt.duantn.domain.Customer;
-import com.fpt.duantn.domain.Employee;
-import com.fpt.duantn.domain.Product;
+import com.fpt.duantn.domain.*;
 import com.fpt.duantn.dto.*;
 import com.fpt.duantn.models.User;
 import com.fpt.duantn.payload.response.MessageResponse;
 import com.fpt.duantn.security.services.AuthenticationService;
-import com.fpt.duantn.service.BillService;
-import com.fpt.duantn.service.CustomerService;
-import com.fpt.duantn.service.EmployeeService;
+import com.fpt.duantn.service.*;
 import com.fpt.duantn.util.FileImgUtil;
 import com.fpt.duantn.util.FormErrorUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,10 +38,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
@@ -60,6 +52,10 @@ public class BillController {
     private AuthenticationService authenticationService;
     @Autowired
     private BillService billService;
+    @Autowired
+    private BillDetailService billDetailService;
+    @Autowired
+    private ProductDetailService productDetailService;
     @Autowired
     private EmployeeService employeeService;
 
@@ -234,12 +230,12 @@ public class BillController {
                         + "\nSet PaymentType : "+bill.getPaymentType()+" -> "+billUpdateResquest.getPaymentType());
                 bill.setPaymentType(billUpdateResquest.getPaymentType());
             }
-            if (!(bill.getAddress().equals(billUpdateResquest.getAddress()))){
+            if (!((bill.getAddress()==null?"":bill.getAddress()).equals(billUpdateResquest.getAddress()))){
                 bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
                                 + "\nSet Address : "+bill.getAddress()+" -> "+billUpdateResquest.getAddress());
                 bill.setAddress(billUpdateResquest.getAddress());
             }
-            if (!(bill.getNote().equals(billUpdateResquest.getNote()))){
+            if (!((bill.getNote()==null?"":bill.getNote()).equals(billUpdateResquest.getNote()))){
                 bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
                         + "\nSet Note : \n"+bill.getNote()+"\n ----> \n"+billUpdateResquest.getNote());
                 bill.setNote(billUpdateResquest.getNote());
@@ -275,6 +271,49 @@ public class BillController {
             Employee employeeLogin =  employeeService.findById(user.getId()).orElse(null);
             bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo()+"\n\n")+employeeLogin.getId()+" : "+employeeLogin.getName() + " : MODERATOR : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")));
 
+           if (bill.getType()==-2){
+               if (billUpdateResquest.getType().intValue()==0){
+                   bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
+                           +"\nSet Type : "+bill.getType()+" -> "+billUpdateResquest.getType());
+                   bill.setType(0);
+                   List<BillDetail> billDetails = billDetailService.findByBillIdAndType(bill.getId(),1);
+                   List<ProductDetail> productDetails  = new ArrayList<>();
+                   for (BillDetail billDetail:billDetails) {
+                       ProductDetail productDetail = billDetail.getProductDetail();
+                       productDetail.setAmount(productDetail.getAmount()+billDetail.getQuantity());
+                       productDetails.add(productDetail);
+                   }
+                   if (!((bill.getAddress()==null?"":bill.getAddress()).equals(billUpdateResquest.getAddress()))){
+                       bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
+                               + "\nSet Address : "+bill.getAddress()+" -> "+billUpdateResquest.getAddress());
+                       bill.setAddress(billUpdateResquest.getAddress());
+                   }
+                   if (!((bill.getNote()==null?"":bill.getNote()).equals(billUpdateResquest.getNote()))){
+                       bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
+                               + "\nSet Note : \n"+bill.getNote()+"\n ----> \n"+billUpdateResquest.getNote());
+                       bill.setNote(billUpdateResquest.getNote());
+                   }
+
+                   Bill newBillSaved = null;
+                   try {
+                       productDetailService.saveAll(productDetails);
+                       bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
+                               + "\nĐã hoàn lại sản phẩm !");
+                       newBillSaved = billService.save(bill);
+                       for (BillDetail billDetail : billDetails){
+                           billDetail.setBill(newBillSaved);
+                       }
+                       billDetailService.saveAll(billDetails);
+                       return ResponseEntity.ok("Thành công , Đã hoàn lại sản phẩm");
+                   }catch (Exception e){
+                       return ResponseEntity.ok("Lỗi , Kiểm tra lại hóa đơn");
+                   }
+               }else {
+                   return ResponseEntity.badRequest().body("Đơn hàng này chỉ có thể chuyển sang trọng thái Hủy !");
+               }
+           }
+
+
             if (billUpdateResquest.getType().intValue()==0){
                 if (bill.getType()==1||bill.getType()==2){
                     if (bill.getPaymentAmount()==null||bill.getPaymentAmount().doubleValue()==0){
@@ -282,7 +321,7 @@ public class BillController {
                                 +"\nSet Type : "+bill.getType()+" -> "+billUpdateResquest.getType());
                         bill.setType(billUpdateResquest.getType());
                     }else {
-                        return ResponseEntity.badRequest().body("Đơn hàng đã thanh toán không thể hủy");
+                        return ResponseEntity.badRequest().body("Đơn hàng đã thanh toán không thể hủy ! Liên hệ hỗ trọ viên để được hỗ trợ !");
                     }
                 }else {
                     return ResponseEntity.badRequest().body("Bill không thể hủy");
@@ -396,39 +435,20 @@ public class BillController {
             }
 
 
-            if (!(bill.getAddress().equals(billUpdateResquest.getAddress()))){
+            if (!((bill.getAddress()==null?"":bill.getAddress()).equals(billUpdateResquest.getAddress()))){
                 bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
                         + "\nSet Address : "+bill.getAddress()+" -> "+billUpdateResquest.getAddress());
                 bill.setAddress(billUpdateResquest.getAddress());
             }
-            if (!(bill.getNote().equals(billUpdateResquest.getNote()))){
+            if (!((bill.getNote()==null?"":bill.getNote()).equals(billUpdateResquest.getNote()))){
                 bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
                         + "\nSet Note : \n"+bill.getNote()+"\n ----> \n"+billUpdateResquest.getNote());
                 bill.setNote(billUpdateResquest.getNote());
             }
 
             Bill newBill = billService.save(bill);
-            if (newBill.getEmployee()!=null){
-                Employee employee =  new Employee();
-                employee.setId(newBill.getEmployee().getId());
-                employee.setName(newBill.getEmployee().getName());
-                newBill.setEmployee(employee);
-            }
-            if (newBill.getCustomer()!=null) {
-                Customer customer = new Customer();
-                customer.setId(newBill.getCustomer().getId());
-                customer.setName(newBill.getCustomer().getName());
-                newBill.setCustomer(customer);
-            }
-
-            if (newBill.getPaymentEmployee()!=null) {
-                Employee paymentEmployee = new Employee();
-                paymentEmployee.setId(newBill.getPaymentEmployee().getId());
-                paymentEmployee.setName(newBill.getPaymentEmployee().getName());
-                newBill.setPaymentEmployee(paymentEmployee);
-            }
-
-            return ResponseEntity.ok(newBill);
+            
+            return ResponseEntity.ok("Thành công !");
 
         }
 

@@ -43,13 +43,21 @@ public class SellOffController {
 
     @GetMapping("/view")
     public String getView (){
-
         return "/admin/view/selloff/view";
     }
 
     @PostMapping ("/calculate-money")
     public ResponseEntity<?> calculateMoney(@ModelAttribute()SellOffRequest sellOffRequest){
         List<SellOffProductRequest> sellOffProductRequests= sellOffRequest.getSanPhams();
+        if (sellOffRequest==null){
+            return ResponseEntity.ok(0D);
+        }
+        if (sellOffProductRequests==null){
+            return ResponseEntity.ok(0D);
+        }
+        if (sellOffProductRequests.size()<=0){
+            return ResponseEntity.ok(0D);
+        }
         Double sum =0D;
         for (SellOffProductRequest request : sellOffProductRequests){
             ProductDetail productDetail =  productDetailService.findById(request.getId()).orElse(null);
@@ -75,17 +83,19 @@ public class SellOffController {
 
     @PostMapping ()
     public ResponseEntity<?> add(@ModelAttribute() SellOffRequest sellOffRequest, Authentication authentication) {
-        if (sellOffRequest.getIdKhachHang()==null||sellOffRequest.getThanhToan()==null||sellOffRequest.getTrangThaiTT()==null||sellOffRequest.getSanPhams()==null){
+        if (sellOffRequest.getThanhToan()==null||sellOffRequest.getTrangThaiTT()==null||sellOffRequest.getSanPhams()==null){
             return ResponseEntity.badRequest().body("Thông tin Không đầy đủ");
         }
-        Customer customer = customerService.findById(sellOffRequest.getIdKhachHang()).orElse(null);
-        if (customer==null){
-            return ResponseEntity.badRequest().body("Thông tin khách hàng không đúng");
+        Customer customer =null;
+        if (sellOffRequest.getIdKhachHang()!=null){
+            customer = customerService.findById(sellOffRequest.getIdKhachHang()).orElse(null);
         }
+
         List<SellOffProductRequest>sellOffProductRequests = sellOffRequest.getSanPhams();
         if (sellOffProductRequests.size()<=0){
             return ResponseEntity.badRequest().body("Đơn hàng trống !");
         }
+        List<ProductDetail> productDetails = new ArrayList<>();
         List<BillDetail> billDetails = new ArrayList<>();
         Double sum =0D;
         for (SellOffProductRequest request : sellOffProductRequests){
@@ -107,6 +117,8 @@ public class SellOffController {
             billDetail.setPrice(productDetail.getPrice());
             billDetail.setQuantity(request.getQuantity());
             billDetail.setType(1);
+            productDetail.setAmount(productDetail.getAmount()- billDetail.getQuantity());
+            productDetails.add(productDetail);
             billDetails.add(billDetail);
             sum+=request.getQuantity()*productDetail.getPrice().doubleValue();
         }
@@ -117,22 +129,27 @@ public class SellOffController {
         newBill.setEmployee(Employee.builder().id(user.getId()).build());
         newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
                 +"\nSet Type : "+newBill.getType()+" -> "+3);
-        newBill.setType(3);
-
+        if (sellOffRequest.getThanhToan().equals(1)){
+            newBill.setType(-2);
+        }else {
+            newBill.setType(7);
+        }
         newBill.setCustomer(customer);
-        newBill.setPhoneNumber(customer.getPhoneNumber());
+        if (customer!=null){
+            newBill.setPhoneNumber(customer.getPhoneNumber());
+        }
         newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
                 + "\nSet PaymentType : "+newBill.getPaymentType()+" -> "+sellOffRequest.getThanhToan());
         newBill.setPaymentType(sellOffRequest.getThanhToan());
 
-        if (sellOffRequest.getTrangThaiTT().equals(1)){
+        if (sellOffRequest.getTrangThaiTT().equals(1)&&sellOffRequest.getThanhToan().equals(0)){
             newBill.setPaymentEmployee(Employee.builder().id(user.getId()).build());
             newBill.setPaymentTime(new Timestamp(System.currentTimeMillis()));
             newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
                     + "\nSet PaymentAmount : "+newBill.getPaymentAmount()+" -> "+ sum);
             newBill.setPaymentAmount(new BigDecimal(sum));
-
         }
+
         newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
                 + "\nSet Note : \n"+newBill.getNote()+"\n ----> \n"+sellOffRequest.getNote());
         newBill.setNote(sellOffRequest.getNote());
@@ -143,10 +160,12 @@ public class SellOffController {
             for (BillDetail billDetail : billDetails){
                 billDetail.setBill(newBillSaved);
             }
+            productDetailService.saveAll(productDetails);
             billDetailService.saveAll(billDetails);
         }catch (Exception e){
+            System.out.println(e);
             return ResponseEntity.ok("Lỗi , Kiểm tra lại hóa đơn");
         }
-        return ResponseEntity.ok("Thành công : "+ newBillSaved.getId());
+        return ResponseEntity.ok(newBillSaved.getId());
     }
 }

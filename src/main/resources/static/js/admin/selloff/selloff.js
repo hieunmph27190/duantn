@@ -290,6 +290,14 @@ $(document).ready(function() {
         }
     }
     $('#phoneNumber').on('change', '',phoneNumberChange);
+    function clearAll(){
+        tableGioHang.clear().draw();
+        $("#phoneNumber").val("");
+        phoneNumberChange();
+        $("#tienDua").val("0");
+        $(".donHang textarea[name='note']").val("");
+        tinhtoantong();
+    }
     $('#donHangSubmit').on('click', '', function() {
         let data = {};
         let sanPhamss = tableGioHang.rows().data().toArray();
@@ -298,18 +306,20 @@ $(document).ready(function() {
             sanPhams.push({id:item.id,quantity: item.quantity})
         });
         data["sanPhams"]=sanPhams;
-        data["idKhachHang"]= $(".donHang input[name='idKH']").val();
+        if ($(".donHang input[name='idKH']").val()==""||$(".donHang input[name='idKH']").val()){
+            data["idKhachHang"]= $(".donHang input[name='idKH']").val();
+        }
         data["thanhToan"]= $(".donHang input[name='thanhToan']:checked").val();
-        data["trangThaiTT"]= $(".donHang input[name='trangThaiTT']:checked").val();
+        data["trangThaiTT"]=1;
         data["note"]= $(".donHang textarea[name='note']").val();
         if (data.sanPhams.length==0){
             alert("Giỏ hàng trống")
             return;
         }
-        if (data.idKhachHang==""){
-            alert("Chưa chọn khách hàng")
+        if (!confirm("Bạn có chắc chắn muốn tạo đơn không?")){
             return;
         }
+
         $.ajax({
             url: "/selloff",
             type: 'POST',
@@ -317,7 +327,9 @@ $(document).ready(function() {
             contentType: false,
             processData: false,
             success: function (response) {
-                alert(response)
+                clearAll();
+                alert("Thành công : "+response+" , Cần thanh toán đơn này");
+                thanhToanVNPAY(response);
             },
             error: function (xhr, status, error) {
                 if(xhr.status==400){
@@ -332,6 +344,25 @@ $(document).ready(function() {
             }
         });
     });
+
+    function thanhToanVNPAY(billId){
+        if (billId){
+            $.ajax({
+                url: "http://localhost:8080/api/vnpay/"+billId+"?admin=x",
+                type: 'GET',
+                success: function(response) {
+                    console.log(response.message);
+                    window.open(response.message, '_blank');
+                },
+                error: function(xhr, status, error) {
+                    alert("Lỗi : "+xhr?.responseText)
+                }
+            });
+        }else {
+            alert("Kiểm tra lại hóa đơn !")
+        }
+
+    }
 
     table = $(`#${tableName}`).DataTable({
         "processing": true,

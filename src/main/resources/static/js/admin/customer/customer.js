@@ -354,18 +354,6 @@ $(document).ready(function() {
       email: {
         required: true
       },
-      address: {
-        required: true
-      },
-      county: {
-        required: true
-      },
-      city: {
-        required: true
-      },
-      district: {
-        required: true
-      },
       type: {
         required: true
       }
@@ -385,18 +373,6 @@ $(document).ready(function() {
         pattern:"Nhập đúng số điện thoại của bạn"
       },
       email: {
-        required: "Vui lòng chọn trường này"
-      },
-      address: {
-        required: "Vui lòng chọn trường này"
-      },
-      county: {
-        required: "Vui lòng chọn trường này"
-      },
-      city: {
-        required: "Vui lòng chọn trường này"
-      },
-      district: {
         required: "Vui lòng chọn trường này"
       },
       type: {

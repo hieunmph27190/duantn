@@ -51,13 +51,12 @@ public class CustomerResquest {
     @Pattern(regexp = "^(0|\\+\\d{2})\\d{9}$")
     private String phoneNumber;
 
-    private String county;
-
     private String city;
 
     private String district;
 
-    @NotBlank
+    private String ward;
+
     private String address;
 
     @CreationTimestamp
