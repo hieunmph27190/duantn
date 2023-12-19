@@ -27,7 +27,7 @@ public interface BillRepository extends JpaRepository<Bill, UUID> {
             "and (:type is null or b.type = :type)")
     public Page<BillReponse> searchByKeyword(String key, Integer type, Pageable pageable);
 
-    @Query("SELECT new com.fpt.duantn.dto.BillSellOnReponse(b.id, b.billCreateDate, b.shipeFee, b.phoneNumber, b.address, b.paymentAmount, b.type) from Bill b " +
+    @Query("SELECT new com.fpt.duantn.dto.BillSellOnReponse(b.id, b.billCreateDate, b.shipeFee, b.phoneNumber, b.address, b.paymentAmount, b.type,b.paymentType) from Bill b " +
             " where ( CAST(:customerId AS string) like b.customer.id)" +
             "and (:type is null or b.type = :type)")
     public Page<BillSellOnReponse> searchByKeyword(UUID customerId, Integer type, Pageable pageable);
