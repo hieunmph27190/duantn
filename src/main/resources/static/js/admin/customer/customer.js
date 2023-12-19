@@ -333,7 +333,9 @@ $(document).ready(function() {
   var configValidate = {
     rules: {
       name: {
-        required: true
+        required: true,
+        minlength: 4,
+        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
       },
       gender: {
         required: true
@@ -342,7 +344,9 @@ $(document).ready(function() {
         required: true
       },
       password: {
-        required: true
+        required: true,
+        minlength: 4,
+        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
       },
       dateOfBirth: {
         required: true
@@ -360,7 +364,9 @@ $(document).ready(function() {
     },
     messages: {
       name: {
-        required: "Vui lòng nhập trường này"
+        required: "Vui lòng nhập trường này",
+        minlength: "Trường này phải có ít nhất 4 ký tự",
+        noLeadingWhitespace: "Tên không được chứa khoảng trắng ở đầu dòng"
       },
       gender: {
         required: "Vui lòng chọn trường này"
@@ -380,6 +386,11 @@ $(document).ready(function() {
       }
     }
   }
+
+// Thêm quy tắc kiểm tra tùy chỉnh cho việc kiểm tra khoảng trắng ở đầu dòng
+  $.validator.addMethod("noLeadingWhitespace", function(value) {
+    return /^[^\s]+/.test(value);
+  }, "Không được chứa khoảng trắng ở đầu dòng");
 
 
 // Validate form add
