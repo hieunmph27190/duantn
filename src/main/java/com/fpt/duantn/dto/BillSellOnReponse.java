@@ -21,16 +21,18 @@ public class BillSellOnReponse {
     private String address;
 
     private BigDecimal paymentAmount;
+    private Integer paymentType;
 
     private Integer type;
 
-    public BillSellOnReponse(UUID id, Timestamp billCreateDate, BigDecimal shipeFee, String phoneNumber, String address, BigDecimal paymentAmount, Integer type) {
+    public BillSellOnReponse(UUID id, Timestamp billCreateDate, BigDecimal shipeFee, String phoneNumber, String address, BigDecimal paymentAmount, Integer type,Integer paymentType) {
         this.id = id;
         this.billCreateDate = billCreateDate;
         this.shipeFee = shipeFee;
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.paymentAmount = paymentAmount;
+        this.paymentType = paymentType;
         this.type = type;
     }
 }
