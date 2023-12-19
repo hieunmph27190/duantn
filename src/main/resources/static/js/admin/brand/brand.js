@@ -154,8 +154,6 @@ $(document).ready(function() {
   });
 
 
-
-
   // Sự kiện submit form Update
   $(`#form-${objectName}-update`).on('submit', function(e) {
     e.preventDefault();
@@ -218,10 +216,13 @@ $(document).ready(function() {
     rules: {
       code: {
         required: true,
-        minlength: 3
+        minlength: 3,
+        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
       },
       name: {
-        required: true
+        required: true,
+        minlength: 3,
+        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
       },
       type: {
         required: true
@@ -230,16 +231,29 @@ $(document).ready(function() {
     messages: {
       code: {
         required: "Vui lòng nhập trường này",
-        minlength: "Trường này phải có ít nhất 3 ký tự"
+        minlength: "Trường này phải có ít nhất 3 ký tự",
+        noLeadingWhitespace: "Trường này không được chứa khoảng trắng ở đầu dòng"
       },
       name: {
-        required: "Vui lòng nhập trường này"
+        required: "Vui lòng nhập trường này",
+        minlength: "Trường này phải có ít nhất 3 ký tự",
+        noLeadingWhitespace: "Trường này không được chứa khoảng trắng ở đầu dòng"
       },
       type: {
         required: "Vui lòng chọn trường này"
       }
     }
-  }
+  };
+
+  // Thêm quy tắc kiểm tra tùy chỉnh
+  $.validator.addMethod("noWhitespace", function(value) {
+    return /^\S+$/.test(value);
+  }, "Không được chứa khoảng trắng");
+
+// Thêm quy tắc kiểm tra tùy chỉnh cho việc kiểm tra khoảng trắng ở đầu dòng
+  $.validator.addMethod("noLeadingWhitespace", function(value) {
+    return /^[^\s]+/.test(value);
+  }, "Không được chứa khoảng trắng ở đầu dòng");
 
 
 // Validate form add
