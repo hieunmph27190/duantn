@@ -316,7 +316,7 @@ $(document).ready(function() {
             alert("Giỏ hàng trống")
             return;
         }
-        if (!confirm("Bạn có chắc chắn muốn tạo đơn không?")){
+        if (!confirm("Bạn có chắc chắn muốn tạo đơn không?"+($(".donHang input[name='idKH']").val()==""?"KH :Vãng lai":""))){
             return;
         }
 
@@ -631,6 +631,7 @@ $(document).ready(function() {
             alert("Đã có trong giỏ hàng");
             return;
         }
+
         let newRowData = {
             "id":rowDataDetail.id,
             "code": rowDataTable.code,
@@ -894,106 +895,13 @@ $(document).ready(function() {
                         return "";
                     }
                 }
-            },
-            {
-                "data": null,
-                "orderable": false,
-                "render": function(data, type, row) {
-                    // Nội dung HTML của cột tiếp theo
-                    return `<button type="button" class="btn btn-info btn-sm btn-primary btn-circle-sm btn-img-settype" typeset="2" >Làm ảnh chính</button>
-                    <button type="button" class="btn btn-info btn-sm btn btn-info btn-circle-sm btn-img-settype" typeset="1" >Hoạt động</button>
-                     <button type="button" class="btn btn-info btn-sm btn btn-info btn-circle-sm btn-img-settype" typeset="0" >Không hoạt động</button>
-                       <button type="button" class="btn btn-info btn btn-danger btn-circle-sm btn-img-delete"><i class="fas fa-trash"></i></button>`;
-                }
             }
         ],
-        "drawCallback": function(settings) {
-            $(`#tableImg tbody tr`).on('click', '.btn-img-settype',settype);
-            $(`#tableImg tbody tr`).on('click', '.btn-img-delete',deleteDLImg);
-        },
+
         searchDelay: 1500,
         "paging": true,
         "pageLength": 10,
         "lengthMenu": [10, 25, 50, 100],
-    });
-
-    function settype() {
-        let type = $(this).attr("typeset")
-        let rowData = tableImg.row($(this).closest('tr')).data();
-        if (confirm("Xác nhận sửa")){
-            $.ajax({
-                url: "/image"+'/settype/' + rowData.id,
-                type: 'PUT',
-                "data": {
-                    type
-                },
-                success: function(response) {
-                    tableImg.ajax.reload(null, false);
-                    alert("Sửa thành công")
-                },
-                error: function(xhr, status, error) {
-                    alert('Lỗi :' + xhr.responseText);
-                }
-            });
-        }else {
-
-        }
-    }
-
-    function deleteDLImg() {
-        let rowData = tableImg.row($(this).closest('tr')).data();
-        if (confirm("Xác nhận xóa")){
-            $.ajax({
-                url: "/image"+'/' + rowData.id,
-                type: 'DELETE',
-                success: function(response) {
-                    tableImg.ajax.reload(null, false);
-                    alert("Xóa thành công")
-                },
-                error: function(xhr, status, error) {
-                    alert('Lỗi :' + xhr.responseText);
-                }
-            });
-        }else {
-
-        }
-    }
-
-    // Sự kiện submit form Add image
-    $(`#form-product-image-add`).on('submit', function(e) {
-        e.preventDefault();
-        let formData = new FormData(this);
-        if ($(this).valid()&&formData.getAll('imgs')[0].name!="") {
-            $.ajax({
-                url: "/image",
-                type: 'POST',
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function (response) {
-                    // Xử lý thành công
-                    alert('Dữ liệu đã được thêm thành công!');
-                    tableImg.ajax.reload(null, false);
-                    clearForm(`form-product-image-add`, response)
-                    selectedFilesUpdate = clearSelectedFiles(inputFileUpdate,selectedFilesUpdate,"imagePreviewUpdate")
-                },
-                error: function (xhr, status, error) {
-                    if(xhr.status==400){
-                        let errorResponse = xhr.responseJSON;
-                        if (errorResponse){
-                        }else if(xhr.responseText) {
-                            alert('Lỗi khi thêm dữ liệu: ' + xhr.responseText);
-                        }else {
-                            alert('Lỗi :' + error);
-                        }
-                    }else {
-                        alert('Lỗi :' + error);
-                    }
-                }
-            });
-        }else {
-            alert("Chưa chọn ảnh")
-        }
     });
 
 

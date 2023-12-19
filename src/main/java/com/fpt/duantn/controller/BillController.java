@@ -246,6 +246,14 @@ public class BillController {
                 bill.setPaymentTime(new Timestamp(System.currentTimeMillis()));
             }
 
+            Double total = billDetailService.sumMoneyByBillIdAndType(bill.getId(),null).orElse(null);
+            if (total==null){
+                return ResponseEntity.badRequest().body("Lỗi tính tổng tiền !");
+            }
+            if((bill.getPaymentAmount().doubleValue()<bill.getShipeFee().doubleValue()+total)&&((bill.getPaymentType().intValue()!=(-2)&&billUpdateResquest.getType().intValue()>=4)||(bill.getPaymentType().equals(-2)&&billUpdateResquest.getType().intValue()>=7))){
+                return ResponseEntity.badRequest().body("Số tiền thanh toán không đủ !");
+            }
+
             if (!((bill.getAddress()==null?"":bill.getAddress()).equals(billUpdateResquest.getAddress()))){
                 bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
                                 + "\nSet Address : "+bill.getAddress()+" -> "+billUpdateResquest.getAddress());
@@ -262,26 +270,33 @@ public class BillController {
                 List<BillDetail> billDetails = billDetailService.findByBillIdAndType(bill.getId(),1);
                 List<ProductDetail> productDetails2  = new ArrayList<>();
                 for (BillDetail billDetail:billDetails) {
+
                     ProductDetail productDetail = billDetail.getProductDetail();
+                    if (productDetail == null){
+                        return ResponseEntity.badRequest().body("Sản phẩm "+productDetail.getId()+" không tồn tại");
+                    }
+                    if (productDetail.getAmount()<billDetail.getQuantity()){
+                        return ResponseEntity.badRequest().body("Sản phẩm "+productDetail.getId()+" không đủ số lượng");
+                    }
+                    if (billDetail.getQuantity()<=0){
+                        return ResponseEntity.badRequest().body("Sản phẩm "+productDetail.getId()+" số lượng phải lớn hơn 0");
+                    }
                     productDetail.setAmount(productDetail.getAmount()-billDetail.getQuantity());
                     productDetails2.add(productDetail);
                 }
                 bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
                         + "\nTrừ số lượng sản phẩm");
-                Double total = billDetailService.sumMoneyByBillIdAndType(bill.getId(),null).orElse(null);
-                if (total==null){
-                    return ResponseEntity.badRequest().body("Lỗi tính tổng tiền !");
-                }
-                if((bill.getPaymentAmount().doubleValue()<bill.getShipeFee().doubleValue()+total)&&(bill.getPaymentType()!=(-2)||(bill.getPaymentType().equals(-2)&&billUpdateResquest.getType().equals(7)))){
-                    return ResponseEntity.badRequest().body("Số tiền thanh toán không đủ !");
-                }
+
+
                 productDetailService.saveAll(productDetails2);
             }
             if ((billUpdateResquest.getType()>=0&&billUpdateResquest.getType()<4)&&((bill.getType()>=4)||(bill.getType()==-2))){
                 List<BillDetail> billDetails = billDetailService.findByBillIdAndType(bill.getId(),1);
                 List<ProductDetail> productDetails2  = new ArrayList<>();
                 for (BillDetail billDetail:billDetails) {
+
                     ProductDetail productDetail = billDetail.getProductDetail();
+
                     productDetail.setAmount(productDetail.getAmount()+billDetail.getQuantity());
                     productDetails2.add(productDetail);
                 }
@@ -363,7 +378,28 @@ public class BillController {
                    }catch (Exception e){
                        return ResponseEntity.ok("Lỗi , Kiểm tra lại hóa đơn");
                    }
-               }else {
+               }else if (billUpdateResquest.getType().intValue()==-2){
+
+                   if ((bill.getPaymentEmployee() == null || bill.getPaymentEmployee().getId().toString().equals(user.getId().toString()))
+                           &&(bill.getPaymentAmount().doubleValue()!=billUpdateResquest.getPaymentAmount())){
+                       bill.setPaymentEmployee(Employee.builder().id(user.getId()).build());
+                       bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
+                               + "\nSet PaymentAmount : "+bill.getPaymentAmount()+" -> "+billUpdateResquest.getPaymentAmount());
+                       bill.setPaymentAmount(new BigDecimal(billUpdateResquest.getPaymentAmount()));
+                       bill.setPaymentTime(new Timestamp(System.currentTimeMillis()));
+                   }
+
+                   if (!((bill.getAddress()==null?"":bill.getAddress()).equals(billUpdateResquest.getAddress()))){
+                       bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
+                               + "\nSet Address : "+bill.getAddress()+" -> "+billUpdateResquest.getAddress());
+                       bill.setAddress(billUpdateResquest.getAddress());
+                   }
+                   if (!((bill.getNote()==null?"":bill.getNote()).equals(billUpdateResquest.getNote()))){
+                       bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
+                               + "\nSet Note : \n"+bill.getNote()+"\n ----> \n"+billUpdateResquest.getNote());
+                       bill.setNote(billUpdateResquest.getNote());
+                   }
+               } else {
                    return ResponseEntity.badRequest().body("Đơn hàng này chỉ có thể chuyển sang trọng thái Hủy !");
                }
            }
@@ -420,13 +456,6 @@ public class BillController {
                 if(billUpdateResquest.getType()==3){
 
                 } else if (billUpdateResquest.getType()==4) {
-                        Double total = billDetailService.sumMoneyByBillIdAndType(bill.getId(),null).orElse(null);
-                        if (total==null){
-                            return ResponseEntity.badRequest().body("Lỗi tính tổng tiền !");
-                        }
-                    if((bill.getPaymentAmount().doubleValue()<bill.getShipeFee().doubleValue()+total)&&(bill.getPaymentType()!=(-2)||(bill.getPaymentType().equals(-2)&&billUpdateResquest.getType().equals(7)))){
-                        return ResponseEntity.badRequest().body("Số tiền thanh toán không đủ !");
-                    }
 
 
                     List<BillDetail> billDetails =  billDetailService.findByBillIdAndType(bill.getId(),1);
@@ -493,7 +522,13 @@ public class BillController {
                 bill.setPaymentAmount(new BigDecimal(billUpdateResquest.getPaymentAmount()));
                 bill.setPaymentTime(new Timestamp(System.currentTimeMillis()));
             }
-
+            Double total = billDetailService.sumMoneyByBillIdAndType(bill.getId(),null).orElse(null);
+            if (total==null){
+                return ResponseEntity.badRequest().body("Lỗi tính tổng tiền !");
+            }
+            if((bill.getPaymentAmount().doubleValue()<bill.getShipeFee().doubleValue()+total)&&((bill.getPaymentType().intValue()!=(-2)&&billUpdateResquest.getType().intValue()>=4)||(bill.getPaymentType().equals(-2)&&billUpdateResquest.getType().intValue()>=7))){
+                return ResponseEntity.badRequest().body("Số tiền thanh toán không đủ !");
+            }
 
 
             if (!((bill.getAddress()==null?"":bill.getAddress()).equals(billUpdateResquest.getAddress()))){
