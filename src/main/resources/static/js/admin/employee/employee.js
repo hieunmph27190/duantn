@@ -323,16 +323,22 @@ $(document).ready(function() {
   var configValidate = {
     rules: {
       name: {
-        required: true
+        required: true,
+        minlength: 4,
+        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
       },
       gender: {
         required: true
       },
       userName: {
-        required: true
+        required: true,
+        minlength: 4,
+        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
       },
       password: {
-        required: true
+        required: true,
+        minlength: 4,
+        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
       },
       dateOfBirth: {
         required: true
@@ -345,7 +351,9 @@ $(document).ready(function() {
         required: true
       },
       address: {
-        required: true
+        required: true,
+        minlength: 4,
+        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
       },
       type: {
         required: true
@@ -353,16 +361,22 @@ $(document).ready(function() {
     },
     messages: {
       name: {
-        required: "Vui lòng nhập trường này"
+        required: "Vui lòng nhập trường này",
+        minlength: "Trường này phải có ít nhất 4 ký tự",
+        noLeadingWhitespace: "Tên không được chứa khoảng trắng ở đầu dòng"
       },
       gender: {
         required: "Vui lòng chọn trường này"
       },
       userName: {
-        required: "Vui lòng chọn trường này"
+        required: "Vui lòng chọn trường này",
+        minlength: "Trường này phải có ít nhất 4 ký tự",
+        noLeadingWhitespace: "UserName không được chứa khoảng trắng ở đầu dòng"
       },
       password: {
-        required: "Vui lòng chọn trường này"
+        required: "Vui lòng chọn trường này",
+        minlength: "Trường này phải có ít nhất 4 ký tự",
+        noLeadingWhitespace: "Mật khẩu không được chứa khoảng trắng ở đầu dòng"
       },
       dateOfBirth: {
         required: "Vui lòng chọn trường này"
@@ -375,13 +389,20 @@ $(document).ready(function() {
         required: "Vui lòng chọn trường này"
       },
       address: {
-        required: "Vui lòng chọn trường này"
+        required: "Vui lòng chọn trường này",
+        minlength: "Trường này phải có ít nhất 4 ký tự",
+        noLeadingWhitespace: "Trường này không được chứa khoảng trắng ở đầu dòng"
       },
       type: {
         required: "Vui lòng chọn trường này"
       }
     }
   }
+
+  // Thêm quy tắc kiểm tra tùy chỉnh cho việc kiểm tra khoảng trắng ở đầu dòng
+  $.validator.addMethod("noLeadingWhitespace", function(value) {
+    return /^[^\s]+/.test(value);
+  }, "Không được chứa khoảng trắng ở đầu dòng");
 
 
 // Validate form add

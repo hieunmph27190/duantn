@@ -837,10 +837,15 @@ $(document).ready(function() {
         required: true,
       },
       amount: {
-        required: true
+        required: true,
+        min: 1,
+        digits: true, // Số nguyên
+
       },
       price: {
-        required: true
+        required: true,
+        min: 1,
+        digits: true, // Số nguyên
       },
       "color.id": {
         required: true
@@ -854,13 +859,17 @@ $(document).ready(function() {
     },
     messages: {
       "product.id": {
-        required: "Vui lòng nhập trường này",
+        required: "Vui lòng nhập trường này",  
       },
       amount: {
-        required: "Vui lòng nhập trường này"
+        required: "Vui lòng nhập trường này",
+        min: "Số lượng phải lớn hơn 0",
+        digits: "Số lượng phải số nguyên "
       },
       price: {
-        required: "Vui lòng nhập trường này"
+        required: "Vui lòng nhập trường này",
+        min: "Giá phải lớn hơn 0",
+        digits: "Giá phải số nguyên "
       },
       "color.id": {
         required: "Vui lòng nhập trường này"

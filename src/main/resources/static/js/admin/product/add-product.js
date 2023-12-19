@@ -98,14 +98,38 @@ $(document).ready(function() {
     }
 
   }
+  //Đặt sự kiện kiểm tra khi giá trị của ô input thay đổi
+  $(document).on('change', '.quantity-input', function() {
+    // Lấy giá trị của ô input
+    const inputValue = $(this).val();
+
+    // Kiểm tra nếu giá trị là rỗng hoặc không phải là số nguyên dương
+    if (inputValue === '' || !(/^\d+$/.test(inputValue) && parseInt(inputValue) > 0)) {
+      alert('Vui lòng nhập giá trị hợp lệ.');
+      // Xóa giá trị không hợp lệ
+      $(this).val('');
+    }
+  });
+
+  $(document).on('change', '.price-input', function() {
+    // Lấy giá trị của ô input
+    const inputValue = $(this).val();
+
+    // Kiểm tra nếu giá trị là rỗng hoặc không phải là số nguyên dương
+    if (inputValue === '' || !(/^\d+$/.test(inputValue) && parseInt(inputValue) > 0)) {
+      alert('Vui lòng nhập giá trị hợp lệ.');
+      // Xóa giá trị không hợp lệ
+      $(this).val('');
+    }
+  });
+
+
 
   $(document).on("click", ".delete-button-row-table", function () {
     const variantId = $(this).data("variantId");
     $(`#row-${variantId}`).remove();
     delete selectedVariants[variantId];
   });
-
-
 
   function getDataFromTable() {
 
@@ -222,7 +246,6 @@ $(document).ready(function() {
   }
 
 
-
   function getDataFromForm() {
     let formData = new FormData($("#form-product-add")[0]);
     formData.delete("type-input");
@@ -284,10 +307,13 @@ $(document).ready(function() {
     rules: {
       code: {
         required: true,
-        minlength: 3
+        minlength: 3,
+        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
       },
       name: {
-        required: true
+        required: true,
+        minlength: 4,
+        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
       },
       "brand.id": {
         required: true
@@ -311,10 +337,13 @@ $(document).ready(function() {
     messages: {
       code: {
         required: "Vui lòng nhập mã sản phẩm",
-        minlength: "Mã sản phẩm phải có ít nhất 3 ký tự"
+        minlength: "Mã sản phẩm phải có ít nhất 3 ký tự",
+        noLeadingWhitespace: "Mã không được chứa khoảng trắng ở đầu dòng"
       },
       name: {
-        required: "Vui lòng nhập tên sản phẩm"
+        required: "Vui lòng nhập tên sản phẩm",
+        minlength: "Mã sản phẩm phải có ít nhất 4 ký tự",
+        noLeadingWhitespace: "Tên không được chứa khoảng trắng ở đầu dòng"
       },
       "brand.id": {
         required: "Vui lòng chọn thương hiệu"
@@ -346,40 +375,45 @@ $(document).ready(function() {
     })
   })
 
+  // var configValidateFormAdd = {
+  //   rules: {
+  //     code: {
+  //       required: true,
+  //       minlength: 3
+  //     },
+  //     name: {
+  //       required: true
+  //     },
+  //     size: {
+  //       required: true
+  //     },
+  //     type: {
+  //       required: true
+  //     }
+  //   },
+  //   messages: {
+  //     code: {
+  //       required: "Vui lòng nhập trường này",
+  //       minlength: "Trường này phải có ít nhất 3 ký tự"
+  //     },
+  //     name: {
+  //       required: "Vui lòng nhập trường này"
+  //     },
+  //     size: {
+  //       required: "Vui lòng nhập trường này"
+  //     },
+  //     type: {
+  //       required: "Vui lòng chọn trường này"
+  //     }
+  //   }
+  // }
 
 
-  var configValidateFormAdd = {
-    rules: {
-      code: {
-        required: true,
-        minlength: 3
-      },
-      name: {
-        required: true
-      },
-      size: {
-        required: true
-      },
-      type: {
-        required: true
-      }
-    },
-    messages: {
-      code: {
-        required: "Vui lòng nhập trường này",
-        minlength: "Trường này phải có ít nhất 3 ký tự"
-      },
-      name: {
-        required: "Vui lòng nhập trường này"
-      },
-      size: {
-        required: "Vui lòng nhập trường này"
-      },
-      type: {
-        required: "Vui lòng chọn trường này"
-      }
-    }
-  }
+  // Thêm quy tắc kiểm tra tùy chỉnh cho việc kiểm tra khoảng trắng ở đầu dòng
+  $.validator.addMethod("noLeadingWhitespace", function(value) {
+    return /^[^\s]+/.test(value);
+  }, "Không được chứa khoảng trắng ở đầu dòng");
+
 
   $(`form[id*="form-add-"]`).each((index,element)=>{
     // Validate form add

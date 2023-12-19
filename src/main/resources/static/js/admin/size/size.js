@@ -218,10 +218,14 @@ $(document).ready(function() {
     rules: {
       code: {
         required: true,
-        minlength: 3
+        minlength: 3,
+        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
       },
       size: {
-        required: true
+        required: true,
+        minSize: 16,
+        maxSize: 45, // Thêm quy tắc kiểm tra tùy chỉnh
+        digits: true
       },
       type: {
         required: true
@@ -230,16 +234,37 @@ $(document).ready(function() {
     messages: {
       code: {
         required: "Vui lòng nhập trường này",
-        minlength: "Trường này phải có ít nhất 3 ký tự"
+        minlength: "Trường này phải có ít nhất 3 ký tự",
+        noLeadingWhitespace: "Trường này không được chứa khoảng trắng ở đầu dòng"
       },
       size: {
-        required: "Vui lòng nhập trường này"
+        required: "Vui lòng nhập trường này",
+        minSize: "Kích thước phải lớn hơn hoặc bằng 16",
+        maxSize: "Kích thước phải nhỏ hơn 45", // Thông báo mới
+        digits: "Vui lòng nhập một số"
       },
       type: {
         required: "Vui lòng chọn trường này"
       }
     }
-  }
+  };
+
+// Thêm quy tắc kiểm tra tùy chỉnh cho việc kiểm tra khoảng trắng ở đầu dòng
+  $.validator.addMethod("noLeadingWhitespace", function(value) {
+    return /^[^\s]+/.test(value);
+  }, "Không được chứa khoảng trắng ở đầu dòng");
+
+
+
+// Thêm quy tắc kiểm tra tùy chỉnh cho kích thước
+  $.validator.addMethod("minSize", function (value, element, param) {
+    return value >= param;
+  }, "Kích thước phải lớn hơn hoặc bằng 16");
+
+// Thêm quy tắc kiểm tra tùy chỉnh cho kích thước (tối đa)
+  $.validator.addMethod("maxSize", function (value, element, param) {
+    return value < param;
+  }, "Kích thước phải nhỏ hơn 45");
 
 
 // Validate form add
