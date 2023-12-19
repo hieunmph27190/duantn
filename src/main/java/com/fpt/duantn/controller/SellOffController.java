@@ -103,8 +103,8 @@ public class SellOffController {
                 return ResponseEntity.badRequest().body("Thông tin sản phẩm hoặc số lượng bị thiếu");
             }
             ProductDetail productDetail =  productDetailService.findById(request.getId()).orElse(null);
-            if (productDetail == null||productDetail.getType().equals(0)||productDetail.getProduct().getType().equals(0)){
-                return ResponseEntity.badRequest().body("Sản phẩm "+request.getId()+" không tồn tại hoặc đã ngừng kinh doanh");
+            if (productDetail == null){
+                return ResponseEntity.badRequest().body("Sản phẩm "+request.getId()+" không tồn tại ");
             }
             if (productDetail.getAmount()<request.getQuantity()){
                 return ResponseEntity.badRequest().body("Sản phẩm "+request.getId()+" không đủ số lượng");
@@ -127,11 +127,15 @@ public class SellOffController {
         Employee employeeLogin =  employeeService.findById(user.getId()).orElse(null);
         newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo()+"\n\n")+employeeLogin.getId()+" : "+employeeLogin.getName() + " : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy"))+" Đã Tạo Bill : ");
         newBill.setEmployee(Employee.builder().id(user.getId()).build());
-        newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
-                +"\nSet Type : "+newBill.getType()+" -> "+3);
+
         if (sellOffRequest.getThanhToan().equals(1)){
+            newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
+                    +"\nSet Type : "+newBill.getType()+" -> "+"-2");
             newBill.setType(-2);
+
         }else {
+            newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
+                    +"\nSet Type : "+newBill.getType()+" -> "+7);
             newBill.setType(7);
         }
         newBill.setCustomer(customer);
@@ -153,6 +157,8 @@ public class SellOffController {
         newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
                 + "\nSet Note : \n"+newBill.getNote()+"\n ----> \n"+sellOffRequest.getNote());
         newBill.setNote(sellOffRequest.getNote());
+        newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
+                +"\nTrừ số lượng trong sản phẩm");
 
         Bill newBillSaved = null;
         try {
