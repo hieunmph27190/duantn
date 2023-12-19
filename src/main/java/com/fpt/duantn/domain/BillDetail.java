@@ -40,7 +40,7 @@ public class BillDetail {
 
 
     @ManyToOne
-    @JoinColumn(name = "product_detailid")
+    @JoinColumn(name = "product_detailid",updatable = false)
     private ProductDetail productDetail;
 
 }

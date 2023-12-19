@@ -28,12 +28,7 @@ public class BillUpdateResquest {
     @NotNull
     private UUID id;
 
-
-    private Integer paymentType;
-
     private Double paymentAmount;
-
-    private Double shipeFee;
 
     private String address;
 

@@ -64,7 +64,7 @@ public class SellOffController {
             if (request.getId()==null||request.getQuantity()==null){
                 return ResponseEntity.badRequest().body("Thông tin sản phẩm hoặc số lượng bị thiếu");
             }
-            if (productDetail == null||productDetail.getType().equals(0)){
+            if (productDetail == null){
                 return ResponseEntity.badRequest().body("Sản phẩm "+request.getId()+" không tồn tại hoặc đã ngừng kinh doanh");
             }
             sum+=request.getQuantity()*productDetail.getPrice().doubleValue();
@@ -103,7 +103,7 @@ public class SellOffController {
                 return ResponseEntity.badRequest().body("Thông tin sản phẩm hoặc số lượng bị thiếu");
             }
             ProductDetail productDetail =  productDetailService.findById(request.getId()).orElse(null);
-            if (productDetail == null){
+            if (productDetail == null||productDetail.getType().equals(0)||productDetail.getProduct().getType().equals(0)){
                 return ResponseEntity.badRequest().body("Sản phẩm "+request.getId()+" không tồn tại hoặc đã ngừng kinh doanh");
             }
             if (productDetail.getAmount()<request.getQuantity()){
@@ -163,7 +163,6 @@ public class SellOffController {
             productDetailService.saveAll(productDetails);
             billDetailService.saveAll(billDetails);
         }catch (Exception e){
-            System.out.println(e);
             return ResponseEntity.ok("Lỗi , Kiểm tra lại hóa đơn");
         }
         return ResponseEntity.ok(newBillSaved.getId());

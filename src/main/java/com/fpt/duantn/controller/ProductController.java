@@ -280,18 +280,15 @@ public class ProductController {
 
     @GetMapping("/{productId}/image-main")
     public ResponseEntity<?> getImageMain(@PathVariable UUID productId) {
-        List<UUID> ids =  imageService.findIDByProductId(productId,null);
+        List<Image> ids =  imageService.findByProductId(productId,2);
         if (ids.size()<=0) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tồn tại");
         }
 
-        Optional<Image> image = imageService.findById(ids.get(0));
-        if (!image.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tồn tại");
-        }
+        Image image = ids.get(0);
         byte[] imageBytes = new byte[0];
         try {
-            imageBytes = fileImgUtil.convertBlobToByteArray(image.get().getImage());
+            imageBytes = fileImgUtil.convertBlobToByteArray(image.getImage());
         } catch (SQLException |IOException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lỗi đọc ảnh");
         }

@@ -20,4 +20,5 @@ public class SellOnRequest {
     private String district;
     private String ward;
     private String note;
+    private Integer paymentType;
 }

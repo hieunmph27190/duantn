@@ -100,11 +100,12 @@ public class BanHangController {
             @RequestParam(value = "order[0][column]", required = false) Optional<Integer> orderColumn,
             @RequestParam(value = "order[0][dir]", required = false) Optional<String>  orderDir,
             @RequestParam(value = "categoryId", required = false) Optional<UUID>  categoryId,
+            @RequestParam(value = "callAll", required = false) Optional<Integer>  callAll,
             HttpServletRequest request
     ) {
         String orderColumnName = request.getParameter("columns["+orderColumn.orElse(0)+"][data]");
         Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10));
-        List<ProductBanHangResponse> list = productService.searchResponseByKeyAndType(searchValue.orElse(""),categoryId.orElse(null),null);
+        List<ProductBanHangResponse> list = productService.searchResponseByKeyAndType(searchValue.orElse(""),categoryId.orElse(null),callAll.isPresent()?null:1);
         DataTablesResponse response = new DataTablesResponse(draw.orElse(10),list.size(),(long)list.size(),list);
         return response;
     }
