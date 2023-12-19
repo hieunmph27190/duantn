@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:encoding="UTF-8"
+      th:replace="~{/admin/layout.html::view(content=~{::tablex},script=~{::script},style=~{::style})}"
+>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <th:block th:fragment="style">
+    <style>
+        .selected-row {
+            background-color: #fadf9b;
+        }
+    </style>
+    </th:block>
+</head>
+<body>
+<div th:fragment="tablex" class="container-fluid">
+    <!-- Page Heading -->
+    <h1 class="h3 mb-2 text-gray-800">Hóa đơn</h1>
+
+
+    <div id="view-update" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+         aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 80vw" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Thông tin</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-bill-update" class="row mb-4" enctype="multipart/form-data">
+                        <input type="text" readonly  class="form-control mb-3"  name="id">
+                        <div class="form-group col-4">
+                            <label >ID nhân viên :</label>
+                            <input type="text" readonly class="form-control"  name="employee.id">
+                        </div>
+                        <div class="form-group col-4">
+                            <label >Tên nhân viên :</label>
+                            <input type="text" readonly class="form-control"  name="employee.name">
+                        </div>
+                        <div class="form-group col-4">
+                            <label >Phương thức thanh toán :</label>
+                            <select class="form-control" name="paymentType" >
+                                <option value="-1" selected>Chưa chọn</option>
+                                <option value="1">Chuyển khoản</option>
+                                <option value="0">Tiền mặt</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-4">
+                            <label >ID khách hàng :</label>
+                            <input type="text" readonly class="form-control"  name="customer.id">
+                        </div>
+                        <div class="form-group col-4">
+                            <label >Tên khách hàng :</label>
+                            <input type="text" readonly class="form-control"  name="customer.name">
+                        </div>
+                        <div class="form-group col-4">
+                            <label >Tiền ship :</label>
+                            <input type="number" class="form-control"  name="shipeFee">
+                        </div>
+                        <div class="form-group col-4">
+                            <label >ID thu ngân :</label>
+                            <input type="text" readonly class="form-control"  name="paymentEmployee.id">
+                        </div>
+                        <div class="form-group col-4">
+                            <label >Tên thu ngân:</label>
+                            <input type="text" readonly class="form-control"  name="paymentEmployee.name">
+                        </div>
+                        <div class="form-group col-2">
+                            <label >Số tiền thu:</label>
+                            <input type="number" class="form-control"  name="paymentAmount">
+                        </div>
+                        <div class="form-group col-2">
+                            <label >Số tiền của đơn:</label>
+                            <input type="text" readonly class="form-control"  name="soTienCuaDon">
+                        </div>
+                        <div class="form-group col-3">
+                            <label >Số điện thoại:</label>
+                            <input type="text" readonly class="form-control"  name="phoneNumber">
+                        </div>
+                        <div class="form-group col-3">
+                            <label >Thời gian thanh toán:</label>
+                            <input type="text" readonly class="form-control"  name="paymentTime">
+                        </div>
+
+                        <div class="form-group col-3">
+                            <label >Trạng thái :</label>
+                            <select class="form-control" name="type" >
+                                <option value="-2">Chờ thanh toán</option>
+                                <option value="" disabled selected>Chọn type</option>
+                                <option value="1">Chờ xử lí</option>
+                                <option value="2">Chờ xác thực</option>
+                                <option value="3">Đã xác thực</option>
+                                <option value="4">Chờ giao hàng</option>
+                                <option value="5">Đang giao hàng</option>
+                                <option value="6">Đã nhận hàng</option>
+                                <option value="7">Đã hoàn thành</option>
+                                <option value="0">Đã hủy</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-2">
+                            <label >Thanh toán :</label>
+                            <button id="btnThanhToanVNPAY" type="button" class="form-control btn btn-primary" >Thanh toán VNPay</button>
+                        </div>
+                        <div class="form-group col-1">
+                            <label >Refresh</label>
+                            <button id="reloadBillDetail" type="button" class="form-control btn btn-primary" >Refresh</button>
+                        </div>
+
+
+                        <div class="form-group col-12">
+                            <label >Địa chỉ:</label>
+                            <input type="text" class="form-control"  name="address">
+                        </div>
+
+                        <div class="form-floating col-12 mb-3">
+                            <label >Note :</label>
+                            <textarea class="form-control" placeholder="note" name="note" style="height: 100px"></textarea>
+                        </div>
+
+
+                        <button  type="submit" class="mb-1 btn btn-primary">Cập nhật</button>
+                        <div class="form-group col-12">
+                            <label >Lịch sử :</label>
+                            <textarea type="text" readonly class="form-control"  name="transactionNo" style="height: 200px"></textarea>
+                        </div>
+                    </form>
+
+                    <table class="table table-bordered table-hover mt-5" id="tableBillDetail" width="100%" cellspacing="0">
+                        <thead>
+                        <tr>
+                            <th>ID SP</th>
+                            <th>Tên SP</th>
+                            <th>Màu sắc</th>
+                            <th>Size</th>
+                            <th>Slượng</th>
+                            <th>Slượng(Kho)</th>
+                            <th>Giá</th>
+                            <th>Type</th>
+                        </tr>
+                        </thead>
+
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="d-flex justify-content-between align-content-center" >
+                <h6 class="m-0 font-weight-bold text-center text-primary">Dữ liệu</h6>
+            </div>
+            <div class="row form-filter" id="form-filter">
+                <div class="form-group col-2">
+                    <label >SĐT khách hàng:</label>
+                    <div class="col-12 d-flex justify-content-between" style="padding: 0px">
+                        <input type="text" step="1" class="form-control" style="width: 100%" name="phoneNumber">
+                    </div>
+
+                </div>
+
+
+
+                <div class="form-group col-6">
+                    <label >Thời gian:</label>
+                    <div class="col-12 d-flex justify-content-between" style="padding: 0px">
+                        <input type="datetime-local" step="1" class="form-control col-6" style="width: 100%" name="startTime">
+                        <input type="datetime-local" step="1"  class="form-control col-6" style="width: 100%" name="endTime">
+                    </div>
+
+                </div>
+                <div class="form-group col-2">
+                    <label >Thanh toán:</label>
+                    <select class="form-control" name="paymentType" >
+                        <option value="-1" selected>Tất cả</option>
+                        <option value="1">Chuyển khoản</option>
+                        <option value="0">Tiền mặt</option>
+                    </select>
+                </div>
+                <div class="form-group col-2">
+                    <label >Type:</label>
+                    <select class="form-control" name="type" >
+                        <option value="-2">Chờ thanh toán</option>
+                        <option value="-1" selected>Tất cả</option>
+                        <option value="1">Chờ xử lí</option>
+                        <option value="2">Chờ xác thực</option>
+                        <option value="3">Đã xác thực</option>
+                        <option value="4">Chờ giao hàng</option>
+                        <option value="5">Đang giao hàng</option>
+                        <option value="6">Đã nhận hàng</option>
+                        <option value="7">Đã hoàn thành</option>
+                        <option value="0">Đã hủy</option>
+                    </select>
+                </div>
+                <div class="form-group col-10">
+
+                </div>
+                <div class="form-group col-2">
+                    <button id="reloadBill" style="background: #0f6848" type="button"  class="btn btn-secondary btn-filter" >Lọc & ReLoad</button>
+                </div>
+
+
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nhân viên</th>
+                        <th>Khách hàng</th>
+                        <th>Thanh toán</th>
+                        <th>Thời gian</th>
+                        <th>Phí ship</th>
+                        <th>Đã TToán</th>
+                        <th>SĐT</th>
+                        <th>Trạng thái</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+<th:block th:fragment="script">
+    <!-- Page level plugins -->
+    <script th:src="@{/vendor/datatables/jquery.dataTables.min.js}"></script>
+    <script th:src="@{/vendor/datatables/dataTables.bootstrap4.min.js}"></script>
+    <!-- Page level custom scripts -->
+    <script th:src="@{/js/admin/bill/bill.js}"></script>
+</th:block>
+</body>
+</html>

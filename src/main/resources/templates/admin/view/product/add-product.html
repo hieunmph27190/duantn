@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:encoding="UTF-8"
+      th:replace="~{/admin/layout.html::view(content=~{::content},script=~{::script},style=~{::style})}"
+>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <th:block th:fragment="style">
+        <style>
+            .image-container{
+                position: relative;
+                border: 2px solid black;
+                border-radius: 15px;
+                box-sizing: border-box;
+                margin: 3px;
+            }
+            .image-container>button{
+                position: absolute;
+                right: 0px;
+                top:0px;
+                border: 0;
+                background-color: transparent;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+<div th:fragment="content" class="container-fluid ">
+
+    <!-- Page Heading -->
+    <h1 class="h3 mb-2 text-gray-800">Thêm sản phẩm</h1>
+    <div >
+        <form id="form-product-add" class="row" enctype="multipart/form-data">
+            <div class="form-group col-4">
+                <label >Mã sản phẩm:</label>
+                <input type="text" class="form-control"  name="code">
+            </div>
+            <div class="form-group col-8">
+                <label>Tên sản phẩm:</label>
+                <input type="text" class="form-control"  name="name">
+            </div>
+            <div class="form-group col-4">
+                <div class="row m-0">
+                    <label class="col-10">Thương hiệu:</label>
+                    <button type="button" id="btn-view-add-brand" class="col-2 mb-1 btn btn-sm btn-primary">+</button>
+                    <select class="select2" style="width: 100%" multiple="multiple" name="brand.id">
+
+                    </select>
+                </div>
+            </div>
+            <div class="form-group col-4">
+                <div class="row m-0">
+                    <label class="col-10">Loại giày:</label>
+                    <button type="button" id="btn-view-add-category" class="col-2 mb-1 btn btn-sm btn-primary">+</button>
+                    <select class="select2" style="width: 100%" multiple="multiple" name="category.id">
+
+                    </select>
+                </div>
+
+            </div>
+            <div class="form-group col-4">
+                <div class="row m-0">
+                    <label class="col-10">Đế giày:</label>
+                    <button type="button" id="btn-view-add-sole" class="col-2 mb-1 btn btn-sm btn-primary">+</button>
+                    <select class="select2" style="width: 100%" multiple="multiple" name="sole.id">
+
+                    </select>
+                </div>
+
+            </div>
+
+
+
+            <div class="form-group col-9">
+
+            </div>
+
+            <div class="form-group col-3">
+                <label >Type:</label>
+                <select class="form-control" name="type" >
+                    <option value="" disabled selected>Chọn type</option>
+                    <option value="1">Hoạt động</option>
+                    <option value="0">Không hoạt động</option>
+                </select>
+            </div>
+            <div class="form-group col-12">
+                <h5>Biến thể của sản phẩm </h5>
+            </div>
+            <div class="form-group col-7">
+                <div class="row m-0">
+                    <label class="col-10">Màu sắc:</label>
+                    <button type="button" id="btn-view-add-color" class="col-2 mb-1 btn btn-sm btn-primary">+</button>
+                    <select class="select2" style="width: 100%" multiple="multiple" name="color.id">
+
+                    </select>
+                </div>
+            </div>
+            <div class="form-group col-5">
+                <div class="row m-0">
+                    <label class="col-10">Size:</label>
+                    <button type="button" id="btn-view-add-size" class="col-2 mb-1 btn btn-sm btn-primary">+</button>
+                    <select class="select2" style="width: 100%" multiple="multiple" name="size.id">
+
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group col-12">
+                <div class="error" id="error-table"></div>
+            </div>
+
+            <div class="form-group col-12" id="selected-options-table">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Màu sắc</th>
+                        <th>Size</th>
+                        <th>Số lượng</th>
+                        <th>Giá</th>
+                        <th>Type</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Các hàng dữ liệu sẽ được thêm vào đây -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-group col-12 row pl-5 pr-5" >
+                <label >Hình ảnh : (Chọn hình ảnh tỉ lệ 3/4 để không bị biến dạng ảnh)</label>
+                <div id="imagePreview" class="row col-12"></div>
+                <div class="image-container p-1 " style="margin:5px;margin-left:40%;" >
+                    <input name="imgs" type="file" id="fileInput"  multiple accept="image/*">
+                </div>
+            </div>
+
+            <div class="form-group col-12">
+                <label >Mô tả:</label>
+                <textarea class="form-control" name="description" rows="8"></textarea>
+            </div>
+
+
+            <button  type="submit" class=" btn btn-primary">Thêm</button>
+        </form>
+    </div>
+
+
+
+<!--    view thêm nhanh category-->
+    <div id="view-add-category" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+         aria-hidden="true">
+        <div class="modal-dialog" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Thông tin</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-add-category">
+                        <input type="hidden"  name="id">
+                        <div class="form-group">
+                            <label >Mã loại:</label>
+                            <input type="text" class="form-control"  name="code">
+                        </div>
+                        <div class="form-group">
+                            <label>Tên loại:</label>
+                            <input type="text" class="form-control"  name="name">
+
+                        </div>
+                        <div class="form-group">
+                            <label >Type:</label>
+                            <select class="form-control" name="type" >
+                                <option value="" disabled selected>Chọn type</option>
+                                <option value="1">Hoạt động</option>
+                                <option value="0">Không hoạt động</option>
+                            </select>
+
+                        </div>
+                        <!-- Các trường khác trong form -->
+                        <button  type="submit" class=" btn btn-primary">Thêm</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--    view add color-->
+    <div id="view-add-color" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+         aria-hidden="true">
+        <div class="modal-dialog" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Thông tin</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-add-color">
+                        <input type="hidden" id="color-id" name="id">
+                        <div class="form-group">
+                            <label >Mã màu:</label>
+                            <input type="text" class="form-control"  name="code">
+                        </div>
+                        <div class="form-group">
+                            <label>Tên màu:</label>
+                            <input type="text" class="form-control"  name="name">
+
+                        </div>
+                        <div class="form-group">
+                            <label >Type:</label>
+                            <select class="form-control" name="type" >
+                                <option value="" disabled selected>Chọn type</option>
+                                <option value="1">Hoạt động</option>
+                                <option value="0">Không hoạt động</option>
+                            </select>
+
+                        </div>
+                        <!-- Các trường khác trong form -->
+                        <button  type="submit" class=" btn btn-primary">Thêm</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--    view add size-->
+    <div id="view-add-size" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+         aria-hidden="true">
+        <div class="modal-dialog" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Thông tin</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-add-size">
+                        <input type="hidden" id="size-id" name="id">
+                        <div class="form-group">
+                            <label >Mã size:</label>
+                            <input type="text" class="form-control"  name="code">
+                        </div>
+                        <div class="form-group">
+                            <label >Size:</label>
+                            <input type="number" class="form-control" name="size">
+                        </div>
+                        <div class="form-group">
+                            <label >Type:</label>
+                            <select class="form-control" name="type" >
+                                <option value="" disabled selected>Chọn type</option>
+                                <option value="1">Hoạt động</option>
+                                <option value="0">Không hoạt động</option>
+                            </select>
+
+                        </div>
+                        <!-- Các trường khác trong form -->
+                        <button  type="submit" class=" btn btn-primary">Thêm</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--    view add sole-->
+    <div id="view-add-sole" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+         aria-hidden="true">
+        <div class="modal-dialog" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Thông tin</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-add-sole">
+                        <input type="hidden"  name="id">
+                        <div class="form-group">
+                            <label >Mã đế:</label>
+                            <input type="text" class="form-control"  name="code">
+                        </div>
+                        <div class="form-group">
+                            <label>Tên đế:</label>
+                            <input type="text" class="form-control"  name="name">
+
+                        </div>
+                        <div class="form-group">
+                            <label >Type:</label>
+                            <select class="form-control" name="type" >
+                                <option value="" disabled selected>Chọn type</option>
+                                <option value="1">Hoạt động</option>
+                                <option value="0">Không hoạt động</option>
+                            </select>
+
+                        </div>
+                        <!-- Các trường khác trong form -->
+                        <button  type="submit" class=" btn btn-primary">Thêm</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--    view add brand-->
+    <div id="view-add-brand" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+         aria-hidden="true">
+        <div class="modal-dialog" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Thông tin</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-add-brand">
+                        <input type="hidden"  name="id">
+                        <div class="form-group">
+                            <label >Mã thương hiệu:</label>
+                            <input type="text" class="form-control"  name="code">
+                        </div>
+                        <div class="form-group">
+                            <label>Tên thương hiệu:</label>
+                            <input type="text" class="form-control"  name="name">
+
+                        </div>
+                        <div class="form-group">
+                            <label >Type:</label>
+                            <select class="form-control" name="type" >
+                                <option value="" disabled selected>Chọn type</option>
+                                <option value="1">Hoạt động</option>
+                                <option value="0">Không hoạt động</option>
+                            </select>
+
+                        </div>
+                        <!-- Các trường khác trong form -->
+                        <button  type="submit" class=" btn btn-primary">Thêm</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<th:block th:fragment="script">
+    <!-- Page level custom scripts -->
+    <script th:src="@{/js/admin/product/add-product.js}"></script>
+</th:block>
+</body>
+</html>

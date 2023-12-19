@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Thanh Toán Thành Công</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            background-color: #fff;
+            margin: auto;
+            width: 50%;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .error-message {
+            color: red;
+            margin: 20px 0;
+        }
+        .button {
+            background-color: blue;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Thanh Toán Không Lỗi!</h1>
+    <p class="error-message">Đơn hàng thanh toán không thành công.</p>
+    <h2>Bill ID : <span id="billId" th:text="${bill.id}"></span> <button onclick="copyBillId()">Copy</button></h2>
+    <h2>Khách hàng :<span th:if="${bill.customer==null}"></span>Vãng lai<span th:if="${bill.customer!=null}" th:text="${bill.customer.name}"></span></h2>
+    <p class="success-message">Mã thanh toán: <span style="color: black" th:text="${transactionNo}"></span></p>
+</div>
+
+<script>
+    function copyBillId() {
+        var billId = document.getElementById("billId").innerText;
+        navigator.clipboard.writeText(billId).then(function() {
+        }).catch(function(error) {
+            alert('Error in copying text: ' + error);
+        });
+    }
+</script>
+</body>
+</html>
+
+

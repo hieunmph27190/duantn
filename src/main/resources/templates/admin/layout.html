@@ -1,0 +1,345 @@
+<!DOCTYPE>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:encoding="UTF-8"
+    th:fragment="view(content,script,style)"
+>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>ADMIN</title>
+
+    <!-- Custom fonts for this template -->
+    <link th:href="@{/vendor/fontawesome-free/css/all.min.css}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+            rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+    <!-- Custom styles for this page -->
+    <link th:href="@{/vendor/datatables/dataTables.bootstrap4.min.css}" rel="stylesheet">
+    <link th:href="@{/vendor/jquery-select2/select2.css}" rel="stylesheet">
+    <link th:href="@{/vendor/jquery-upload-file/upload-file.css}" rel="stylesheet">
+    <th:block th:unless="${style==''}" >
+        <th:block th:replace="${style}" ></th:block>
+    </th:block>
+
+</head>
+
+<body id="page-top">
+
+<!-- Page Wrapper -->
+<div id="wrapper">
+
+    <!-- Sidebar -->
+    <div th:replace="~{/admin/sidebar.html::sidebar}"></div>
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            <div th:replace="~{/admin/nav::nav}"></div>
+            <!-- End of Topbar -->
+
+            <!-- Begin Page Content -->
+            <div th:replace="${content}"></div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <div th:replace="~{/admin/footer::footer}"></div>
+
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+
+<div id="view-profile-update" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+     aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 80vw" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" >Thông tin</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form-profile-update" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-4 row">
+                            <div class="form-group col-12 row pl-5 pr-5" >
+                                <label >Hình ảnh : (Ảnh 3/4)</label>
+                                <div id="imageProfilePreviewUpdate" class="col-12 " height="300px"></div>
+                                <div class="image-container p-1" style="margin:5px; border: 0px" >
+                                    <input name="imagesProfile" type="file" id="fileInputProfileUpdate"  accept="image/*">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-8 row">
+                            <div class="form-group col-12">
+                                <label >Id :</label>
+                                <input type="text" readonly  class="form-control"  name="id">
+                            </div>
+                            <div class="form-group col-8">
+                                <label >Tên :</label>
+                                <input type="text" class="form-control"  name="name">
+                            </div>
+                            <div class="form-group col-4">
+                                <label >Giới tính :</label>
+                                <select class="form-control" name="gender" >
+                                    <option value="" disabled selected>Chọn type</option>
+                                    <option value="true">Nam</option>
+                                    <option value="false">Nữ</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-4">
+                                <label >User Name :</label>
+                                <input type="text" class="form-control"  name="userName">
+                            </div>
+                            <div class="form-group col-4">
+                                <label >Ngày sinh :</label>
+                                <input type="date" class="form-control"  name="dateOfBirth">
+                            </div>
+                            <div class="form-group col-4">
+                                <label >Đổi Mật khẩu :</label>
+                                <button id="changePassword"  type="button" class="form-control btn btn-info">Đổi Mật Khẩu</button>
+                            </div>
+
+                            <div class="form-group col-5">
+                                <label >Số điện thoại :</label>
+                                <input type="text" class="form-control"  name="phoneNumber">
+                            </div>
+                            <div class="form-group col-7">
+                                <label >Email :</label>
+                                <input readonly type="text" class="form-control"  name="email">
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label >Địa chỉ :</label>
+                        <input type="text" class="form-control"  name="address">
+                    </div>
+
+                    <div class="form-group">
+                        <label >Type:</label>
+                        <select class="form-control" name="type" >
+                            <option value="" disabled selected>Chọn type</option>
+                            <option value="1">Hoạt động</option>
+                            <option value="0">Không hoạt động</option>
+                        </select>
+
+                    </div>
+                    <!-- Các trường khác trong form -->
+                    <button  type="submit" class=" btn btn-primary">Cập nhật</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="view-change-password" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 30vw" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" >Đổi mật khẩu</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form-change-password" enctype="multipart/form-data">
+                    <div class="form-group col-12">
+                        <label >Mật khẩu cũ :</label>
+                        <input type="password" class="form-control"  name="password">
+                    </div>
+                    <div class="form-group col-12">
+                        <label >Mật khẩu mới :</label>
+                        <input type="password" class="form-control"  name="newPassword">
+                    </div>
+                    <div class="form-group col-12">
+                        <label >Nhập lại mật khẩu mới :</label>
+                        <input type="password" class="form-control"  name="confirmPassword">
+                    </div>
+
+                    <button  type="submit" class=" btn btn-primary">Xác nhận</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+<!-- Logout Modal-->
+<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Chọn "Đăng xuất" bên dưới nếu bạn sẵn sàng kết thúc phiên hiện tại của mình.</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Hủy</button>
+                <a class="btn btn-primary" id="btnLogout" href="/api/auth/signout">Đăng xuất</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript-->
+<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<!-- Core plugin JavaScript-->
+<script th:src="@{/vendor/jquery-easing/jquery.easing.min.js}"></script>
+<script th:src="@{/vendor/jquery-select2/select2.js}" ></script>
+<script th:src="@{/vendor/jquery-upload-file/upload-file.js}" ></script>
+
+
+<!-- Custom scripts for all pages-->
+<script th:src="@{/js/sb-admin-2.min.js}"></script>
+<script th:src="@{/vendor/jquery-validate/jquery.validate.js}"></script>
+<script th:src="@{/vendor/jquery-validate/additional-methods.js}"></script>
+
+<script th:src="@{/js/admin/layout.js}"></script>
+
+
+<script>
+    $(document).ready(function() {
+        let currentPath = window.location.pathname;
+        $("a[href*='view']").each(function() {
+            var linkPath = $(this).attr("href");
+            if (linkPath === currentPath) {
+                $(this).addClass("active");
+                $(this).closest('li').addClass("active");
+                $(this).closest(".collapse")?.collapse("show")
+            }
+        });
+        $(`#changePassword`).on('click', '', function (e){
+            $('#view-change-password').modal('show');
+        });
+
+        $(`#form-change-password`).on('submit', function(e) {
+            e.preventDefault();
+            let formData = new FormData(this);
+            if(!(formData.get("newPassword")==formData.get("confirmPassword"))){
+                alert("Confirm Password phải giống New Password")
+                return;
+            }
+            if ($(this).valid()){
+                $.ajax({
+                    url: "/profile/change-password",
+                    type: 'PUT',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        // Xử lý thành công
+                        alert('Thay đổi mật khẩu thành công!');
+                        $('#view-change-password').modal('hide');
+                    },
+                    error: function (xhr, status, error) {
+                        if(xhr.status==400){
+                            alert('Lỗi khi sửa dữ liệu: ' + xhr.responseText);
+                        }else {
+                            alert('Lỗi :' + error);
+                        }
+                    }
+                });
+            }
+
+
+        });
+
+        $(`#btnLogout`).on('click', '', function (e){
+            e.preventDefault();
+            $.ajax({
+                url: e.target.href,
+                type: 'POST',
+                data: {},
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    window.location.href = "/login"
+                },
+                error: function (xhr, status, error) {
+                    if(xhr.status==400){
+                        let errorResponse = xhr.responseJSON;
+                        if (errorResponse){
+                            alert('Lỗi : ' + errorResponse.message);
+                        }else {
+                            alert('Lỗi : ' + xhr.responseText);
+                        }
+                    }else {
+                        alert('Lỗi :' + error);
+                    }
+                }
+            });
+        });
+
+
+
+
+        var configValidateChangePassword = {
+            rules: {
+                password: {
+                    required: true,
+                },
+                newPassword: {
+                    required: true
+                },
+                confirmPassword: {
+                    required: true
+                }
+            },
+            messages: {
+                password: {
+                    required: "Vui lòng nhập trường này",
+                },
+                newPassword: {
+                    required: "Vui lòng nhập trường này"
+                },
+                confirmPassword: {
+                    required: "Vui lòng chọn trường này"
+                }
+            }
+        }
+
+
+// Validate form add
+        $(`#form-change-password`).validate(configValidateChangePassword);
+    });
+</script>
+<th:block th:insert="${script}"></th:block>
+
+</body>
+
+</html>

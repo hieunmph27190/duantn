@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:encoding="UTF-8"
+      th:replace="~{/admin/layout.html::view(content=~{::tablex},script=~{::script},style=~{::style})}"
+>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <th:block th:fragment="style">
+    <style>
+        .selected-row {
+            background-color: #fadf9b;
+        }
+        #dataTable td{
+            font-size: 14px;
+        }
+        #tableChiTiet td{
+            font-size: 14px;
+        }
+        .table-container {
+            max-height: 800px;
+            overflow: hidden; /* Ẩn phần dư thừa của tbody */
+            position: relative; /* Cài đặt position là relative để các phần tử con có thể sử dụng position absolute */
+        }
+        .table-container table {
+            height: 500px;
+        }
+
+        .table-container thead {
+            position: sticky; /* Giữ nguyên vị trí khi scroll */
+            top: 0; /* Đặt top là 0 để giữ nguyên vị trí ngay phía trên tbody */
+        }
+
+        .table-container tbody {
+            max-height: 450px; /* Độ cao tối đa của tbody */
+            overflow-y: auto; /* Tạo thanh cuộn dọc khi nội dung vượt quá khung */
+            position: absolute; /* Đặt position là absolute để tự động điều chỉnh kích thước */
+            top: 55px; /* Đặt top là 42px để giữ khoảng cách cho phần thead */
+            left: 0; /* Đặt left là 0 để giữ nguyên vị trí so với phần cha */
+            right: 0; /* Đặt right là 0 để giữ nguyên vị trí so với phần cha */
+            bottom: 0; /* Đặt bottom là 0 để điều chỉnh chiều cao tự động */
+        }
+        .image-container{
+            position: relative;
+            border: 2px solid black;
+            border-radius: 15px;
+            box-sizing: border-box;
+            margin: 3px;
+        }
+        .image-container>button{
+            position: absolute;
+            right: 0px;
+            top:0px;
+            border: 0;
+            background-color: transparent;
+        }
+        #view-filter {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: auto;
+            margin: auto;
+            max-width: 40vw;
+        }
+        #btn-view-filter.filter-active {
+            background: green;
+            color: #fadf9b;
+        }
+
+    </style>
+    </th:block>
+</head>
+<body>
+<div th:fragment="tablex" class="container-fluid ">
+
+    <!-- Page Heading -->
+    <div class="d-flex justify-content-between align-content-center mb-2">
+        <h1 class="h3 mb-2 text-gray-800">Sản phẩm</h1>
+        <a href="/product/view-add" class="btn btn-primary btn-circle-sm" id="btn" >Thêm sản phẩm</a>
+    </div>
+    <div class="row d-flex pr-3 justify-content-between align-content-center">
+        <div></div>
+        <button id="btn-view-filter" type="button"  class="btn btn-secondary btn-filter" >Lọc</button>
+    </div>
+    <div id="view-filter" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+         aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 40vw" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Lọc</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="" id="filter">
+                        <div class="form-group col-12">
+                            <label>Thương hiệu:</label>
+                            <select id="brandFilter" class="select2" style="width: 100%" multiple="multiple" name="brandIDs">
+
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label>Loại giày:</label>
+                            <select class="form-control" style="width: 100%" multiple="multiple" name="categoryIDs">
+
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label>Đế giày:</label>
+                            <select class="form-control" style="width: 100%" multiple="multiple" name="soleIDs">
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label>Màu sắc:</label>
+                            <select class="select2" style="width: 100%" multiple="multiple" name="colorIDs">
+
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label>Size:</label>
+                            <select class="form-control" style="width: 100%" multiple="multiple" name="sizeIDs">
+
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label >Giá:</label>
+                            <div class="col-12 d-flex justify-content-between" style="padding: 0px">
+                                <input type="number" step="1" class="form-control col-6" style="width: 100%" name="minPrice">
+                                <input type="number" step="1"  class="form-control col-6" style="width: 100%" name="maxPrice">
+                            </div>
+
+                        </div>
+                        <div class="form-group col-12">
+                            <label >Type:</label>
+                            <select class="form-control" name="type" >
+                                <option value="" disabled selected>Chọn type</option>
+                                <option value="-1">Tất cả</option>
+                                <option value="1">Hoạt động</option>
+                                <option value="0">Không hoạt động</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <button type="button" id="btn-filter" class="form-control btn btn-primary "  >Lọc</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-around">
+                    <button id="btn-clear" class="btn btn-info" type="button" >Làm mới</button>
+                    <button id="btn-restore" class="btn btn-primary" type="button" >khôi phục</button>
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-7">
+            <div id="view-add" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+                 aria-hidden="true">
+                <div class="modal-dialog" style="max-width: 80vw" >
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" >Thông tin</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="form-product-add" class="row" enctype="multipart/form-data">
+                                <input type="hidden" name="id">
+                                <div class="form-group col-4">
+                                    <label >Mã sản phẩm:</label>
+                                    <input type="text" class="form-control"  name="code">
+                                </div>
+                                <div class="form-group col-8">
+                                    <label>Tên sản phẩm:</label>
+                                    <input type="text" class="form-control"  name="name">
+                                </div>
+                                <div class="form-group col-4">
+                                    <label>Thương hiệu:</label>
+                                    <select class="select2" style="width: 100%" multiple="multiple" name="brand.id">
+
+                                    </select>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label>Loại giày:</label>
+                                    <select class="form-control" style="width: 100%" multiple="multiple" name="category.id">
+
+                                    </select>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label>Đế giày:</label>
+                                    <select class="form-control" style="width: 100%" multiple="multiple" name="sole.id">
+                                    </select>
+                                </div>
+                                <div class="form-group col-9">
+
+                                </div>
+
+                                <div class="form-group col-3">
+                                    <label >Type:</label>
+                                    <select class="form-control" name="type" >
+                                        <option value="" disabled selected>Chọn type</option>
+                                        <option value="1">Hoạt động</option>
+                                        <option value="0">Không hoạt động</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-12">
+                                    <label >Mô tả:</label>
+                                    <textarea class="form-control" name="description" rows="3"></textarea>
+                                </div>
+                                <div class="form-group col-12 row pl-5 pr-5" >
+                                    <label >Hình ảnh : (Chọn hình ảnh tỉ lệ 3/4 để không bị biến dạng ảnh)</label>
+                                    <div id="imagePreview" class="row col-12"></div>
+                                    <div class="image-container p-1 " style="margin:5px;margin-left:40%;" >
+                                        <input name="imgs" type="file" id="fileInput"  multiple accept="image/*">
+                                    </div>
+                                </div>
+
+                                <button  type="submit" class=" btn btn-primary">Thêm</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-update" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+                 aria-hidden="true">
+                <div class="modal-dialog" style="max-width: 80vw" >
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Thông tin</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="form-product-update" class="row" >
+                                <div class="form-group col-3">
+                                    <label >Id :</label>
+                                    <input type="text" readonly  class="form-control"  name="id">
+                                </div>
+
+                                <div class="form-group col-3">
+                                    <label >Mã sản phẩm:</label>
+                                    <input type="text" class="form-control"  name="code">
+                                </div>
+                                <div class="form-group col-6">
+                                    <label>Tên sản phẩm:</label>
+                                    <input type="text" class="form-control"  name="name">
+                                </div>
+                                <div class="form-group col-4">
+                                    <label>Thương hiệu:</label>
+                                    <select class="select2" style="width: 100%" multiple="multiple" name="brand.id">
+
+                                    </select>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label>Loại giày:</label>
+                                    <select class="form-control" style="width: 100%" multiple="multiple" name="category.id">
+
+                                    </select>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label>Đế giày:</label>
+                                    <select class="form-control" style="width: 100%" multiple="multiple" name="sole.id">
+                                    </select>
+                                </div>
+                                <div class="form-group col-9">
+                                   
+                                </div>
+                                <div class="form-group col-3">
+                                    <label >Type:</label>
+                                    <select class="form-control" name="type" >
+                                        <option value="" disabled selected>Chọn type</option>
+                                        <option value="1">Hoạt động</option>
+                                        <option value="0">Không hoạt động</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-12">
+                                    <label >Mô tả:</label>
+                                    <textarea class="form-control" name="description" rows="3"></textarea>
+                                </div>
+
+                                <!-- Các trường khác trong form -->
+                                <button id="submitForm" type="submit" class="btn btn-primary">Cập nhật</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- DataTales Example -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="d-flex justify-content-between align-content-center" >
+                        <h6 class="m-0 font-weight-bold text-center text-primary">Dữ liệu</h6>
+                        <button class="btn btn-info btn-circle-sm view-add-btn" id="btn-view-add">Thêm</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive table-container">
+
+                        <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th>Mã</th>
+                                <th>Tên</th>
+                                <th>Hãng</th>
+                                <th>Loại</th>
+                                <th>Đế</th>
+                                <th>Ảnh</th>
+                                <th>Type</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="col-5">
+            <div id="view-detail-add" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+                 aria-hidden="true">
+                <div class="modal-dialog" style="max-width: 60vw" >
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" >Thông tin</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="form-product-detail-add" class="row" >
+                                <div class="form-group col-4">
+                                    <label >Id sản phẩm :</label>
+                                    <input type="text" readonly  class="form-control"  name="product.id">
+                                </div>
+
+                                <div class="form-group col-4">
+                                    <label >Số lượng:</label>
+                                    <input type="number" class="form-control"  name="amount">
+                                </div>
+                                <div class="form-group col-4">
+                                    <label>Giá:</label>
+                                    <input type="number" step="1" class="form-control"  name="price">
+                                </div>
+                                <div class="form-group col-4">
+                                    <label>Màu sắc:</label>
+                                    <select class="select2" style="width: 100%" multiple="multiple" name="color.id">
+
+                                    </select>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label>Size:</label>
+                                    <select class="form-control" style="width: 100%" multiple="multiple" name="size.id">
+
+                                    </select>
+                                </div>
+
+
+                                <div class="form-group col-4">
+                                    <label >Type:</label>
+                                    <select class="form-control" name="type" >
+                                        <option value="" disabled selected>Chọn type</option>
+                                        <option value="1">Hoạt động</option>
+                                        <option value="0">Không hoạt động</option>
+                                    </select>
+                                </div>
+                                <button  type="submit" class="btn btn-primary">Thêm</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-detail-update" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+                 aria-hidden="true">
+                <div class="modal-dialog" style="max-width: 60vw" >
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" >Thông tin</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="form-product-detail-update" class="row" >
+                                <div class="form-group col-5">
+                                    <label >Id :</label>
+                                    <input type="text" readonly  class="form-control"  name="id">
+                                </div>
+                                <div class="form-group col-4">
+                                    <label >Id sản phẩm :</label>
+                                    <input type="text" readonly  class="form-control"  name="product.id">
+                                </div>
+
+                                <div class="form-group col-3">
+                                    <label >Số lượng:</label>
+                                    <input type="number" class="form-control"  name="amount">
+                                </div>
+                                <div class="form-group col-3">
+                                    <label>Giá:</label>
+                                    <input type="number" step="1" class="form-control"  name="price">
+                                </div>
+                                <div class="form-group col-3">
+                                    <label>Màu sắc:</label>
+                                    <select class="select2" style="width: 100%" multiple="multiple" name="color.id">
+
+                                    </select>
+                                </div>
+                                <div class="form-group col-3">
+                                    <label>Size:</label>
+                                    <select class="form-control" style="width: 100%" multiple="multiple" name="size.id">
+
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-3">
+                                    <label >Type:</label>
+                                    <select class="form-control" name="type" >
+                                        <option value="" disabled selected>Chọn type</option>
+                                        <option value="1">Hoạt động</option>
+                                        <option value="0">Không hoạt động</option>
+                                    </select>
+                                </div>
+                                <button id="submitDetailForm" type="submit" class="btn btn-primary">Cập nhật</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-detail-img-update" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+                 aria-hidden="true">
+                <div class="modal-dialog" style="max-width: 60vw" >
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" >Thông tin</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="form-product-image-add" class="row" >
+                                <div class="form-group col-6">
+                                    <label >Id sản phẩm :</label>
+                                    <input type="text" readonly  class="form-control"  name="id">
+                                </div>
+                                <div class="form-group col-12">
+                                    <label >Ảnh :</label>
+                                    <table class="table table-bordered table-hover" id="tableImg" width="100%" cellspacing="0">
+                                        <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Ảnh</th>
+                                            <th>Type</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+
+                                    </table>
+                                </div>
+                                <div class="form-group col-12 row pl-5 pr-5" >
+                                    <label >Hình ảnh : (Chọn hình ảnh tỉ lệ 3/4 để không bị biến dạng ảnh)</label>
+                                    <div id="imagePreviewUpdate" class="row col-12"></div>
+                                    <div class="image-container p-1 " style="margin:5px;margin-left:40%;" >
+                                        <input name="imgs" type="file" id="fileInputUpdate"  multiple accept="image/*">
+                                    </div>
+                                </div>
+
+
+                                <button  type="submit" class="btn btn-primary">Thêm</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="d-flex justify-content-between align-content-center" >
+                        <h6 class="m-0 font-weight-bold text-center text-primary">Chi tiết</h6>
+                        <button class="btn btn-info btn-circle-sm view-add-btn" id="btn-view-add-detail">Thêm</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive table-container">
+
+                        <table class="table table-bordered table-hover" id="tableChiTiet" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Màu sắc</th>
+                                    <th>Size</th>
+                                    <th>Slượng</th>
+                                    <th>Giá</th>
+                                    <th>Type</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+</div>
+<th:block th:fragment="script">
+    <!-- Page level plugins -->
+    <script th:src="@{/vendor/datatables/jquery.dataTables.min.js}"></script>
+    <script th:src="@{/vendor/datatables/dataTables.bootstrap4.min.js}"></script>
+    <!-- Page level custom scripts -->
+    <script th:src="@{/js/admin/product/product.js}"></script>
+
+</th:block>
+</body>
+</html>

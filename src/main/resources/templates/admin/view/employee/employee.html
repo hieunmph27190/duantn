@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:encoding="UTF-8"
+      th:replace="~{/admin/layout.html::view(content=~{::tablex},script=~{::script},style=~{::style})}"
+>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <th:block th:fragment="style">
+    <style>
+
+    </style>
+    </th:block>
+</head>
+<body>
+<div th:fragment="tablex" class="container-fluid">
+    <!-- Page Heading -->
+    <h1 class="h3 mb-2 text-gray-800">Nhân viên</h1>
+
+    <div id="view-add" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+         aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 80vw" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Thông tin</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-employee-add" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-4 row">
+                                <div class="form-group col-12 row pl-5 pr-5" >
+                                    <label >Hình ảnh : (Ảnh 3/4)</label>
+                                    <div id="imagePreview" class="col-12 " height="300px"></div>
+                                    <div class="image-container p-1" style="margin:5px;" >
+                                        <input name="images" type="file" id="fileInput"  accept="image/*">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-8 row">
+                                <div class="form-group col-8">
+                                    <label >Tên :</label>
+                                    <input type="text" class="form-control"  name="name">
+                                </div>
+                                <div class="form-group col-4">
+                                    <label >Giới tính :</label>
+                                    <select class="form-control" name="gender" >
+                                        <option value="" disabled selected>Chọn type</option>
+                                        <option value="true">Nam</option>
+                                        <option value="false">Nữ</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label >User Name :</label>
+                                    <input type="text" class="form-control"  name="userName">
+                                </div>
+                                <div class="form-group col-4">
+                                    <label >Mật khẩu :</label>
+                                    <input type="text" class="form-control"  name="password">
+                                </div>
+
+                                <div class="form-group col-4">
+                                    <label >Ngày sinh :</label>
+                                    <input type="date" class="form-control"  name="dateOfBirth">
+                                </div>
+                                <div class="form-group col-5">
+                                    <label >Số điện thoại :</label>
+                                    <input type="text" class="form-control"  name="phoneNumber">
+                                </div>
+                                <div class="form-group col-7">
+                                    <label >Email :</label>
+                                    <input type="text" class="form-control"  name="email">
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label >Địa chỉ :</label>
+                            <input type="text" class="form-control"  name="address">
+                        </div>
+
+                        <div class="form-group">
+                            <label >Type:</label>
+                            <select class="form-control" name="type" >
+                                <option value="" disabled selected>Chọn type</option>
+                                <option value="1">Hoạt động</option>
+                                <option value="0">Không hoạt động</option>
+                            </select>
+
+                        </div>
+                        <!-- Các trường khác trong form -->
+                        <button  type="submit" class=" btn btn-primary">Thêm</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-update" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+         aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 80vw" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Thông tin</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-employee-update" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-4 row">
+                                <div class="form-group col-12 row pl-5 pr-5" >
+                                    <label >Hình ảnh : (Ảnh 3/4)</label>
+                                    <div id="imagePreviewUpdate" class="col-12 " height="300px"></div>
+                                    <div class="image-container p-1" style="margin:5px;" >
+                                        <input name="images" type="file" id="fileInputUpdate"  accept="image/*">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-8 row">
+                                <div class="form-group col-12">
+                                    <label >Id :</label>
+                                    <input type="text" readonly  class="form-control"  name="id">
+                                </div>
+                                <div class="form-group col-8">
+                                    <label >Tên :</label>
+                                    <input type="text" class="form-control"  name="name">
+                                </div>
+                                <div class="form-group col-4">
+                                    <label >Giới tính :</label>
+                                    <select class="form-control" name="gender" >
+                                        <option value="" disabled selected>Chọn type</option>
+                                        <option value="true">Nam</option>
+                                        <option value="false">Nữ</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-4">
+                                    <label >User Name :</label>
+                                    <input type="text" class="form-control"  name="userName">
+                                </div>
+                                <div class="form-group col-4">
+                                    <label >Ngày sinh :</label>
+                                    <input type="date" class="form-control"  name="dateOfBirth">
+                                </div>
+                                <div class="form-group col-4">
+                                    <label >Reset Mật khẩu :</label>
+                                    <button id="resetPass" type="button" class="form-control btn btn-info">Reset Mật Khẩu</button>
+                                </div>
+
+                                <div class="form-group col-5">
+                                    <label >Số điện thoại :</label>
+                                    <input type="text" class="form-control"  name="phoneNumber">
+                                </div>
+                                <div class="form-group col-7">
+                                    <label >Email :</label>
+                                    <input type="text" class="form-control"  name="email">
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label >Địa chỉ :</label>
+                            <input type="text" class="form-control"  name="address">
+                        </div>
+
+                        <div class="form-group">
+                            <label >Type:</label>
+                            <select class="form-control" name="type" >
+                                <option value="" disabled selected>Chọn type</option>
+                                <option value="1">Hoạt động</option>
+                                <option value="0">Không hoạt động</option>
+                            </select>
+
+                        </div>
+                        <!-- Các trường khác trong form -->
+                        <button  type="submit" class=" btn btn-primary">Cập nhật</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="d-flex justify-content-between align-content-center" >
+                <h6 class="m-0 font-weight-bold text-center text-primary">Dữ liệu</h6>
+                <button class="btn btn-info btn-circle-sm view-add-btn" id="btn-view-add">Thêm</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên</th>
+                        <th>Giới tính</th>
+                        <th>Ngày sinh</th>
+                        <th>Địa chỉ</th>
+                        <th>Email</th>
+                        <th>Số điện thoại</th>
+                        <th>Ảnh</th>
+                        <th>Type</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+<th:block th:fragment="script">
+    <!-- Page level plugins -->
+    <script th:src="@{/vendor/datatables/jquery.dataTables.min.js}"></script>
+    <script th:src="@{/vendor/datatables/dataTables.bootstrap4.min.js}"></script>
+    <!-- Page level custom scripts -->
+    <script th:src="@{/js/admin/employee/employee.js}"></script>
+</th:block>
+</body>
+</html>

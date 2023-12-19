@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:encoding="UTF-8"
+      th:replace="~{/admin/layout.html::view(content=~{::tablex},script=~{::script},style=~{::style})}"
+>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <th:block th:fragment="style">
+        <style>
+            .selected-row {
+                background-color: #fadf9b;
+            }
+            #dataTable td{
+                font-size: 14px;
+            }
+            #tableChiTiet td{
+                font-size: 14px;
+            }
+            #tableGioHang td{
+                font-size: 14px;
+            }
+
+            .dataTable .table-container {
+                max-height: 850px;
+                overflow: hidden; /* Ẩn phần dư thừa của tbody */
+                position: relative; /* Cài đặt position là relative để các phần tử con có thể sử dụng position absolute */
+            }
+            .dataTable .table-container table {
+                height: 550px;
+            }
+            .tableGioHang .table-container {
+                max-height: 500px;
+                overflow: hidden; /* Ẩn phần dư thừa của tbody */
+                position: relative; /* Cài đặt position là relative để các phần tử con có thể sử dụng position absolute */
+            }
+            .tableGioHang .table-container table {
+                height: 200px;
+            }
+
+            .table-container thead {
+                position: sticky; /* Giữ nguyên vị trí khi scroll */
+                top: 0; /* Đặt top là 0 để giữ nguyên vị trí ngay phía trên tbody */
+            }
+
+            .table-container tbody {
+                max-height: 450px; /* Độ cao tối đa của tbody */
+                overflow-y: auto; /* Tạo thanh cuộn dọc khi nội dung vượt quá khung */
+                position: absolute; /* Đặt position là absolute để tự động điều chỉnh kích thước */
+                top: 55px; /* Đặt top là 42px để giữ khoảng cách cho phần thead */
+                left: 0; /* Đặt left là 0 để giữ nguyên vị trí so với phần cha */
+                right: 0; /* Đặt right là 0 để giữ nguyên vị trí so với phần cha */
+                bottom: 0; /* Đặt bottom là 0 để điều chỉnh chiều cao tự động */
+            }
+
+            .image-container{
+                position: relative;
+                border: 2px solid black;
+                border-radius: 15px;
+                box-sizing: border-box;
+                margin: 3px;
+            }
+            .image-container>button{
+                position: absolute;
+                right: 0px;
+                top:0px;
+                border: 0;
+                background-color: transparent;
+            }
+            #view-filter {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: auto;
+                margin: auto;
+                max-width: 40vw;
+            }
+            #btn-view-filter.filter-active {
+                background: green;
+                color: #fadf9b;
+            }
+            .hidden{
+                display: none !important;
+            }
+
+        </style>
+    </th:block>
+</head>
+<body>
+<div th:fragment="tablex" class="container-fluid ">
+
+    <div id="view-add-kh" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+         aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 50vw" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Thông tin</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-customer-add" enctype="multipart/form-data">
+                        <div class="row">
+
+                            <div class="col-12 row">
+                                <div class="form-group col-12">
+                                    <label >Tên :</label>
+                                    <input type="text" class="form-control" autocomplete="off"  name="name">
+                                </div>
+                                <div class="form-group col-8">
+                                    <label >Số điện thoại :</label>
+                                    <input type="text" class="form-control" autocomplete="off"  name="phoneNumber">
+                                </div>
+                                <div class="form-group col-4">
+                                    <label >Giới tính :</label>
+                                    <select class="form-control" name="gender" >
+                                        <option value="" disabled selected>Chọn Giới Tính</option>
+                                        <option value="true">Nam</option>
+                                        <option value="false">Nữ</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-12">
+                                    <label >Email :</label>
+                                    <input type="email" class="form-control" autocomplete="off"  name="email">
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <button  type="submit" class=" btn btn-primary">Thêm</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Heading -->
+    <div class="d-flex justify-content-between align-content-center mb-2">
+        <h1 class="h3 mb-2 text-gray-800 text-primary">Bán hàng tại quầy</h1>
+    </div>
+    <div id="view-filter" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+         aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 40vw" >
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" >Lọc</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="" id="filter">
+                        <div class="form-group col-12">
+                            <label>Thương hiệu:</label>
+                            <select id="brandFilter" class="select2" style="width: 100%" multiple="multiple" name="brandIDs">
+
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label>Loại giày:</label>
+                            <select class="form-control" style="width: 100%" multiple="multiple" name="categoryIDs">
+
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label>Đế giày:</label>
+                            <select class="form-control" style="width: 100%" multiple="multiple" name="soleIDs">
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label>Màu sắc:</label>
+                            <select class="select2" style="width: 100%" multiple="multiple" name="colorIDs">
+
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label>Size:</label>
+                            <select class="form-control" style="width: 100%" multiple="multiple" name="sizeIDs">
+
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <label >Giá:</label>
+                            <div class="col-12 d-flex justify-content-between" style="padding: 0px">
+                                <input type="number" step="1" class="form-control col-6" style="width: 100%" name="minPrice">
+                                <input type="number" step="1"  class="form-control col-6" style="width: 100%" name="maxPrice">
+                            </div>
+
+                        </div>
+                        <div class="form-group col-12">
+                            <label >Type:</label>
+                            <select class="form-control" name="type" >
+                                <option value="" disabled selected>Chọn type</option>
+                                <option value="-1">Tất cả</option>
+                                <option value="1">Hoạt động</option>
+                                <option value="0">Không hoạt động</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-12">
+                            <button type="button" id="btn-filter" class="form-control btn btn-primary "  >Lọc</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-around">
+                    <button id="btn-clear" class="btn btn-info" type="button" >Làm mới</button>
+                    <button id="btn-restore" class="btn btn-primary" type="button" >khôi phục</button>
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-6">
+
+            <!-- DataTales Example -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="d-flex justify-content-between align-content-center" >
+                        <h6 class="m-0 font-weight-bold text-center text-primary">Dữ liệu</h6>
+                        <button id="btn-view-filter" type="button"  class="btn btn-secondary btn-filter" >Lọc</button>
+<!--                        <button class="btn btn-info btn-circle-sm view-add-btn" id="btn-view-add">Thêm</button>-->
+                    </div>
+                </div>
+                <div class="card-body dataTable">
+                    <div class="table-responsive table-container">
+
+                        <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th>Mã</th>
+                                <th>Tên</th>
+                                <th>Hãng</th>
+                                <th>Loại</th>
+                                <th>Đế</th>
+                                <th>Ảnh</th>
+                                <th>Type</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="col-6">
+            <div id="view-detail-img-update" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+                 aria-hidden="true">
+                <div class="modal-dialog" style="max-width: 60vw" >
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" >Thông tin</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="form-product-image-add" class="row" >
+                                <div class="form-group col-6">
+                                    <label >Id sản phẩm :</label>
+                                    <input type="text" readonly  class="form-control"  name="id">
+                                </div>
+                                <div class="form-group col-12">
+                                    <label >Ảnh :</label>
+                                    <table class="table table-bordered table-hover" id="tableImg" width="100%" cellspacing="0">
+                                        <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Ảnh</th>
+                                            <th>Type</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+
+                                    </table>
+                                </div>
+                                <div class="form-group col-12 row pl-5 pr-5" >
+                                    <label >Hình ảnh : (Chọn hình ảnh tỉ lệ 3/4 để không bị biến dạng ảnh)</label>
+                                    <div id="imagePreviewUpdate" class="row col-12"></div>
+                                    <div class="image-container p-1 " style="margin:5px;margin-left:40%;" >
+                                        <input name="imgs" type="file" id="fileInputUpdate"  multiple accept="image/*">
+                                    </div>
+                                </div>
+
+
+                                <button  type="submit" class="btn btn-primary">Thêm</button>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-detail" class="modal fade"  tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;"
+                 aria-hidden="true">
+                <div class="modal-dialog" style="max-width: 60vw" >
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" >Thông tin</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">    
+                            <input type="text" readonly  class="form-control mb-3"  name="id">
+
+
+                                <table class="table table-bordered table-hover" id="tableChiTiet" width="100%" cellspacing="0">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Màu sắc</th>
+                                        <th>Size</th>
+                                        <th>Slượng</th>
+                                        <th>Giá</th>
+                                        <th>Type</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+
+                                </table>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="card shadow mb-2">
+                <div class="card-header py-3">
+                    <div class="d-flex justify-content-between align-content-center" >
+                        <h6 class="m-0 font-weight-bold text-center text-primary">Giỏ hàng</h6>
+<!--                        <button class="btn btn-info btn-circle-sm view-add-btn" id="btn-view-add-detail">Thêm</button>-->
+                    </div>
+                </div>
+                <div class="card-body tableGioHang">
+                    <div class="table-responsive table-container">
+
+                        <table class="table table-bordered table-hover" id="tableGioHang" width="100%" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th>Mã</th>
+                                <th>Tên</th>
+                                <th>Color</th>
+                                <th>Size</th>
+                                <th>Giá</th>
+                                <th>Slượng</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow donHang">
+                <div class="card-header ">
+                    <div class="d-flex justify-content-between align-content-center" >
+                        <h6 class="m-0 font-weight-bold text-center text-primary">Đơn hàng</h6>
+                        <!--                        <button class="btn btn-info btn-circle-sm view-add-btn" id="btn-view-add-detail">Thêm</button>-->
+                    </div>
+                </div>
+                <div class="card-body row" style="padding-top: 2px;padding-bottom: 2px" >
+                    <input type="hidden" name="idKH" value="">
+                    <div class="form-group col-3 d-flex justify-content-center align-content-center">
+                        <label class="m-0 text-center" align="center" for="phoneNumber" >SĐT Khách hàng</label>
+                    </div>
+                    <div class="form-group col-3">
+                        <input id="phoneNumber" autocomplete="off" style="height: 24px;padding: 0.1rem;" type="text" class="form-control"  name="phoneNumber">
+                    </div>
+                    <div class="form-group col-5 d-flex justify-content-center align-content-center">
+                        <label id="tenKhachHang" class="m-0 text-center text-primary" align="center" for="phoneNumber" >NULL</label>
+                    </div>
+                    <div class="form-group col-1 d-flex justify-content-center align-content-center">
+                        <button id="btn-add-khach-hang" style="height: 30px" class="btn btn-info btn-circle-sm btn-add-khach-hang">+</button>
+                    </div>
+                    <div class="form-group col-3 d-flex justify-content-center align-content-center">
+                        <label class="m-0 text-center" align="center" >Số lượng : </label>
+                    </div>
+                    <div class="form-group col-1 d-flex justify-content-center align-content-center">
+                        <label id="tongSoLuongSP" class="m-0 text-center" align="center" >0</label>
+                    </div>
+                    <div class="form-group col-3 d-flex justify-content-center align-content-center">
+                        <label class="m-0 text-center" align="center" >Tổng tiền : </label>
+                    </div>
+                    <div class="form-group col-4 d-flex justify-content-center align-content-center">
+                        <label id="tongTien" class="m-0 text-center" style="color: #fadf9b" align="center" >0</label>
+                    </div>
+                    <div class="form-group col-1 d-flex justify-content-center align-content-center">
+                        <label class="m-0 text-center text-info" align="center" >VND</label>
+                    </div>
+
+                    <div class="form-group col-3 d-flex justify-content-center align-content-center">
+                        <label class="m-0 text-center" align="center" >Thanh toán :</label>
+                    </div>
+                    <div class="form-group col-3 d-flex">
+                        <input id="thanhToanTienMat" style="max-width: 50px;max-height: 24px" type="radio" name="thanhToan" value="0" class="form-control" checked >
+                        <label for="thanhToanTienMat" class="m-0 text-center" align="center" >Tiền mặt</label>
+                    </div>
+                    <div class="form-group col-4 d-flex">
+                        <input id="thanhToanQR" style="max-width: 50px;max-height: 24px" type="radio" name="thanhToan" value="1" class="form-control" >
+                        <label for="thanhToanQR" class="m-0 text-center" align="center" >Chuyển khoản</label>
+                    </div>
+                    <div id="inputTinhTienThua" class="form-group col-2 d-flex">
+                        <input id="tinhTienThua" style="max-width: 50px;max-height: 24px" type="checkbox" name="tinhTienThua" value="1" class="form-control" >
+                        <label for="tinhTienThua" class="m-0 text-center" align="center" >Tính</label>
+                    </div>
+                    <div id="view-tinhTienThua" class="col-12 row hidden">
+                        <div class="form-group col-2 d-flex justify-content-center align-content-center">
+                            <label class="m-0 text-center" align="center" for="tienDua" >Số tiền :</label>
+                        </div>
+                        <div class="form-group col-4">
+                            <input id="tienDua" min="0" step="1000" autocomplete="off" style="height: 24px;padding: 0.1rem;" value="0" type="number" class="form-control" >
+                        </div>
+                        <div class="form-group col-2 d-flex justify-content-center align-content-center">
+                            <label class="m-0 text-center text-primary" align="center"  >Thừa :</label>
+                        </div>
+                        <div class="form-group col-4 d-flex justify-content-center align-content-center">
+                            <label id="tienThua" class="m-0 text-center text-primary" align="center" for="phoneNumber" >0</label>
+                        </div>
+                    </div>
+
+                    <div class="row col-12 mb-1">
+                        <label class="col-2" >Note :</label>
+                        <textarea class="col-10 form-control" placeholder="note" name="note" style="height: 50px"></textarea>
+                    </div>
+                    <div class="form-group col-12 d-flex justify-content-center align-content-center">
+                        <button id="donHangSubmit" class="btn btn-primary" type="button" >Hoàn thành</button>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+<th:block th:fragment="script">
+    <!-- Page level plugins -->
+    <script th:src="@{/vendor/datatables/jquery.dataTables.min.js}"></script>
+    <script th:src="@{/vendor/datatables/dataTables.bootstrap4.min.js}"></script>
+    <!-- Page level custom scripts -->
+    <script th:src="@{/js/admin/selloff/selloff.js}"></script>
+
+</th:block>
+</body>
+</html>
