@@ -106,7 +106,7 @@ public class BillController {
             phoneNumberx= phoneNumber.get().equals("")?null:phoneNumber.get();
         }
         Pageable pageable = PageRequest.of(start.orElse(0) / length.orElse(10), length.orElse(10), Sort.by(orderDir.orElse("desc").equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, orderColumnName == null ? "billCreateDate" : orderColumnName));
-        Page<BillReponse> page = billService.searchByKeyword(searchValue.orElse(""),phoneNumberx,timestampStart,timestampEnd,paymentTypeInt==-1?null:paymentTypeInt,typeInt==-1?null:typeInt,employeeId, pageable);
+        Page<BillReponse> page = billService.searchByKeyword(searchValue.orElse(""),phoneNumberx,timestampStart,timestampEnd,paymentTypeInt==-1?null:paymentTypeInt,typeInt==-1?null:typeInt,null, pageable);
         DataTablesResponse response = new DataTablesResponse(draw, page);
         return response;
     }
@@ -272,7 +272,7 @@ public class BillController {
                 if (total==null){
                     return ResponseEntity.badRequest().body("Lỗi tính tổng tiền !");
                 }
-                if(bill.getPaymentAmount().doubleValue()<bill.getShipeFee().doubleValue()+total){
+                if((bill.getPaymentAmount().doubleValue()<bill.getShipeFee().doubleValue()+total)&&(bill.getPaymentType()!=(-2)||(bill.getPaymentType().equals(-2)&&billUpdateResquest.getType().equals(7)))){
                     return ResponseEntity.badRequest().body("Số tiền thanh toán không đủ !");
                 }
                 productDetailService.saveAll(productDetails2);
@@ -424,11 +424,12 @@ public class BillController {
                         if (total==null){
                             return ResponseEntity.badRequest().body("Lỗi tính tổng tiền !");
                         }
-                        if(bill.getPaymentAmount().doubleValue()<bill.getShipeFee().doubleValue()+total){
-                            return ResponseEntity.badRequest().body("Số tiền thanh toán không đủ !");
-                        }
+                    if((bill.getPaymentAmount().doubleValue()<bill.getShipeFee().doubleValue()+total)&&(bill.getPaymentType()!=(-2)||(bill.getPaymentType().equals(-2)&&billUpdateResquest.getType().equals(7)))){
+                        return ResponseEntity.badRequest().body("Số tiền thanh toán không đủ !");
+                    }
 
-                        List<BillDetail> billDetails =  billDetailService.findByBillIdAndType(bill.getId(),1);
+
+                    List<BillDetail> billDetails =  billDetailService.findByBillIdAndType(bill.getId(),1);
 
                         for (BillDetail billDetail:billDetails) {
                             ProductDetail productDetail = billDetail.getProductDetail();
