@@ -43,26 +43,17 @@ public class ProductDetail {
     @Column(name = "type")
     private Integer type;
 
-
-    //bi-directional many-to-one association to Color
     @ManyToOne
     @JoinColumn(name = "colorid")
     private Color color;
 
-    @JsonIgnore
     @ManyToOne
-//    @Cascade({CascadeType.PERSIST,CascadeType.MERGE})
     @JoinColumn(name = "productid")
     private Product product;
 
     @ManyToOne
     @JoinColumn(name = "sizeid")
     private Size size;
-
-
-
-//    @OneToMany(mappedBy = "productDetail")
-//    private List<Promotion_Product> promotionProducts;
 
 
 }

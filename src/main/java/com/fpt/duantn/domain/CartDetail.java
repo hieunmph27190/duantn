@@ -18,22 +18,17 @@ public class CartDetail implements Serializable {
     @Id
     @Column(name = "cart_detail_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long cart_detail_id;
-
-    @Column(name = "quantity")
-    private int quantity;
-
-    @Column(name = "price")
-    private Double price;
+    private long cartDetailId;
 
     @ManyToOne
     @JoinColumn(name = "productdetail_id")
-    private ProductDetail productdetail;
+    private ProductDetail productDetail;
 
     @ManyToOne
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
-
+    @Column(name="type")
+    private Integer type;
 
 }

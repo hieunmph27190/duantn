@@ -29,6 +29,7 @@ import java.util.UUID;
 @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 @RequestMapping("/color")
 public class ColorController {
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/view")
     public String test(Model model){
         return "/admin/view/color/color";
@@ -67,7 +68,7 @@ public class ColorController {
         }
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping( value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> update(@PathVariable UUID id, @Valid @RequestBody Color color , BindingResult bindingResult) {
 
@@ -85,7 +86,7 @@ public class ColorController {
 
 
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping ( consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> add(@Valid @RequestBody Color color , BindingResult bindingResult) {
 
@@ -97,6 +98,7 @@ public class ColorController {
         Color colorSaved = colorService.save(color);
         return ResponseEntity.ok(colorSaved);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable UUID id) {
         if (colorService.existsById(id)){

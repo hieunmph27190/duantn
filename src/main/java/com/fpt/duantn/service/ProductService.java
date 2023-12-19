@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +16,10 @@ import java.util.UUID;
 @Service
 public interface ProductService {
     Page<Product> findByType(Integer type, Pageable pageable);
+
+    Page<Product> searchByKeyAndTypeAndFilter(String key, Integer type, List<UUID> brandIDs, Integer brandSize, List<UUID> categoryIDs, Integer categorySize, List<UUID> soleIDs, Integer soleIDsSize, List<UUID> colorIDs, Integer colorIDsSize, List<UUID> sizeIDs, Integer sizeIDsSize, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable);
+
+    List<ProductBanHangResponse> searchResponseByKeyAndType(String key,UUID categoryId, Integer type);
 
     Page<Product> searchByKeyAndTypeAndFilter(String key, Integer type, ProductFilterRequest productFilterRequest, Pageable pageable);
 

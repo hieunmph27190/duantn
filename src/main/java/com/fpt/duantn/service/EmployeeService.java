@@ -17,6 +17,8 @@ import java.util.function.Function;
 
 @Service
 public interface EmployeeService {
+    Optional<Employee> findEByPhoneNumber(String phoneNumber);
+
     Integer updateEmployeeWithoutImage(Employee updatedEmployee);
 
     Integer updateEmployeeImage(UUID id, Blob image);

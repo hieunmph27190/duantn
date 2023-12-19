@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,7 @@ public class ImageController {
     private FileImgUtil fileImgUtil;
     @ResponseBody
     @GetMapping("")
-    public DataTablesResponse getProductDetail(
+    public DataTablesResponse get(
             @RequestParam(value = "draw", required = false) Optional<Integer> draw,
             @RequestParam(value = "start", required = false) Optional<Integer> start,
             @RequestParam(value = "length", required = false) Optional<Integer> length,
@@ -68,6 +69,7 @@ public class ImageController {
         headers.setContentType(MediaType.IMAGE_JPEG);
         return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping ( )
     public ResponseEntity<?> add(@Valid @RequestParam("id") UUID idProduct , @RequestPart(value = "imgs",required = false) MultipartFile[] files) {
         FileImgUtil fileImgUtil = new FileImgUtil();
@@ -89,6 +91,7 @@ public class ImageController {
         imageService.saveAll(imagesList);
         return ResponseEntity.ok("Thành công");
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping  ("/settype/{id}" )
     public ResponseEntity<?> setType(@PathVariable("id") UUID id , @RequestParam(value = "type",required = true) Integer type) {
        Optional<Image> optional = imageService.findById(id);
@@ -107,7 +110,7 @@ public class ImageController {
 
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable UUID id) {
         if (imageService.existsById(id)){

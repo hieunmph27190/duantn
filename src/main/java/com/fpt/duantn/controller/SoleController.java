@@ -28,6 +28,7 @@ import java.util.UUID;
 @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 @RequestMapping("/sole")
 public class SoleController {
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/view")
     public String test(Model model){
         return "/admin/view/sole/sole";
@@ -66,7 +67,7 @@ public class SoleController {
         }
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping( value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> update(@PathVariable UUID id, @Valid @RequestBody Sole sole , BindingResult bindingResult) {
 
@@ -84,7 +85,7 @@ public class SoleController {
 
 
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping ( consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> add(@Valid @RequestBody Sole sole , BindingResult bindingResult) {
 
@@ -96,6 +97,7 @@ public class SoleController {
         Sole soleSaved = soleService.save(sole);
         return ResponseEntity.ok(soleSaved);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable UUID id) {
         if (soleService.existsById(id)){

@@ -29,6 +29,7 @@ import java.util.UUID;
 @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 @RequestMapping("/brand")
 public class BrandController {
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/view")
     public String test(Model model){
         return "/admin/view/brand/brand";
@@ -67,7 +68,7 @@ public class BrandController {
         }
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping( value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> update(@PathVariable UUID id, @Valid @RequestBody Brand brand , BindingResult bindingResult) {
 
@@ -85,7 +86,7 @@ public class BrandController {
 
 
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping ( consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> add(@Valid @RequestBody Brand brand , BindingResult bindingResult) {
 
@@ -97,6 +98,7 @@ public class BrandController {
         Brand brandSaved = brandService.save(brand);
         return ResponseEntity.ok(brandSaved);
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable UUID id) {
         if (brandService.existsById(id)){

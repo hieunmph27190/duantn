@@ -34,7 +34,6 @@ public class Image {
     @Column(name = "type")
     private Integer type;
 
-    //bi-directional many-to-one association to ProductDetail
     @ManyToOne
     @JoinColumn(name = "productid")
     private Product product;

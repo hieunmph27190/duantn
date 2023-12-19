@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-@CrossOrigin("*")
 @RestController
 @RequestMapping("api/favorites")
 public class FavoritesApi {
@@ -39,33 +38,33 @@ public class FavoritesApi {
 	}
 
 
-	@GetMapping("productdetail/{id}")
-	public ResponseEntity<Integer> findByProduct(@PathVariable("id") UUID id) {
-		if (productDetailRepository.existsById(id)) {
-			return ResponseEntity.ok(favoriteRepository.countByProductdetail(productDetailRepository.getById(id)));
-		}
-		System.out.println(id);
-		return ResponseEntity.notFound().build();
-	}
+//	@GetMapping("productdetail/{id}")
+//	public ResponseEntity<Integer> findByProduct(@PathVariable("id") UUID id) {
+//		if (productDetailRepository.existsById(id)) {
+//			return ResponseEntity.ok(favoriteRepository.countByProductdetail(productDetailRepository.getById(id)));
+//		}
+//		System.out.println(id);
+//		return ResponseEntity.notFound().build();
+//	}
 
 
-	@GetMapping("{id}/{email}")
-	public ResponseEntity<Favorite> findByProductAndUser(@PathVariable("id") UUID id,
-														 @PathVariable("email") String email) {
-		if (customerService.existsByEmail(email)) {
-			if (productDetailRepository.existsById(id)) {
-				ProductDetail productDetail = productDetailRepository.findById(id).get();
-				Customer user = customerService.findByEmail(email).get();
-				return ResponseEntity.ok(favoriteRepository.findByProductdetailAndCustomer(productDetail, user));
-			}
-
-		}
-
-		System.out.println(id);
-		System.out.println(email);
-
-		return ResponseEntity.notFound().build();
-	}
+//	@GetMapping("{id}/{email}")
+//	public ResponseEntity<Favorite> findByProductAndUser(@PathVariable("id") UUID id,
+//														 @PathVariable("email") String email) {
+//		if (customerService.existsByEmail(email)) {
+//			if (productDetailRepository.existsById(id)) {
+//				ProductDetail productDetail = productDetailRepository.findById(id).get();
+//				Customer user = customerService.findByEmail(email).get();
+//				return ResponseEntity.ok(favoriteRepository.findByProductdetailAndCustomer(productDetail, user));
+//			}
+//
+//		}
+//
+//		System.out.println(id);
+//		System.out.println(email);
+//
+//		return ResponseEntity.notFound().build();
+//	}
 
 
 

@@ -38,6 +38,9 @@ public class Bill {
     @Column(name = "payment_type")
     private Integer paymentType;
 
+    @Column(name = "transactionno")
+    private String transactionNo;
+
     @Column(name = "type")
     private Integer type;
 
@@ -47,7 +50,7 @@ public class Bill {
     @Column(name = "payment_amount")
     private BigDecimal paymentAmount = new BigDecimal(0);
 
-    @NotBlank
+
     @Pattern(regexp = "^(0|\\+\\d{2})\\d{9}$")
     @Column(name="phone_number")
     private String phoneNumber;

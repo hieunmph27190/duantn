@@ -38,15 +38,15 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             "OR c.brand.code LIKE CONCAT('%', :key, '%') " +
             "OR c.brand.name LIKE CONCAT('%', :key, '%') " +
             "OR c.sole.code LIKE CONCAT('%', :key, '%') " +
-            "OR c.sole.name LIKE CONCAT('%', :key, '%')) " +
+            "OR c.sole.name LIKE CONCAT('%', :key, '%')" +
+            "or :key is null or :key = '' ) " +
             "AND ( :type IS null OR c.type = :type) " +
             "AND (( :brandIDsSize = 0  OR c.brand.id IN :brandIDs) " +
             "AND (  :categoryIDsSize  = 0 OR c.category.id IN :categoryIDs) " +
             "AND (  :soleIDsSize  = 0 OR c.sole.id IN :soleIDs) " +
             "AND (  :colorIDsSize  = 0 OR pd.color.id IN :colorIDs) " +
             "AND (  :sizeIDsSize  = 0 OR pd.size.id IN :sizeIDs)) " +
-            "AND ( ( :minPrice is null or :minPrice <= (SELECT MAX(pd1.price) FROM ProductDetail pd1 WHERE pd1.product = c)) " +
-            "and    ( :maxPrice is null or :maxPrice >= (SELECT MIN(pd2.price) FROM ProductDetail pd2 WHERE pd2.product = c)) )) ")
+            "AND ((SELECT COUNT(pd1) FROM ProductDetail pd1 WHERE pd1.product = c)=0 or(  (SELECT COUNT(pd1) FROM ProductDetail pd1 WHERE pd1.product = c and (:minPrice is null or pd1.price >=:minPrice)  and  (:maxPrice is null or  pd1.price <=:maxPrice) ) >0 ))) ")
     Page<Product> searchByKeyAndTypeAndFilter(
             @Param("key") String key,
             @Param("type") Integer type,
@@ -65,14 +65,54 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             Pageable pageable);
 
 
+    @Query(value = "SELECT " +
+            "product.id, " +
+            "product.code, " +
+            "product.productname, " +
+            "MIN(productdetail.price) AS minPrice, " +
+            "MAX(productdetail.price) AS maxPrice, " +
+            "img.id AS imageId " +
+            "FROM product " +
+            "JOIN productdetail ON product.id = productdetail.productid " +
+            "JOIN (SELECT " +
+            "    id, " +
+            "    productid, " +
+            "    type, " +
+            "    ROW_NUMBER() OVER (PARTITION BY productid ORDER BY NEWID()) AS RowNum " +
+            "FROM images " +
+            "WHERE type = 2) AS img ON product.id = img.productid AND img.RowNum = 1 " +
+            "WHERE (:key IS NULL OR product.productname LIKE %:key%) " +
+            "AND (:categoryId IS NULL OR product.categoryid = :categoryId) " +
+            "AND (:type IS NULL OR productdetail.type = :type) " +
+            "GROUP BY product.id, product.code, product.productname, img.id", nativeQuery = true)
+    List<ProductBanHangResponse> searchResponseByKeyAndType(@Param("key") String key, UUID categoryId, @Param("type") Integer type);
 
-    @Query(value = "select product.id,product.code,product.productname,min(productdetail.price) 'minPrice' ,max(productdetail.price) 'maxPrice' ,images.id 'imageId'  from product \n" +
-            " join productdetail on product.id = productdetail.productid \n" +
-            "join (SELECT id, productid,type,ROW_NUMBER() OVER (PARTITION BY productid ORDER BY NEWID()) as RowNum \n" +
-            "FROM images \n" +
-            "where images.type =2 ) images on product.id = images.productid\n" +
-            "where images.RowNum =1 \n" +
-            "GROUP BY product.id,product.code,product.productname,images.id ", nativeQuery = true)
+
+
+    @Query(value = "SELECT \n" +
+            "    product.id,\n" +
+            "    product.code,\n" +
+            "    product.productname,\n" +
+            "    MIN(productdetail.price) AS minPrice,\n" +
+            "    MAX(productdetail.price) AS maxPrice,\n" +
+            "    img.id AS imageId \n" +
+            "FROM \n" +
+            "    product \n" +
+            "JOIN \n" +
+            "    productdetail ON product.id = productdetail.productid \n" +
+            "JOIN \n" +
+            "    (SELECT \n" +
+            "        id, \n" +
+            "        productid,\n" +
+            "        type,\n" +
+            "        ROW_NUMBER() OVER (PARTITION BY productid ORDER BY NEWID()) AS RowNum \n" +
+            "    FROM \n" +
+            "        images \n" +
+            "    WHERE \n" +
+            "        type = 2\n" +
+            "    ) AS img ON product.id = img.productid AND img.RowNum = 1 \n" +
+            "GROUP BY \n" +
+            "    product.id, product.code, product.productname, img.id\n", nativeQuery = true)
     Page<ProductBanHangResponse> searchResponseByKeyAndType(@Param("key") String key, @Param("type") Integer type, Pageable pageable);
 
     @Query(value = "SELECT p.id as id, p.code as code, p.productname as name, p.type as type, " +

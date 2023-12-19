@@ -32,7 +32,10 @@ import java.util.stream.Collectors;
 
 //for Angular Client (withCredentials)
 //@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600, allowCredentials="true")
+<<<<<<< HEAD
 @CrossOrigin(origins = "*")
+=======
+>>>>>>> a8088c38aa590644979ec08768257940a7182c25
 @Controller
 @RequestMapping()
 public class AuthController {

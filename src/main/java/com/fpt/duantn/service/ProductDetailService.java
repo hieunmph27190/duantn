@@ -1,6 +1,8 @@
 package com.fpt.duantn.service;
 
+import com.fpt.duantn.domain.Color;
 import com.fpt.duantn.domain.ProductDetail;
+import com.fpt.duantn.domain.Size;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,12 @@ import java.util.UUID;
 
 @Service
 public interface ProductDetailService {
+    List<Color> getColorsByProductID(UUID productid, Integer type);
+
+    Optional<ProductDetail> findByProductIdAndColorIdAndSizeIdAndType(UUID productid, UUID colorid, UUID sizeid, Integer type);
+
+    List<Size> getSizesByProductIDAndColorID(UUID productid, UUID colorid, Integer type);
+
     Page<ProductDetail> findByType(Integer type, Pageable pageable);
 
     Boolean existsByProductIdAndColorIdAndSizeId(UUID idProduct, UUID idColor, UUID idSize);

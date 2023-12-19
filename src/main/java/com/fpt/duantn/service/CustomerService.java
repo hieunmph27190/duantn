@@ -20,6 +20,8 @@ import java.util.function.Function;
 @Service
 public interface CustomerService {
 
+    Optional<Customer> findCByPhoneNumber(String phoneNumber);
+
     Boolean existsByEmail(String email);
 
     Optional<Customer> findByEmail(String email);

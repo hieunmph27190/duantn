@@ -39,7 +39,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Controller
-@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
 @RequestMapping("/bill-detail")
 public class BillDetailController {
 

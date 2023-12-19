@@ -33,6 +33,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
     @Query("SELECT e.image from Employee e where e.id = :id")
     public Optional<Blob> findImageById(UUID id);
 
+    @Query("SELECT e from  Employee e where e.phoneNumber like :phoneNumber" )
+    public Optional<Employee> findEByPhoneNumber(String phoneNumber);
+
 
     @Modifying
     @Transactional

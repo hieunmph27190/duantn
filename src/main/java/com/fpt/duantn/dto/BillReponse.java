@@ -27,19 +27,22 @@ public class BillReponse {
 
     private BigDecimal shipeFee;
 
+    private BigDecimal paymentAmount;
+
     private String phoneNumber;
 
     private String address;
 
     private Integer type;
 
-    public BillReponse(UUID id, UUID employeeId, String employeeName, UUID customerId, String customerName, Integer paymentType, Timestamp billCreateDate, BigDecimal shipeFee, String phoneNumber, String address, Integer type) {
+    public BillReponse(UUID id, UUID employeeId, String employeeName, UUID customerId, String customerName, Integer paymentType, Timestamp billCreateDate, BigDecimal shipeFee,BigDecimal paymentAmount, String phoneNumber, String address, Integer type) {
         this.id = id;
         this.employeeId = employeeId;
         this.employeeName = employeeName;
         this.customerId = customerId;
         this.customerName = customerName;
         this.paymentType = paymentType;
+        this.paymentAmount = paymentAmount;
         this.billCreateDate = billCreateDate;
         this.shipeFee = shipeFee;
         this.phoneNumber = phoneNumber;

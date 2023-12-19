@@ -57,7 +57,11 @@ $(document).ready(function() {
       "url": urlBase,
       "type": "GET",
       "data": function(d) {
-        d.callAll = true
+        d.phoneNumber =$("#form-filter input[name='phoneNumber']").val();
+        d.startTime =$("#form-filter input[name='startTime']").val()
+        d.endTime =$("#form-filter input[name='endTime']").val()
+        d.paymentType =$("#form-filter select[name='paymentType']").val()
+        d.type = $("#form-filter select[name='type']").val();
       },
       "dataSrc": function(json) {
         return json.data;
@@ -69,7 +73,9 @@ $(document).ready(function() {
       { "data": "customerName","orderable": false, },
       { "data": "paymentType" ,
         "render": function(data, type, row) {
-          if (data == 0) {
+          if (data == -1) {
+            return "Chưa chọn";
+          } else  if (data == 0) {
             return "Tiền mặt";
           } else if (data == 1) {
             return "Chuyển khoản";
@@ -84,31 +90,16 @@ $(document).ready(function() {
         }
       },
       { "data": "shipeFee" },
+      { "data": "paymentAmount",
+        "render": function(data, type, row) {
+          return data.toLocaleString('en-US')
+        }
+      },
       { "data": "phoneNumber" },
-      { "data": "address" },
-
       {
         "data": "type",
         "render": function(data, type, row) {
-          if (data == 0) {
-            return "Không hoạt động";
-          } else if (data == 1) {
-            return "Chờ xử lí";
-          } else if (data == 2) {
-            return "Chờ xác thực";
-          } else if (data == 3) {
-            return "Đã xác thực";
-          } else if (data == 4) {
-            return "Chờ giao hàng";
-          } else if (data == 5) {
-            return "Đang giao hàng";
-          } else if (data == 6) {
-            return "Đã nhận hàng";
-          } else if (data == 7) {
-            return "Đã hoàn thành";
-          } else {
-            return "";
-          }
+          return genType(data);
         }
       },
       {
@@ -138,11 +129,110 @@ $(document).ready(function() {
   });
 
 
+  function genType(data){
+    if (data == 0) {
+      return "Đã hủy";
+    } else if (data == "1") {
+      return "Chờ xử lí";
+    } else if (data == 2) {
+      return "Chờ xác thực";
+    } else if (data == 3) {
+      return "Đã xác thực";
+    } else if (data == 4) {
+      return "Chờ giao hàng";
+    } else if (data == 5) {
+      return "Đang giao hàng";
+    } else if (data == 6) {
+      return "Đã nhận hàng";
+    } else if (data == 7) {
+      return "Đã hoàn thành";
+    }else if (data == -2) {
+      return "Chờ thanh toán";
+    } else {
+      return "";
+    }
+  }
+
   // Show form update
   $(`#${tableName} tbody`).on('dblclick', 'tr', loadDataModal);
+  $(`#btnThanhToanVNPAY`).on('click', '', thanhToanVNPAY);
+  $(`#reloadBillDetail`).on('click', '', reloadBillDetail);
+  $(`#reloadBill`).on('click', '', function (){
+    table.ajax.reload(null,false);
+  });
+
+  function thanhToanVNPAY(){
+    let billId = $("#form-bill-update input[name=id]").val();
+    if (billId){
+      $.ajax({
+        url: "http://localhost:8080/api/vnpay/"+billId+"?admin=x",
+        type: 'GET',
+        success: function(response) {
+          console.log(response.message);
+          window.open(response.message, '_blank');
+        },
+        error: function(xhr, status, error) {
+          alert("Lỗi : "+xhr?.responseText)
+        }
+      });
+    }else {
+      alert("Kiểm tra lại hóa đơn !")
+    }
+
+  }
+  function reloadBillDetail() {
+
+    tableBillDetail.ajax.reload(null,false);
+    let billId = $("#form-bill-update input[name=id]").val();
+    $.ajax({
+      url: urlBase+'/' + billId,
+      type: 'GET',
+      success: function(response) {
+        // Lấy dữ liệu từ response và hiển thị trên modal
+        let data = response;
+        pullDataToForm(`form-${objectName}-update`,data)
+        $(`#view-update input[name="paymentTime"]`).val(formatDateTime(data.paymentTime))
+
+        $(`#view-update input[name="employee.id"]`).val((data?.employee?.id))
+        $(`#view-update input[name="employee.name"]`).val((data?.employee?.name))
+
+        $(`#view-update input[name="customer.id"]`).val((data?.customer?.id))
+        $(`#view-update input[name="customer.name"]`).val((data?.customer?.name))
+
+        $(`#view-update input[name="paymentEmployee.id"]`).val((data?.paymentEmployee?.id))
+        $(`#view-update input[name="paymentEmployee.name"]`).val((data?.paymentEmployee?.name))
+
+      },
+      error: function(xhr, status, error) {
+        alert("Không thể lấy dữ liệu ")
+      }
+    });
+
+    $.ajax({
+      url: "/selloff/calculate-money"+'/' + billId,
+      type: 'GET',
+      success: function(response) {
+        // Lấy dữ liệu từ response và hiển thị trên modal
+        let data = response;
+        $(`#view-update input[name="soTienCuaDon"]`).val(Intl.NumberFormat('en-US').format(data));
+
+      },
+      error: function(xhr, status, error) {
+        if (xhr.status === 400) {
+          // Nếu là lỗi Bad Request, hiển thị thông báo lỗi
+          alert("Lỗi: " + xhr.responseText);
+        } else {
+          // Xử lý các trường hợp lỗi khác nếu cần
+          alert("Không thể lấy dữ liệu");
+        }
+      }
+    });
+
+  }
+
 
   function loadDataModal() {
-    selectRow($(this))
+    selectRow($(this).closest("tr"))
     tableBillDetail.ajax.reload(null,false);
     let rowData = table.row($(this).closest('tr')).data();
     $.ajax({
@@ -154,7 +244,6 @@ $(document).ready(function() {
         $('#view-update').modal('show');
         pullDataToForm(`form-${objectName}-update`,data)
         $(`#view-update input[name="paymentTime"]`).val(formatDateTime(data.paymentTime))
-
         $(`#view-update input[name="employee.id"]`).val((data?.employee?.id))
         $(`#view-update input[name="employee.name"]`).val((data?.employee?.name))
 
@@ -176,7 +265,7 @@ $(document).ready(function() {
       success: function(response) {
         // Lấy dữ liệu từ response và hiển thị trên modal
         let data = response;
-        $(`#view-update input[name="soTienCuaDon"]`).val((data))
+        $(`#view-update input[name="soTienCuaDon"]`).val(Intl.NumberFormat('en-US').format(data));
 
       },
       error: function(xhr, status, error) {
@@ -247,6 +336,14 @@ $(document).ready(function() {
           return data;
         }
       },
+      {"data":"productDetail.amount",
+        "render": function (data, type, row, meta) {
+          if (type === 'display') {
+            return new Intl.NumberFormat('en-US').format(data);
+          }
+          return data;
+        }
+      },
       {"data":"price",
         "render": function (data, type, row, meta) {
           if (type === 'display') {
@@ -269,8 +366,7 @@ $(document).ready(function() {
       }
     ],
     "drawCallback": function(settings) {
-      $(`#tableChiTiet tbody tr`).on('click', '.btn-view-update', null);
-      $(`#tableChiTiet tbody tr`).on('click', '.btn-delete',null);
+
     },
     searchDelay: 1500,
     "paging": true,
@@ -293,6 +389,9 @@ $(document).ready(function() {
     formData.delete("phoneNumber")
     formData.delete("paymentTime")
 
+    if (!confirm("Bạn có chắc chắn muốn chuyển trạng thái đơn hàng thành : "+genType(formData.get("type")))){
+      return;
+    }
       $.ajax({
         url: urlBase+"/update/"+ formData.get("id"),
         type: 'PUT',
@@ -301,10 +400,7 @@ $(document).ready(function() {
         processData: false,
         success: function (response) {
           // Xử lý thành công
-          alert('Dữ liệu đã được sửa thành công!');
-          table.ajax.reload(null, false);
-          clearForm(`form-${objectName}-add`, response)
-          $('#view-update').modal('hide');
+          alert('Dữ liệu đã được sửa thành công! '+"\n"+response );
         },
         error: function (xhr, status, error) {
           if(xhr.status==400){
@@ -321,10 +417,6 @@ $(document).ready(function() {
       });
 
   });
-
-
-
-
 
 
 

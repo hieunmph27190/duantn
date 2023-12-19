@@ -27,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,6 +47,7 @@ import java.util.UUID;
 @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 @RequestMapping("/customer")
 public class CustomerController implements Serializable {
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/view")
     public String test(Model model){
         return "/admin/view/customer/customer";
@@ -60,6 +62,7 @@ public class CustomerController implements Serializable {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping()
     @ResponseBody
     public DataTablesResponse getCustomer(
@@ -82,6 +85,7 @@ public class CustomerController implements Serializable {
         DataTablesResponse response = new DataTablesResponse(draw, page);
         return response;
     }
+
     @GetMapping("/phone-number")
     @ResponseBody
     public CustomerReponse findByPhone(
@@ -90,7 +94,7 @@ public class CustomerController implements Serializable {
         CustomerReponse customerReponse = customerService.findByPhoneNumber(phoneNumber.orElse(null));
         return customerReponse;
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity getCustomerById(@PathVariable UUID id) {
         if (customerService.existsById(id)){
@@ -109,7 +113,7 @@ public class CustomerController implements Serializable {
             return ResponseEntity.notFound().build();
         }
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping ("/{id}")
     public ResponseEntity<?> updateCustomer(@PathVariable("id") UUID id, @Valid @ModelAttribute Customer customer, BindingResult bindingResult, @RequestPart(value = "images",required = false) MultipartFile[] files) {
         if (bindingResult.hasErrors()){
@@ -144,7 +148,7 @@ public class CustomerController implements Serializable {
         customerSaved.setPassword(null);
         return ResponseEntity.ok(customerSaved);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping ( )
     public ResponseEntity<?> addCustomer(@Valid @ModelAttribute CustomerResquest customerResquest, BindingResult bindingResult, @RequestPart(value = "images",required = false) MultipartFile[] files) {
         if (bindingResult.hasErrors()){
@@ -160,14 +164,14 @@ public class CustomerController implements Serializable {
             }
         });
         Customer customer= new Customer();
-        modelMapper.map(customerResquest,customerResquest);
+        modelMapper.map(customerResquest,customer);
         if ((employeeService.findByEmail(customer.getEmail()).isPresent()||customerService.findByEmail(customer.getEmail()).isPresent())){
             Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
             errors.put("email","Email đã tồn tại");
             return ResponseEntity.badRequest().body(errors);
         }
 
-        if (customerService.findByPhoneNumber(customer.getPhoneNumber())!=null){
+        if (customerService.findByPhoneNumber(customer.getPhoneNumber())!=null||employeeService.findEByPhoneNumber(customer.getPhoneNumber()).isPresent()){
             Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
             errors.put("phoneNumber","Số điện thoại đã tồn tại");
             return ResponseEntity.badRequest().body(errors);
@@ -203,26 +207,52 @@ public class CustomerController implements Serializable {
             Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
-        if (customerService.findByPhoneNumber(customer.getPhoneNumber())!=null){
+        if(!customer.getEmail().equals("")){
+            if (customerService.findByEmail(customer.getEmail()).orElse(null)!=null||employeeService.findByEmail(customer.getEmail()).orElse(null)!=null){
+                Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
+                errors.put("email","Email đã tồn tại");
+                return ResponseEntity.badRequest().body(errors);
+            }
+        }
+        if (customerService.findByPhoneNumber(customer.getPhoneNumber())!=null||employeeService.findEByPhoneNumber(customer.getPhoneNumber())!=null){
             Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
             errors.put("phoneNumber","Số điện thoại đã tồn tại");
             return ResponseEntity.badRequest().body(errors);
         }
-        customer.setId(null);
-        customer.setPassword(passwordEncoder.encode(customer.getPassword()));
-        if (customer.getId()!=null){
-            Customer oldCustomer =  customerService.findById(customer.getId()).orElse(null);
-            if (oldCustomer!=null){
-                customer.setPassword(oldCustomer.getPassword());
-            }
+        Customer customerSave = new Customer();
+        customerSave.setName(customer.getName());
+        customerSave.setPhoneNumber(customer.getPhoneNumber());
+        customerSave.setGender(customer.getGender());
+        if(!customer.getEmail().equals("")){
+            customerSave.setEmail(customer.getEmail());
         }
-        customer.setDateOfBirth(null);
-        customer.setType(2);
-        Customer customerSaved = customerService.save(customer);
+        customerSave.setType(2);
+        Customer customerSaved = customerService.save(customerSave);
         customerSaved.setPassword(null);
         return ResponseEntity.ok(customerSaved);
     }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestParam(required = true) UUID id,
+                                            @RequestParam(required = true) String newPassword, Authentication authentication) {
 
+        if (authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))){
+            Customer oldCustomer =  customerService.findById(id).orElse(null);
+            if (oldCustomer!=null){
+                oldCustomer.setPassword(passwordEncoder.encode(newPassword));
+            }else {
+                return ResponseEntity.badRequest().body("Không thể lấy thông tin ");
+            }
+            customerService.save(oldCustomer);
+            Customer customerSaved = customerService.findById(oldCustomer.getId()).get();
+            customerSaved.setPassword(null);
+            return ResponseEntity.ok(customerSaved);
+        }
+        return ResponseEntity.badRequest().body("Yêu cầu quyền ADMIN !");
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity deleteEmployee(@PathVariable UUID id) {
         if (customerService.existsById(id)){

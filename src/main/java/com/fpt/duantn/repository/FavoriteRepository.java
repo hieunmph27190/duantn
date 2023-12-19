@@ -8,6 +8,7 @@ package com.fpt.duantn.repository;
 
 import com.fpt.duantn.domain.Customer;
 import com.fpt.duantn.domain.Favorite;
+import com.fpt.duantn.domain.Product;
 import com.fpt.duantn.domain.ProductDetail;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,8 +21,8 @@ import java.util.List;
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
 	List<Favorite> findByCustomer(Customer customer);
-	Integer countByProductdetail(ProductDetail productDetail);
-	Favorite findByProductdetailAndCustomer(ProductDetail productDetail, Customer customer);
+	Integer countByProduct(Product product);
+	Favorite findByProductAndCustomer(Product product, Customer customer);
 
 
 //	Integer countByProduct(Product product);

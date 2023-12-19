@@ -25,9 +25,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Controller
-@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 @RequestMapping("/category")
 public class CategoryController {
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/view")
     public String test(Model model){
         return "/admin/view/category/category";
@@ -66,7 +66,7 @@ public class CategoryController {
         }
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping( value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> update(@PathVariable UUID id, @Valid @RequestBody Category category , BindingResult bindingResult) {
 
@@ -84,7 +84,7 @@ public class CategoryController {
 
 
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping ( consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> add(@Valid @RequestBody Category Category , BindingResult bindingResult) {
 
@@ -96,7 +96,7 @@ public class CategoryController {
         Category categorySaved = categoryService.save(Category);
         return ResponseEntity.ok(categorySaved);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable UUID id) {
         if (categoryService.existsById(id)){
