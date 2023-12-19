@@ -243,6 +243,8 @@ $(document).ready(function() {
       }
     }
   };
+
+
 // Thêm quy tắc kiểm tra tùy chỉnh
   $.validator.addMethod("noWhitespace", function(value) {
     return /^\S+$/.test(value);
