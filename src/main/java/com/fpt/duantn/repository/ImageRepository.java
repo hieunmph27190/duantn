@@ -21,4 +21,6 @@ public interface ImageRepository extends JpaRepository<Image, UUID> {
     List<Image> findByProductIdAndProductType(UUID id, @Param("type") Integer type);
     @Query("select i.id from Image i where i.product.id =:id and (:type is null or i.type=:type)")
     List<UUID> findIDByProductId(UUID id, @Param("type") Integer type);
+    @Query("select i from Image i where i.product.id =:id and (:type is null or i.type=:type)")
+    List<Image> findByProductId(UUID id, @Param("type") Integer type);
 }

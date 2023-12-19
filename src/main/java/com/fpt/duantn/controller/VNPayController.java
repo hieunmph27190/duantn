@@ -60,14 +60,13 @@ public class VNPayController {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
                 Date parsedDate = dateFormat.parse(queryParams.get("vnp_PayDate"));
                 Timestamp timestamp = new Timestamp(parsedDate.getTime());
-                if (bill.getType().equals(-2)){
+                if (bill.getType().equals(-2)&&bill.getPaymentType().equals(1)){
                     bill.setType(7);
+                }else if (bill.getType().equals(-2)&&bill.getPaymentType().equals(2)){
+                    bill.setType(4);
                 }
                 bill.setPaymentTime(timestamp);
                 bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo()+"\n\n")+"Đã thanh toán : "+(Double.valueOf(amount)/100)+" : VNP Code : "+transactionNo+" : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")));
-                bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
-                        + "\nSet PaymentType : "+bill.getPaymentType()+" -> "+1);
-                bill.setPaymentType(1);
                 billService.save(bill);
                 if (queryParams.get("admin") !=null&&queryParams.get("admin") !=""){
                     response.sendRedirect("http://localhost:8080/payment/success?billId="+billId+"&amount="+amount+"&transactionNo="+transactionNo);

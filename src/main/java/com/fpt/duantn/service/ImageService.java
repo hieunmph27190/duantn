@@ -15,6 +15,8 @@ public interface ImageService {
 
     Page<Image> findByType(Integer type, Pageable pageable);
 
+    List<Image> findByProductId(UUID id, Integer type);
+
     List<Image> findByProductIdAndProductType(UUID id, Integer type);
 
     void deleteAllById(Iterable<? extends UUID> uuids);

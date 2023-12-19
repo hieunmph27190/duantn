@@ -328,7 +328,7 @@ $(document).ready(function() {
             processData: false,
             success: function (response) {
                 clearAll();
-                alert("Thành công : "+response+" , Cần thanh toán đơn này");
+                alert("Thành công : "+response);
                 if ($(".donHang input[name='thanhToan']:checked").val()==1){
                     thanhToanVNPAY(response);
                 }

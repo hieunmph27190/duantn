@@ -83,9 +83,9 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             "WHERE type = 2) AS img ON product.id = img.productid AND img.RowNum = 1 " +
             "WHERE (:key IS NULL OR product.productname LIKE %:key%) " +
             "AND (:categoryId IS NULL OR product.categoryid = :categoryId) " +
-            "AND (:type IS NULL OR productdetail.type = :type) " +
+            "AND (:productType IS NULL OR product.type = :productType) " +
             "GROUP BY product.id, product.code, product.productname, img.id", nativeQuery = true)
-    List<ProductBanHangResponse> searchResponseByKeyAndType(@Param("key") String key, UUID categoryId, @Param("type") Integer type);
+    List<ProductBanHangResponse> searchResponseByKeyAndType(@Param("key") String key, UUID categoryId, @Param("productType") Integer productType);
 
 
 

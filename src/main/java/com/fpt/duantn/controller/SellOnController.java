@@ -64,7 +64,7 @@ public class SellOnController {
                if (request.getId()==null||request.getQuantity()==null){
                    return ResponseEntity.badRequest().body("Thông tin sản phẩm hoặc số lượng bị thiếu");
                }
-               if (productDetail == null||productDetail.getType().equals(0)){
+               if (productDetail == null){
                    return ResponseEntity.badRequest().body("Sản phẩm "+request.getId()+" không tồn tại hoặc đã ngừng kinh doanh");
                }
                sum+=request.getQuantity()*productDetail.getPrice().doubleValue();
@@ -88,7 +88,7 @@ public class SellOnController {
     @PostMapping ()
     public ResponseEntity<?> add(@RequestBody() SellOnRequest sellOnRequest, Authentication authentication) {
 
-        if (sellOnRequest.getAddress()==null||sellOnRequest.getCity()==null||sellOnRequest.getDistrict()==null||sellOnRequest.getWard()==null||sellOnRequest.getNote()==null||sellOnRequest.getPhoneNumber()==null||sellOnRequest.getSanPhams()==null) {
+        if (sellOnRequest.getPaymentType()==null||sellOnRequest.getAddress()==null||sellOnRequest.getCity()==null||sellOnRequest.getDistrict()==null||sellOnRequest.getWard()==null||sellOnRequest.getNote()==null||sellOnRequest.getPhoneNumber()==null||sellOnRequest.getSanPhams()==null) {
             return ResponseEntity.badRequest().body("Thông tin Không đầy đủ");
         }
         List<SellOffProductRequest>sellOffProductRequests = sellOnRequest.getSanPhams();
@@ -104,7 +104,7 @@ public class SellOnController {
                 return ResponseEntity.badRequest().body("Thông tin sản phẩm hoặc số lượng bị thiếu");
             }
             ProductDetail productDetail =  productDetailService.findById(request.getId()).orElse(null);
-            if (productDetail == null||productDetail.getType().equals(0)){
+            if (productDetail == null||productDetail.getType().equals(0)||productDetail.getProduct().getType().equals(0)){
                 return ResponseEntity.badRequest().body("Sản phẩm "+request.getId()+" không tồn tại hoặc đã ngừng kinh doanh");
             }
             if (productDetail.getAmount()<request.getQuantity()){
@@ -119,6 +119,9 @@ public class SellOnController {
             billDetail.setQuantity(request.getQuantity());
             billDetail.setType(1);
             billDetails.add(billDetail);
+            if (sellOnRequest.getPaymentType().equals(2)){
+                productDetail.setAmount(productDetail.getAmount()- billDetail.getQuantity());
+            }
             sum+=request.getQuantity()*productDetail.getPrice().doubleValue();
             sumQ+=request.getQuantity();
         }
@@ -133,7 +136,7 @@ public class SellOnController {
                 return responseEntity;
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Lỗi tính tiên ship !");
+            return ResponseEntity.badRequest().body("Không thể tính tiên ship ! Kiểm tra lại địa chỉ ");
         }
         Bill newBill = new Bill();
         User user = authenticationService.loadUserByUsername(authentication.getName());
@@ -141,11 +144,8 @@ public class SellOnController {
         newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo()+"\n\n")+customer.getId()+" :Khách hàng: "+customer.getName() + " : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy"))+" Đã Tạo Bill : ");
         newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
                 +"\nSet ShipeFee : "+newBill.getShipeFee()+" -> "+shipFee);
-        newBill.setType(1);
         newBill.setShipeFee(new BigDecimal(shipFee));
-        newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
-                +"\nSet Type : "+newBill.getType()+" -> "+1);
-        newBill.setType(1);
+
         newBill.setCustomer(customer);
 
         newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
@@ -155,27 +155,50 @@ public class SellOnController {
         newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
                 + "\nSet Phone Number : "+newBill.getPhoneNumber()+" -> "+sellOnRequest.getPhoneNumber());
         newBill.setPhoneNumber(sellOnRequest.getPhoneNumber());
-        newBill.setPaymentType(-1);
+
         newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
                 + "\nSet Note : \n"+newBill.getNote()+"\n ----> \n"+sellOnRequest.getNote());
         newBill.setNote(sellOnRequest.getNote());
+
+       if (sellOnRequest.getPaymentType().equals(2)||sellOnRequest.getPaymentType().equals(-2)){
+           newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
+                   + "\nSet PaymentType : "+newBill.getPaymentType()+" -> "+sellOnRequest.getPaymentType());
+           newBill.setPaymentType(sellOnRequest.getPaymentType());
+            if (sellOnRequest.getPaymentType().equals(2)){
+                newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
+                        +"\nSet Type : "+newBill.getType()+" -> "+"-2");
+                newBill.setType(-2);
+                newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
+                        +"\nTrừ số lượng sản phẩm ");
+            }else  if (sellOnRequest.getPaymentType().equals(-2)){
+                newBill.setTransactionNo((newBill.getTransactionNo()==null?"": newBill.getTransactionNo())
+                        +"\nSet Type : "+newBill.getType()+" -> "+1);
+                newBill.setType(1);
+            }
+
+
+       }else {
+           return ResponseEntity.badRequest().body("Phương thức thanh toán không đúng !");
+       }
+
         Bill newBillSaved = null;
         try {
             newBillSaved = billService.save(newBill);
             for (BillDetail billDetail : billDetails){
                 billDetail.setBill(newBillSaved);
             }
+
+
             billDetailService.saveAll(billDetails);
             for (SellOffProductRequest request : sellOffProductRequests){
                 cartdetailRepository.deleteByProductDetailIdAndCustomerId(request.getId(),customer.getId());
             }
 
         }catch (Exception e){
-            System.out.println(e);
-            return ResponseEntity.ok("Lỗi , Kiểm tra lại hóa đơn : ");
+            return ResponseEntity.badRequest().body("Lỗi , Kiểm tra lại hóa đơn : ");
 
         }
-        return ResponseEntity.ok(new MessageResponse("Thành công : "+ newBillSaved.getId()));
+        return ResponseEntity.ok(new MessageResponse(newBillSaved.getId().toString()));
 
     }
 }

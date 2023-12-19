@@ -79,6 +79,10 @@ $(document).ready(function() {
             return "Tiền mặt";
           } else if (data == 1) {
             return "Chuyển khoản";
+          } else if (data == -2) {
+            return "Thanh toán COD";
+          } else if (data == 2) {
+            return "Chuyển khoản Online";
           } else {
             return "";
           }
@@ -184,12 +188,14 @@ $(document).ready(function() {
 
     tableBillDetail.ajax.reload(null,false);
     let billId = $("#form-bill-update input[name=id]").val();
+    let bill = null;
     $.ajax({
       url: urlBase+'/' + billId,
       type: 'GET',
       success: function(response) {
         // Lấy dữ liệu từ response và hiển thị trên modal
         let data = response;
+        bill=data;
         pullDataToForm(`form-${objectName}-update`,data)
         $(`#view-update input[name="paymentTime"]`).val(formatDateTime(data.paymentTime))
 
@@ -202,31 +208,34 @@ $(document).ready(function() {
         $(`#view-update input[name="paymentEmployee.id"]`).val((data?.paymentEmployee?.id))
         $(`#view-update input[name="paymentEmployee.name"]`).val((data?.paymentEmployee?.name))
 
+        $.ajax({
+          url: "/selloff/calculate-money"+'/' + billId,
+          type: 'GET',
+          success: function(response) {
+            // Lấy dữ liệu từ response và hiển thị trên modal
+            console.log(bill)
+            let data = response;
+            $(`#view-update input[name="soTienCuaDon"]`).val(Intl.NumberFormat('en-US').format(data+(bill?.shipeFee)));
+
+          },
+          error: function(xhr, status, error) {
+            if (xhr.status === 400) {
+              // Nếu là lỗi Bad Request, hiển thị thông báo lỗi
+              alert("Lỗi: " + xhr.responseText);
+            } else {
+              // Xử lý các trường hợp lỗi khác nếu cần
+              alert("Không thể lấy dữ liệu");
+            }
+          }
+        });
+
       },
       error: function(xhr, status, error) {
         alert("Không thể lấy dữ liệu ")
       }
     });
 
-    $.ajax({
-      url: "/selloff/calculate-money"+'/' + billId,
-      type: 'GET',
-      success: function(response) {
-        // Lấy dữ liệu từ response và hiển thị trên modal
-        let data = response;
-        $(`#view-update input[name="soTienCuaDon"]`).val(Intl.NumberFormat('en-US').format(data));
 
-      },
-      error: function(xhr, status, error) {
-        if (xhr.status === 400) {
-          // Nếu là lỗi Bad Request, hiển thị thông báo lỗi
-          alert("Lỗi: " + xhr.responseText);
-        } else {
-          // Xử lý các trường hợp lỗi khác nếu cần
-          alert("Không thể lấy dữ liệu");
-        }
-      }
-    });
 
   }
 
@@ -235,12 +244,14 @@ $(document).ready(function() {
     selectRow($(this).closest("tr"))
     tableBillDetail.ajax.reload(null,false);
     let rowData = table.row($(this).closest('tr')).data();
+    let bill = null;
     $.ajax({
       url: urlBase+'/' + rowData.id,
       type: 'GET',
       success: function(response) {
         // Lấy dữ liệu từ response và hiển thị trên modal
         let data = response;
+        bill=data;
         $('#view-update').modal('show');
         pullDataToForm(`form-${objectName}-update`,data)
         $(`#view-update input[name="paymentTime"]`).val(formatDateTime(data.paymentTime))
@@ -252,6 +263,26 @@ $(document).ready(function() {
 
         $(`#view-update input[name="paymentEmployee.id"]`).val((data?.paymentEmployee?.id))
         $(`#view-update input[name="paymentEmployee.name"]`).val((data?.paymentEmployee?.name))
+        $.ajax({
+          url: "/selloff/calculate-money"+'/' + rowData.id,
+          type: 'GET',
+          success: function(response) {
+            // Lấy dữ liệu từ response và hiển thị trên modal
+            console.log(bill)
+            let data = response;
+            $(`#view-update input[name="soTienCuaDon"]`).val(Intl.NumberFormat('en-US').format(data+(bill?.shipeFee)));
+
+          },
+          error: function(xhr, status, error) {
+            if (xhr.status === 400) {
+              // Nếu là lỗi Bad Request, hiển thị thông báo lỗi
+              alert("Lỗi: " + xhr.responseText);
+            } else {
+              // Xử lý các trường hợp lỗi khác nếu cần
+              alert("Không thể lấy dữ liệu");
+            }
+          }
+        });
 
       },
       error: function(xhr, status, error) {
@@ -259,25 +290,7 @@ $(document).ready(function() {
       }
     });
 
-    $.ajax({
-      url: "/selloff/calculate-money"+'/' + rowData.id,
-      type: 'GET',
-      success: function(response) {
-        // Lấy dữ liệu từ response và hiển thị trên modal
-        let data = response;
-        $(`#view-update input[name="soTienCuaDon"]`).val(Intl.NumberFormat('en-US').format(data));
 
-      },
-      error: function(xhr, status, error) {
-        if (xhr.status === 400) {
-          // Nếu là lỗi Bad Request, hiển thị thông báo lỗi
-          alert("Lỗi: " + xhr.responseText);
-        } else {
-          // Xử lý các trường hợp lỗi khác nếu cần
-          alert("Không thể lấy dữ liệu");
-        }
-      }
-    });
 
   }
 
@@ -401,6 +414,7 @@ $(document).ready(function() {
         success: function (response) {
           // Xử lý thành công
           alert('Dữ liệu đã được sửa thành công! '+"\n"+response );
+          reloadBillDetail();
         },
         error: function (xhr, status, error) {
           if(xhr.status==400){
