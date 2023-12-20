@@ -102,6 +102,14 @@ public class VNPayController {
         DecimalFormat df = new DecimalFormat("#");
         df.setMaximumFractionDigits(340);
 
+        Date now = new Date();
+        Timestamp currentTimestamp = new Timestamp(now.getTime());
+        long millisecondsDifference = currentTimestamp.getTime() - bill.getBillCreateDate().getTime();
+        long minutesDifference = millisecondsDifference / (60 * 1000);
+        if ((15-minutesDifference)<0&&bill.getPaymentType().equals(2)){
+            return ResponseEntity.badRequest().body("Không thể thanh toán bill đã quá thời gian");
+        }
+
         String vnp_Version =ConfigVNPay.vnp_Version;
         String vnp_Command = "pay";
         String orderType = "other";

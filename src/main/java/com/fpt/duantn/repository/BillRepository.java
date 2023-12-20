@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,4 +50,5 @@ public interface BillRepository extends JpaRepository<Bill, UUID> {
 
 
     public List<Bill> findByCustomer(Customer customer);
+    public List<Bill> findByPaymentTypeAndTypeAndBillCreateDateBefore(Integer paymentType,Integer type, LocalDateTime billCreateDate);
 }

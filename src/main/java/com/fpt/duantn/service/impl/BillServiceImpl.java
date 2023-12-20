@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Blob;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +36,9 @@ public class BillServiceImpl implements BillService {
         return billRepository.searchByKeyword(key, type, pageable);
     }
 
+    public List<Bill> findByPaymentTypeAndTypeAndBillCreateDateBefore(Integer paymentType, Integer type, LocalDateTime billCreateDate) {
+        return billRepository.findByPaymentTypeAndTypeAndBillCreateDateBefore(paymentType, type, billCreateDate);
+    }
 
     @Override
     public Page<BillReponse> searchByKeyword(String key, String phoneNumber, Timestamp startTime, Timestamp endTime, Integer paymentType, Integer type, UUID employeeID, Pageable pageable) {

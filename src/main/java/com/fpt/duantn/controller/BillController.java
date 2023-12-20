@@ -187,6 +187,38 @@ public class BillController {
     }
 
 
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping("/nhan-hang/{id}")
+    public ResponseEntity nhanHang(@PathVariable UUID id,Authentication authentication) {
+        if (billService.existsById(id)){
+            Bill bill = billService.findById(id).get();
+            User user = authenticationService.loadUserByUsername(authentication.getName());
+            Customer customer  =  customerService.findById(user.getId()).orElse(null);
+            if (customer==null){
+                return ResponseEntity.badRequest().body("Không lấy được thông tin đăng nhập");
+            }
+            bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo()+"\n\n")+customer.getId()+" : "+customer.getName() + " : USER : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")));
+            if (user.getId().toString().equals(bill.getCustomer().getId().toString())){
+                if (bill.getType()==5){
+
+                    bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
+                            +"\nSet Type : "+bill.getType()+" -> "+6);
+                    bill.setType(6);
+                    billService.save(bill);
+                    return ResponseEntity.ok(new MessageResponse("Đã nhận hàng thành công"));
+
+                } else {
+                    return ResponseEntity.badRequest().body("Chỉ có thể hủy khi đơn Chờ xử lí hoặc chờ thanh toán !");
+                }
+            }else {
+                return ResponseEntity.badRequest().body("Bạn không có quyền hủy đơn này");
+            }
+
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity getBillById(@PathVariable UUID id) {
@@ -237,6 +269,9 @@ public class BillController {
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))){
             Employee employeeLogin =  employeeService.findById(user.getId()).orElse(null);
             bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo()+"\n\n")+employeeLogin.getId()+" : "+employeeLogin.getName() + " : ADMIN : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")));
+            if (billUpdateResquest.getPaymentAmount().doubleValue()<0||billUpdateResquest.getPaymentAmount().doubleValue() % 1 != 0){
+                return ResponseEntity.badRequest().body("PaymentAmount không hợp lệ !");
+            }
 
             if (!(bill.getPaymentAmount().doubleValue()==billUpdateResquest.getPaymentAmount().doubleValue())){
                 bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
@@ -286,7 +321,6 @@ public class BillController {
                 }
                 bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
                         + "\nTrừ số lượng sản phẩm");
-
 
                 productDetailService.saveAll(productDetails2);
             }
@@ -340,7 +374,9 @@ public class BillController {
 
             Employee employeeLogin =  employeeService.findById(user.getId()).orElse(null);
             bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo()+"\n\n")+employeeLogin.getId()+" : "+employeeLogin.getName() + " : MODERATOR : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")));
-
+            if (billUpdateResquest.getPaymentAmount().doubleValue()<0||billUpdateResquest.getPaymentAmount().doubleValue() % 1 != 0){
+                return ResponseEntity.badRequest().body("PaymentAmount không hợp lệ !");
+            }
            if (bill.getType()==-2){
                if (billUpdateResquest.getType().intValue()==0){
                    bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo())
