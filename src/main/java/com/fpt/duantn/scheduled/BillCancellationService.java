@@ -30,13 +30,13 @@ public class BillCancellationService {
     private ProductDetailRepository productDetailRepository;
 
     @Transactional
-    @Scheduled(fixedRate = 600000,initialDelay = 30000)
+    @Scheduled(fixedRate = 300000,initialDelay = 60000)
     public void cancelPendingOrders() {
         List<Bill> pendingOrders = billRepository.findByPaymentTypeAndTypeAndBillCreateDateBefore(
                 2,-2,
                 LocalDateTime.now().minusMinutes(35)
         );
-        System.out.println("SYSTEM :  Quét bill chờ thanh toán");
+        System.out.println("SYSTEM : "+  LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy"))+" :  Quét bill chờ thanh toán");
         for (Bill bill: pendingOrders) {
                  bill.setTransactionNo((bill.getTransactionNo()==null?"": bill.getTransactionNo()+"\n\n")+" : SYSTEM : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")));
 

@@ -31,8 +31,6 @@ public class GiaoHangTietKiemController {
         @GetMapping("/shipfee")
         public ResponseEntity tinhFee(@RequestParam() String tinh, @RequestParam() String huyen, @RequestParam() String xa,@RequestParam() Integer quantity,@RequestParam() Long price) {
             try {
-                System.out.println(quantity);
-                System.out.println(price);
                return giaoHangTietKiemService.tinhShip(tinh,huyen,xa,quantity,price);
             } catch (Exception e) {
                 return ResponseEntity.badRequest().body(e.getMessage());
