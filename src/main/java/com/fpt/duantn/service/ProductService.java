@@ -1,6 +1,7 @@
 package com.fpt.duantn.service;
 
 import com.fpt.duantn.domain.Product;
+import com.fpt.duantn.domain.Size;
 import com.fpt.duantn.dto.ProductBanHangResponse;
 import com.fpt.duantn.dto.ProductFilterRequest;
 import com.fpt.duantn.dto.ProductResponse;
@@ -47,4 +48,7 @@ public interface ProductService {
     void deleteById(UUID uuid);
 
     void delete(Product entity);
+
+    Product findByCode(String code);
+
 }

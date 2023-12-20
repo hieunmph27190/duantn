@@ -3,6 +3,7 @@ package com.fpt.duantn.repository;
 import com.fpt.duantn.domain.Brand;
 import com.fpt.duantn.domain.Color;
 import com.fpt.duantn.domain.Product;
+import com.fpt.duantn.domain.Sole;
 import com.fpt.duantn.dto.ProductBanHangResponse;
 import com.fpt.duantn.dto.ProductResponse;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -175,5 +177,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             nativeQuery = true)
     Page<ProductResponse> searchResponseByKeyAndTypeAndFilter(@Param("key") String key, @Param("type") Integer type, Pageable pageable);
 
+
+    Optional<Product> findByCode(String code);
 
 }

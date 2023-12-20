@@ -1,5 +1,6 @@
 package com.fpt.duantn.controller;
 
+import com.fpt.duantn.domain.Brand;
 import com.fpt.duantn.domain.Category;
 import com.fpt.duantn.dto.DataTablesResponse;
 import com.fpt.duantn.service.CategoryService;
@@ -76,13 +77,12 @@ public class CategoryController {
             return ResponseEntity.badRequest().body(errors);
         }
         // Kiểm tra mã trùng
-        Category existingcategory = categoryService.findByCode(category.getCode());
-        if (existingcategory != null) {
+        Category existingCategory = categoryService.findById(id).orElse(null);
+        if (existingCategory != null&&(!existingCategory.getCode().equals(category.getCode()))) {
             Map<String, String> errors = new HashMap<>();
             errors.put("code", "Mã đã tồn tại");
             return ResponseEntity.badRequest().body(errors);
         }
-
 
         if (categoryService.existsById(id)){
             category.setId(id);
