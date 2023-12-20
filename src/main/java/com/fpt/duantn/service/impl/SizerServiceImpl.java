@@ -1,6 +1,6 @@
 package com.fpt.duantn.service.impl;
 
-import com.fpt.duantn.domain.Color;
+
 import com.fpt.duantn.domain.Size;
 import com.fpt.duantn.repository.SizeRepository;
 import com.fpt.duantn.service.SizeService;
@@ -72,5 +72,10 @@ public class SizerServiceImpl implements SizeService {
     @Override
     public void delete(Size entity) {
         sizeRepository.delete(entity);
+    }
+
+    @Override
+    public Size findByCode(String code) {
+        return sizeRepository.findByCode(code).orElse(null);
     }
 }

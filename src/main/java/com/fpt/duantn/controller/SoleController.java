@@ -1,5 +1,6 @@
 package com.fpt.duantn.controller;
 
+import com.fpt.duantn.domain.Color;
 import com.fpt.duantn.domain.Sole;
 import com.fpt.duantn.dto.DataTablesResponse;
 import com.fpt.duantn.service.SoleService;
@@ -20,6 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -75,6 +77,17 @@ public class SoleController {
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+
+        // Kiểm tra mã trùng
+        Sole existingSole = soleService.findByCode(sole.getCode());
+        if (existingSole != null) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "Mã đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+
+
         if (soleService.existsById(id)){
             sole.setId(id);
             Sole soleSaved = soleService.save(sole);
@@ -93,6 +106,17 @@ public class SoleController {
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+
+        // Kiểm tra mã trùng
+        Sole existingSole = soleService.findByCode(sole.getCode());
+        if (existingSole != null) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "Mã đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+
+
         sole.setId(null);
         Sole soleSaved = soleService.save(sole);
         return ResponseEntity.ok(soleSaved);

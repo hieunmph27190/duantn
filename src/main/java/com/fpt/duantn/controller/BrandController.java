@@ -21,6 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -76,6 +77,14 @@ public class BrandController {
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+        // Kiểm tra mã trùng
+        Brand existingBrand = brandService.findByCode(brand.getCode());
+        if (existingBrand != null) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "Mã đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
+
         if (brandService.existsById(id)){
             brand.setId(id);
             Brand brandSaved = brandService.save(brand);
@@ -94,10 +103,22 @@ public class BrandController {
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+
+        // Kiểm tra mã trùng
+        Brand existingBrand = brandService.findByCode(brand.getCode());
+        if (existingBrand != null) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "Mã đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
+
         brand.setId(null);
         Brand brandSaved = brandService.save(brand);
         return ResponseEntity.ok(brandSaved);
     }
+
+
+
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable UUID id) {

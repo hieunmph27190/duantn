@@ -20,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -74,6 +75,15 @@ public class CategoryController {
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+        // Kiểm tra mã trùng
+        Category existingcategory = categoryService.findByCode(category.getCode());
+        if (existingcategory != null) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "Mã đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+
         if (categoryService.existsById(id)){
             category.setId(id);
             Category categorySaved = categoryService.save(category);
@@ -92,6 +102,15 @@ public class CategoryController {
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+
+        // Kiểm tra mã trùng
+        Category existingcategory = categoryService.findByCode(Category.getCode());
+        if (existingcategory != null) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "Mã đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
+
         Category.setId(null);
         Category categorySaved = categoryService.save(Category);
         return ResponseEntity.ok(categorySaved);

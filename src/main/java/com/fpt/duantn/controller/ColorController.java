@@ -1,5 +1,6 @@
 package com.fpt.duantn.controller;
 
+import com.fpt.duantn.domain.Brand;
 import com.fpt.duantn.domain.Color;
 import com.fpt.duantn.dto.DataTablesResponse;
 
@@ -21,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -76,6 +78,16 @@ public class ColorController {
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+
+        // Kiểm tra mã trùng
+        Color existingColor = colorService.findByCode(color.getCode());
+        if (existingColor != null) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "Mã đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+
         if (colorService.existsById(id)){
             color.setId(id);
             Color colorSaved = colorService.save(color);
@@ -94,6 +106,16 @@ public class ColorController {
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+
+        // Kiểm tra mã trùng
+        Color existingColor = colorService.findByCode(color.getCode());
+        if (existingColor != null) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "Mã đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+
         color.setId(null);
         Color colorSaved = colorService.save(color);
         return ResponseEntity.ok(colorSaved);

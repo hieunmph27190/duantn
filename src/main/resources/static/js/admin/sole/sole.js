@@ -234,12 +234,12 @@ $(document).ready(function() {
       code: {
         required: "Vui lòng nhập trường này",
         minlength: "Trường này phải có ít nhất 3 ký tự",
-        noLeadingWhitespace: "Trường này không được chứa khoảng trắng ở đầu dòng"
+        noLeadingWhitespace: "Mã không được chứa khoảng trắng ở đầu dòng"
       },
       name: {
         required: "Vui lòng nhập trường này",
         minlength: "Trường này phải có ít nhất 3 ký tự",
-        noLeadingWhitespace: "Trường này không được chứa khoảng trắng ở đầu dòng"
+        noLeadingWhitespace: "Tên không được chứa khoảng trắng ở đầu dòng"
       },
       type: {
         required: "Vui lòng chọn trường này"

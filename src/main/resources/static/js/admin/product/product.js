@@ -383,10 +383,13 @@ $(document).ready(function() {
     rules: {
       code: {
         required: true,
-        minlength: 3
+        minlength: 3,
+        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
       },
       name: {
-        required: true
+        required: true,
+        minlength: 3,
+        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
       },
       "brand.id": {
         required: true
@@ -404,10 +407,13 @@ $(document).ready(function() {
     messages: {
       code: {
         required: "Vui lòng nhập trường này",
-        minlength: "Trường này phải có ít nhất 3 ký tự"
+        minlength: "Trường này phải có ít nhất 3 ký tự",
+        noLeadingWhitespace: "Mã không được chứa khoảng trắng ở đầu dòng"
       },
       name: {
-        required: "Vui lòng nhập trường này"
+        required: "Vui lòng nhập trường này",
+        minlength: "Trường này phải có ít nhất 3 ký tự",
+        noLeadingWhitespace: "Tên không được chứa khoảng trắng ở đầu dòng"
       },
       "brand.id": {
         required: "Vui lòng nhập trường này"
@@ -424,6 +430,10 @@ $(document).ready(function() {
     }
   }
 
+  // Thêm quy tắc kiểm tra tùy chỉnh cho việc kiểm tra khoảng trắng ở đầu dòng
+  $.validator.addMethod("noLeadingWhitespace", function(value) {
+    return /^[^\s]+/.test(value);
+  }, "Không được chứa khoảng trắng ở đầu dòng");
 
 // Validate form add
   $(`#form-${objectName}-add`).validate(configValidate);
@@ -859,7 +869,7 @@ $(document).ready(function() {
     },
     messages: {
       "product.id": {
-        required: "Vui lòng nhập trường này",  
+        required: "Vui lòng nhập trường này",
       },
       amount: {
         required: "Vui lòng nhập trường này",
