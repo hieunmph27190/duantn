@@ -308,12 +308,14 @@ $(document).ready(function() {
       code: {
         required: true,
         minlength: 3,
-        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
+        noLeadingWhitespace: true, // Thêm quy tắc kiểm tra tùy chỉnh
+        noTrailingWhitespace: true // Sử dụng quy tắc mới
       },
       name: {
         required: true,
         minlength: 4,
-        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
+        noLeadingWhitespace: true ,
+        noTrailingWhitespace: true // Sử dụng quy tắc mới
       },
       "brand.id": {
         required: true
@@ -338,12 +340,14 @@ $(document).ready(function() {
       code: {
         required: "Vui lòng nhập mã sản phẩm",
         minlength: "Mã sản phẩm phải có ít nhất 3 ký tự",
-        noLeadingWhitespace: "Mã không được chứa khoảng trắng ở đầu dòng"
+        noLeadingWhitespace: "Mã không được chứa khoảng trắng ở đầu dòng",
+        noTrailingWhitespace: "Mã không được chứa khoảng trắng ở cuối dòng"
       },
       name: {
         required: "Vui lòng nhập tên sản phẩm",
         minlength: "Mã sản phẩm phải có ít nhất 4 ký tự",
-        noLeadingWhitespace: "Tên không được chứa khoảng trắng ở đầu dòng"
+        noLeadingWhitespace: "Tên không được chứa khoảng trắng ở đầu dòng",
+        noTrailingWhitespace: "Tên không được chứa khoảng trắng ở cuối dòng"
       },
       "brand.id": {
         required: "Vui lòng chọn thương hiệu"
@@ -413,6 +417,14 @@ $(document).ready(function() {
   $.validator.addMethod("noLeadingWhitespace", function(value) {
     return /^[^\s]+/.test(value);
   }, "Không được chứa khoảng trắng ở đầu dòng");
+
+// Thêm quy tắc kiểm tra tùy chỉnh cho việc kiểm tra khoảng trắng ở cuối dòng
+  $.validator.addMethod("noTrailingWhitespace", function(value) {
+    // Kiểm tra xem giá trị sau khi trim có chứa khoảng trắng ở cuối dòng không
+    return value === value.replace(/\s+$/, '');
+  }, "Không được chứa khoảng trắng ở cuối dòng");
+
+
 
 
   $(`form[id*="form-add-"]`).each((index,element)=>{

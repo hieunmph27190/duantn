@@ -1,17 +1,15 @@
 package com.fpt.duantn.service.impl;
 
-import com.fpt.duantn.domain.Color;
+
 import com.fpt.duantn.domain.Product;
 import com.fpt.duantn.dto.ProductBanHangResponse;
 import com.fpt.duantn.dto.ProductFilterRequest;
 import com.fpt.duantn.dto.ProductResponse;
 import com.fpt.duantn.repository.ProductRepository;
-import com.fpt.duantn.service.ColorService;
 import com.fpt.duantn.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -115,5 +113,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void delete(Product entity) {
         productRepository.delete(entity);
+    }
+
+    @Override
+    public Product findByCode(String code) {
+        return productRepository.findByCode(code).orElse(null);
     }
 }

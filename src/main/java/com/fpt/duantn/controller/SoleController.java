@@ -1,5 +1,6 @@
 package com.fpt.duantn.controller;
 
+import com.fpt.duantn.domain.Category;
 import com.fpt.duantn.domain.Color;
 import com.fpt.duantn.domain.Sole;
 import com.fpt.duantn.dto.DataTablesResponse;
@@ -79,8 +80,8 @@ public class SoleController {
         }
 
         // Kiểm tra mã trùng
-        Sole existingSole = soleService.findByCode(sole.getCode());
-        if (existingSole != null) {
+        Sole existingSole = soleService.findById(id).orElse(null);
+        if (existingSole != null&&(!existingSole.getCode().equals(sole.getCode()))) {
             Map<String, String> errors = new HashMap<>();
             errors.put("code", "Mã đã tồn tại");
             return ResponseEntity.badRequest().body(errors);

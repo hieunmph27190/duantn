@@ -1,6 +1,7 @@
 package com.fpt.duantn.controller;
 
 import com.fpt.duantn.domain.Brand;
+import com.fpt.duantn.domain.Category;
 import com.fpt.duantn.domain.Color;
 import com.fpt.duantn.dto.DataTablesResponse;
 
@@ -78,10 +79,9 @@ public class ColorController {
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
-
         // Kiểm tra mã trùng
-        Color existingColor = colorService.findByCode(color.getCode());
-        if (existingColor != null) {
+        Color existingColor = colorService.findById(id).orElse(null);
+        if (existingColor != null&&(!existingColor.getCode().equals(color.getCode()))) {
             Map<String, String> errors = new HashMap<>();
             errors.put("code", "Mã đã tồn tại");
             return ResponseEntity.badRequest().body(errors);

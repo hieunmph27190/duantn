@@ -219,7 +219,8 @@ $(document).ready(function() {
       code: {
         required: true,
         minlength: 3,
-        noLeadingWhitespace: true // Thêm quy tắc kiểm tra tùy chỉnh
+        noLeadingWhitespace: true, // Thêm quy tắc kiểm tra tùy chỉnh
+        noTrailingWhitespace: true // Sử dụng quy tắc mới
       },
       size: {
         required: true,
@@ -235,7 +236,8 @@ $(document).ready(function() {
       code: {
         required: "Vui lòng nhập trường này",
         minlength: "Trường này phải có ít nhất 3 ký tự",
-        noLeadingWhitespace: "Mã không được chứa khoảng trắng ở đầu dòng"
+        noLeadingWhitespace: "Mã không được chứa khoảng trắng ở đầu dòng",
+        noTrailingWhitespace: "Mã không được chứa khoảng trắng ở cuối dòng"
       },
       size: {
         required: "Vui lòng nhập trường này",
@@ -265,6 +267,12 @@ $(document).ready(function() {
   $.validator.addMethod("maxSize", function (value, element, param) {
     return value < param;
   }, "Kích thước phải nhỏ hơn 45");
+
+// Thêm quy tắc kiểm tra tùy chỉnh cho việc kiểm tra khoảng trắng ở cuối dòng
+  $.validator.addMethod("noTrailingWhitespace", function(value) {
+    // Kiểm tra xem giá trị sau khi trim có chứa khoảng trắng ở cuối dòng không
+    return value === value.replace(/\s+$/, '');
+  }, "Không được chứa khoảng trắng ở cuối dòng");
 
 
 // Validate form add

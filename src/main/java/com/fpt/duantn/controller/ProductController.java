@@ -4,6 +4,7 @@ package com.fpt.duantn.controller;
 import com.fpt.duantn.domain.Image;
 import com.fpt.duantn.domain.Product;
 import com.fpt.duantn.domain.ProductDetail;
+import com.fpt.duantn.domain.Size;
 import com.fpt.duantn.dto.DataTablesResponse;
 import com.fpt.duantn.dto.ProductFilterRequest;
 import com.fpt.duantn.dto.ProductRequest;
@@ -145,6 +146,14 @@ public class ProductController {
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+
+        Product existingProduct = productService.findById(id).orElse(null);
+        if (existingProduct != null&&(!existingProduct.getCode().equals(product.getCode()))) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "Mã đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
+
         if (productService.existsById(id)){
             product.setId(id);
             Product productSaved = productService.save(product);
@@ -162,6 +171,14 @@ public class ProductController {
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+        // Kiểm tra mã trùng
+        Product existingProduct = productService.findByCode(product.getCode());
+        if (existingProduct != null) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "Mã đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
+
         product.setId(null);
         Product productSaved = productService.save(product);
         List<Image> imagesList= new ArrayList<>();
@@ -185,6 +202,8 @@ public class ProductController {
                 return ResponseEntity.badRequest().body("Không đọc ghi được ảnh (kiểm tra lại sản phảm vừa tạo)");
             }
         }
+
+
         imageService.saveAll(imagesList);
         return ResponseEntity.ok(productSaved);
     }
@@ -197,6 +216,16 @@ public class ProductController {
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+
+        // Kiểm tra mã trùng
+        Product existingProduct = productService.findByCode(productRequest.getCode());
+        if (existingProduct != null) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "Mã đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+
 //        Conver dữ liệu sang domain
         Product product = new Product();
         product.setCode(productRequest.getCode());
@@ -214,6 +243,7 @@ public class ProductController {
            productDetails.stream().forEach(item ->{
                item.setProduct(product);
            });
+
            productDetailService.saveAll(productDetails);
 
            //        Thêm ảnh
@@ -242,7 +272,6 @@ public class ProductController {
                }
            }
            imageService.saveAll(imagesList);
-
 
        }catch (Exception e){
            return ResponseEntity.badRequest().body("Có lỗi sảy ra (kiểm tra lại sản phảm vừa tạo)");

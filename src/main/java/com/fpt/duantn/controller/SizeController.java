@@ -79,12 +79,13 @@ public class SizeController {
         }
 
         // Kiểm tra mã trùng
-        Size existingSize = sizeService.findByCode(size.getCode());
-        if (existingSize != null) {
+        Size existingSize = sizeService.findById(id).orElse(null);
+        if (existingSize != null&&(!existingSize.getCode().equals(size.getCode()))) {
             Map<String, String> errors = new HashMap<>();
             errors.put("code", "Mã đã tồn tại");
             return ResponseEntity.badRequest().body(errors);
         }
+
 
         if (sizeService.existsById(id)){
             size.setId(id);

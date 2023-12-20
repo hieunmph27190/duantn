@@ -216,6 +216,7 @@ $(document).ready(function() {
     });
 
 
+
     // duoi
     $('#tableGioHang').on('change', 'input[type="number"]', function() {
         let newValue = $(this).val();
@@ -301,7 +302,7 @@ $(document).ready(function() {
                 url: "/customer/phone-number?phoneNumber="+phoneNumber,
                 type: 'GET',
                 success: function(response) {
-                    inputIDKH.val(response.id==undefined?"NULL":response?.id)
+                    inputIDKH.val(response.id==undefined?"":response?.id)
                     label.text(response.name==undefined?"NULL":response?.name) ;
                 },
                 error: function(xhr, status, error) {
