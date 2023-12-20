@@ -111,6 +111,7 @@ $(document).ready(function() {
         $('#form-customer-add input[name*="phoneNumber"]').val($("#phoneNumber").val())
         $('#view-add-kh').modal('show');
     });
+
     $("#view-filter #btn-clear").click(function (){
         let filterOptionsClone = {}
         for (let key in filterOptions) {

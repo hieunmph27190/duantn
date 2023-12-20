@@ -161,6 +161,17 @@ $(document).ready(function() {
   $(`#${tableName} tbody`).on('dblclick', 'tr', loadDataModal);
   $(`#btnThanhToanVNPAY`).on('click', '', thanhToanVNPAY);
   $(`#reloadBillDetail`).on('click', '', reloadBillDetail);
+  $(`#ipPaymentAmount`).on('change', '', function (event){
+    let currentValue = $(this).val();
+    // Kiểm tra xem giá trị có phải là số nguyên không
+    if (!Number.isInteger(parseFloat(currentValue))) {
+      // Nếu không phải số nguyên, đặt lại giá trị cũ
+      $(this).val(Math.floor(currentValue));
+    } else if (parseInt(currentValue) < 0) {
+      // Nếu là số âm, đặt lại giá trị cũ
+      $(this).val(0);
+    }
+  });
   $(`#reloadBill`).on('click', '', function (){
     table.ajax.reload(null,false);
   });
