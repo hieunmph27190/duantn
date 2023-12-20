@@ -33,4 +33,6 @@ public interface SizeService {
     void deleteById(UUID uuid);
 
     void delete(Size entity);
+
+    Size findByCode(String code);
 }

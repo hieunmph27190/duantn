@@ -32,4 +32,6 @@ public interface ColorService {
     void deleteById(UUID uuid);
 
     void delete(Color entity);
+
+    Color findByCode(String code);
 }

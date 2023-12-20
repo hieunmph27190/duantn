@@ -199,11 +199,31 @@ $(document).ready(function() {
          "pageLength": 5,
          "lengthMenu": [1,2,3,4,5,8,10, 25, 50, 100]
     });
+
+    // Đặt sự kiện change cho input số lượng
+    $('#tableGioHang tbody').on('change', 'input[type="number"]', function() {
+        var quantity = $(this).val();
+        // Kiểm tra xem giá trị có phải là số nguyên dương không
+        if (!Number.isInteger(parseFloat(quantity))) {
+            alert('Số lượng sản phẩm phải là một số nguyên.');
+            // Đặt lại giá trị về 1 hoặc giá trị mặc định mong muốn
+            $(this).val(1);
+        } else if (parseInt(quantity) <= 0) {
+            alert('Số lượng sản phẩm trong giỏ hàng phải lớn hơn 0.');
+            // Đặt lại giá trị về 1 hoặc giá trị mặc định mong muốn
+            $(this).val(1);
+        }
+    });
+
+
+    // duoi
     $('#tableGioHang').on('change', 'input[type="number"]', function() {
         let newValue = $(this).val();
         tableGioHang.cell($(this).closest('td')).data(newValue)
         tinhtoantong();
     });
+
+
     $('.donHang').on('change', 'input[name="thanhToan"]:checked', function() {
         if ($(this).val()==0){
             $("#inputTinhTienThua").removeClass("hidden")
@@ -212,11 +232,13 @@ $(document).ready(function() {
             $("#tinhTienThua").prop("checked", false)
             $("#view-tinhTienThua").addClass("hidden")
         }
-
     });
+
+
     $('.donHang').on('change', '#tienDua', function() {
         $("#tienThua").text(new Intl.NumberFormat('en-US').format($(this).val()-tongTien));
     });
+
     $('.donHang').on('change', '#tinhTienThua', function() {
         if ($(this).is(":checked")) {
             $("#view-tinhTienThua").removeClass("hidden")
@@ -226,6 +248,8 @@ $(document).ready(function() {
         }
 
     });
+
+
     function tinhtoantong() {
         let sanPhamss = tableGioHang.rows().data().toArray();
         let sanPhams = [];
@@ -262,6 +286,10 @@ $(document).ready(function() {
             }
         });
     }
+
+
+
+
 
     function phoneNumberChange() {
         let phoneNumber = $("#phoneNumber").val();
@@ -517,12 +545,6 @@ $(document).ready(function() {
         }
         return formData;
     }
-
-
-
-
-
-
 
 
 

@@ -1,6 +1,7 @@
 package com.fpt.duantn.service;
 
 import com.fpt.duantn.domain.Brand;
+import com.fpt.duantn.domain.Employee;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,4 +33,6 @@ public interface BrandService {
     void deleteById(UUID uuid);
 
     void delete(Brand entity);
+
+    Brand findByCode(String ma);
 }

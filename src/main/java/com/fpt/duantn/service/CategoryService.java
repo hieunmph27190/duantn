@@ -33,4 +33,6 @@ public interface CategoryService {
     void deleteById(UUID uuid);
 
     void delete(Category entity);
+
+    Category findByCode(String code);
 }

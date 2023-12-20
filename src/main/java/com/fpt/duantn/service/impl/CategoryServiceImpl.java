@@ -74,4 +74,9 @@ public class CategoryServiceImpl implements CategoryService {
     public void delete(Category entity) {
         categoryRepository.delete(entity);
     }
+
+    @Override
+    public Category findByCode(String code) {
+        return categoryRepository.findByCode(code).orElse(null);
+    }
 }

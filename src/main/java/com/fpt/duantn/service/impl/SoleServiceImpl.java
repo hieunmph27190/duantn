@@ -75,4 +75,10 @@ public class SoleServiceImpl implements SoleService {
     public void delete(Sole entity) {
         soleRepository.delete(entity);
     }
+
+
+    @Override
+    public Sole findByCode(String code) {
+        return soleRepository.findByCode(code).orElse(null);
+    }
 }

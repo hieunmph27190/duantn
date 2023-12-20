@@ -72,4 +72,9 @@ public class ColorServiceImpl implements ColorService {
     public void delete(Color entity) {
         colorRepository.delete(entity);
     }
+
+    @Override
+    public Color findByCode(String code) {
+        return colorRepository.findByCode(code).orElse(null);
+    }
 }

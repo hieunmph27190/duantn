@@ -1,6 +1,7 @@
 package com.fpt.duantn.controller;
 
 import com.fpt.duantn.domain.Size;
+import com.fpt.duantn.domain.Sole;
 import com.fpt.duantn.dto.DataTablesResponse;
 import com.fpt.duantn.service.SizeService;
 import com.fpt.duantn.util.FormErrorUtil;
@@ -19,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -75,6 +77,15 @@ public class SizeController {
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+
+        // Kiểm tra mã trùng
+        Size existingSize = sizeService.findByCode(size.getCode());
+        if (existingSize != null) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "Mã đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
+
         if (sizeService.existsById(id)){
             size.setId(id);
             Size sizeSaved = sizeService.save(size);
@@ -93,6 +104,16 @@ public class SizeController {
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+        // Kiểm tra mã trùng
+        Size existingSize = sizeService.findByCode(size.getCode());
+        if (existingSize != null) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "Mã đã tồn tại");
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+
+
         size.setId(null);
         Size sizeSaved= sizeService.save(size);
         return ResponseEntity.ok(sizeSaved);

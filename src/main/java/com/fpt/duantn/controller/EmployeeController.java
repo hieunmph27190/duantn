@@ -144,16 +144,17 @@ public class EmployeeController implements Serializable {
             Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
             return ResponseEntity.badRequest().body(errors);
         }
+
         if (employeeService.findByEmail(employee.getEmail()).isPresent()||customerService.findByEmail(employee.getEmail()).isPresent()){
             Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
             errors.put("email","Email đã tồn tại");
             return ResponseEntity.badRequest().body(errors);
         }
-        if (customerService.findByPhoneNumber(employee.getPhoneNumber())!=null||employeeService.findEByPhoneNumber(employee.getPhoneNumber()).isPresent()){
-            Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
-            errors.put("phoneNumber","Số điện thoại đã tồn tại");
-            return ResponseEntity.badRequest().body(errors);
-        }
+            if (customerService.findByPhoneNumber(employee.getPhoneNumber())!=null||employeeService.findEByPhoneNumber(employee.getPhoneNumber()).isPresent()){
+                Map<String, String> errors = FormErrorUtil.changeToMapError(bindingResult);
+                errors.put("phoneNumber","Số điện thoại đã tồn tại");
+                return ResponseEntity.badRequest().body(errors);
+            }
         employee.setId(null);
         if (files!=null){
             if (files.length>0){

@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 import java.util.UUID;
 @Repository
 public interface SizeRepository extends JpaRepository<Size, UUID> {
@@ -18,4 +20,6 @@ public interface SizeRepository extends JpaRepository<Size, UUID> {
             "or s.size like concat('%',:key,'%')) " +
             "and (:type is null or s.type = :type)")
     Page<Size> searchByKeyAndType(@Param("key") String key, @Param("type") Integer type, Pageable pageable);
+    Optional<Size> findByCode(String code);
+
 }

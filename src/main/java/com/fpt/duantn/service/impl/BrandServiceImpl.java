@@ -73,4 +73,11 @@ public class BrandServiceImpl implements BrandService {
     public void delete(Brand entity) {
         brandRepository.delete(entity);
     }
+
+    @Override
+    public Brand findByCode(String ma) {
+        return brandRepository.findByCode(ma).orElse(null);
+    }
+
+
 }

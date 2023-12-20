@@ -223,8 +223,8 @@ $(document).ready(function() {
       },
       size: {
         required: true,
-        minSize: 16,
-        maxSize: 45, // Thêm quy tắc kiểm tra tùy chỉnh
+        minSize: 10,
+        maxSize: 100, // Thêm quy tắc kiểm tra tùy chỉnh
         digits: true
       },
       type: {
@@ -235,12 +235,12 @@ $(document).ready(function() {
       code: {
         required: "Vui lòng nhập trường này",
         minlength: "Trường này phải có ít nhất 3 ký tự",
-        noLeadingWhitespace: "Trường này không được chứa khoảng trắng ở đầu dòng"
+        noLeadingWhitespace: "Mã không được chứa khoảng trắng ở đầu dòng"
       },
       size: {
         required: "Vui lòng nhập trường này",
-        minSize: "Kích thước phải lớn hơn hoặc bằng 16",
-        maxSize: "Kích thước phải nhỏ hơn 45", // Thông báo mới
+        minSize: "Kích thước phải lớn hơn hoặc bằng 10",
+        maxSize: "Kích thước phải nhỏ hơn 100", // Thông báo mới
         digits: "Vui lòng nhập một số"
       },
       type: {

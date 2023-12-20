@@ -33,4 +33,6 @@ public interface SoleService {
     void deleteById(UUID uuid);
 
     void delete(Sole entity);
+
+    Sole findByCode(String code);
 }
