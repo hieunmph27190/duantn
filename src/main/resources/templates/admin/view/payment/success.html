@@ -35,7 +35,7 @@
     <h1>Thanh Toán Thành Công!</h1>
     <p class="success-message">Đơn hàng của bạn đã được thanh toán thành công.</p>
     <h2>Bill ID : <span id="billId" th:text="${bill.id}"></span> <button onclick="copyBillId()">Copy</button></h2>
-    <h2>Khách hàng :<span th:if="${bill.customer==null}"></span>Vãng lai<span th:if="${bill.customer!=null}" th:text="${bill.customer.name}"></span></h2>
+    <h2>Khách hàng :<span th:if="${bill.customer==null}">Vãng lai</span><span th:if="${bill.customer!=null}" th:text="${bill.customer.name}"></span></h2>
     <p class="success-message">Mã thanh toán: <span style="color: black" th:text="${transactionNo}"></span></p>
     <p class="success-message">Số tiền thanh toán : <span style="color: black" th:text="${#numbers.formatDecimal(amount, 0, 'COMMA', 0, 'POINT')}"></span> VND</p>
 </div>

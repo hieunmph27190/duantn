@@ -32,10 +32,10 @@
 </head>
 <body>
 <div class="container">
-    <h1>Thanh Toán Không Lỗi!</h1>
+    <h1>Thanh Toán Không Thành Công !</h1>
     <p class="error-message">Đơn hàng thanh toán không thành công.</p>
     <h2>Bill ID : <span id="billId" th:text="${bill.id}"></span> <button onclick="copyBillId()">Copy</button></h2>
-    <h2>Khách hàng :<span th:if="${bill.customer==null}"></span>Vãng lai<span th:if="${bill.customer!=null}" th:text="${bill.customer.name}"></span></h2>
+    <h2>Khách hàng :<span th:if="${bill.customer==null}">Vãng lai</span><span th:if="${bill.customer!=null}" th:text="${bill.customer.name}"></span></h2>
     <p class="success-message">Mã thanh toán: <span style="color: black" th:text="${transactionNo}"></span></p>
 </div>
 

@@ -81,7 +81,7 @@ public class SoleController {
 
         // Kiểm tra mã trùng
         Sole existingSole = soleService.findById(id).orElse(null);
-        if (existingSole != null&&(!existingSole.getCode().equals(sole.getCode()))) {
+        if (soleService.findByCode(sole.getCode())  != null&&(!existingSole.getCode().equals(sole.getCode()))) {
             Map<String, String> errors = new HashMap<>();
             errors.put("code", "Mã đã tồn tại");
             return ResponseEntity.badRequest().body(errors);

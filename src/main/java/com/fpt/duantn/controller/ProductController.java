@@ -148,7 +148,7 @@ public class ProductController {
         }
 
         Product existingProduct = productService.findById(id).orElse(null);
-        if (existingProduct != null&&(!existingProduct.getCode().equals(product.getCode()))) {
+        if ( productService.findByCode(product.getCode()) != null&&(!existingProduct.getCode().equals(product.getCode()))) {
             Map<String, String> errors = new HashMap<>();
             errors.put("code", "Mã đã tồn tại");
             return ResponseEntity.badRequest().body(errors);

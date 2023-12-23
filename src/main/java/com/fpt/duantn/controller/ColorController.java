@@ -81,7 +81,7 @@ public class ColorController {
         }
         // Kiểm tra mã trùng
         Color existingColor = colorService.findById(id).orElse(null);
-        if (existingColor != null&&(!existingColor.getCode().equals(color.getCode()))) {
+        if (colorService.findByCode(color.getCode())  != null&&(!existingColor.getCode().equals(color.getCode()))) {
             Map<String, String> errors = new HashMap<>();
             errors.put("code", "Mã đã tồn tại");
             return ResponseEntity.badRequest().body(errors);

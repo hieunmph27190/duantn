@@ -79,7 +79,7 @@ public class BrandController {
         }
         // Kiểm tra mã trùng
         Brand existingBrand = brandService.findById(id).orElse(null);
-        if (existingBrand != null&&(!existingBrand.getCode().equals(brand.getCode()))) {
+        if (brandService.findByCode(brand.getCode()) != null&&(!existingBrand.getCode().equals(brand.getCode()))) {
             Map<String, String> errors = new HashMap<>();
             errors.put("code", "Mã đã tồn tại");
             return ResponseEntity.badRequest().body(errors);
