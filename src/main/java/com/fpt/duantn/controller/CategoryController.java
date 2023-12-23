@@ -78,7 +78,7 @@ public class CategoryController {
         }
         // Kiểm tra mã trùng
         Category existingCategory = categoryService.findById(id).orElse(null);
-        if (existingCategory != null&&(!existingCategory.getCode().equals(category.getCode()))) {
+        if (categoryService.findByCode(category.getCode())  != null&&(!existingCategory.getCode().equals(category.getCode()))) {
             Map<String, String> errors = new HashMap<>();
             errors.put("code", "Mã đã tồn tại");
             return ResponseEntity.badRequest().body(errors);
@@ -96,7 +96,7 @@ public class CategoryController {
     }
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping ( consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> add(@Valid @RequestBody Category Category , BindingResult bindingResult) {
+    public ResponseEntity<?> add(@Valid @RequestBody Category  category , BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()){
             Map errors = FormErrorUtil.changeToMapError(bindingResult);
@@ -104,15 +104,15 @@ public class CategoryController {
         }
 
         // Kiểm tra mã trùng
-        Category existingcategory = categoryService.findByCode(Category.getCode());
+        Category existingcategory = categoryService.findByCode(category.getCode());
         if (existingcategory != null) {
             Map<String, String> errors = new HashMap<>();
             errors.put("code", "Mã đã tồn tại");
             return ResponseEntity.badRequest().body(errors);
         }
 
-        Category.setId(null);
-        Category categorySaved = categoryService.save(Category);
+        category.setId(null);
+        Category categorySaved = categoryService.save(category);
         return ResponseEntity.ok(categorySaved);
     }
     @PreAuthorize("hasRole('ADMIN')")

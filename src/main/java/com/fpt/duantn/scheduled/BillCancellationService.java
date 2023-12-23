@@ -34,7 +34,7 @@ public class BillCancellationService {
     public void cancelPendingOrders() {
         List<Bill> pendingOrders = billRepository.findByPaymentTypeAndTypeAndBillCreateDateBefore(
                 2,-2,
-                LocalDateTime.now().minusMinutes(35)
+                LocalDateTime.now().minusMinutes(1)
         );
         System.out.println("SYSTEM : "+  LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy"))+" :  Quét bill chờ thanh toán");
         for (Bill bill: pendingOrders) {
@@ -56,13 +56,13 @@ public class BillCancellationService {
                         bill.setType(0);
                         productDetailRepository.saveAll(productDetails2);
                         billRepository.save(bill);
+                        System.out.println("Bill : "+ bill.getId()+" đã hủy do chưa thanh toán quá 35 phút ");
                     }else {
                         System.out.println("Bill : "+ bill.getId()+" đã được thanh toán ở trạng thái chờ thanh toán");
                     }
                 }catch (Exception e){
                     System.out.println("Bill : "+ bill.getId()+" Lỗi hủy đơn");
                 }
-
 
         }
     }

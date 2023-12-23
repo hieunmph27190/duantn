@@ -484,7 +484,7 @@ $(document).ready(function() {
         },
         searchDelay: 1500,
         "paging": true,
-        "pageLength": 25,
+        "pageLength": 100,
         "lengthMenu": [10, 25, 50, 100],
     });
 

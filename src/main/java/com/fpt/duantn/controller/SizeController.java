@@ -80,7 +80,7 @@ public class SizeController {
 
         // Kiểm tra mã trùng
         Size existingSize = sizeService.findById(id).orElse(null);
-        if (existingSize != null&&(!existingSize.getCode().equals(size.getCode()))) {
+        if (sizeService.findByCode(size.getCode())  != null&&(!existingSize.getCode().equals(size.getCode()))) {
             Map<String, String> errors = new HashMap<>();
             errors.put("code", "Mã đã tồn tại");
             return ResponseEntity.badRequest().body(errors);

@@ -160,10 +160,10 @@ $(document).ready(function() {
         },
         error: function (xhr, status, error) {
           if(xhr.status==400){
-
             alert('Lỗi khi sửa dữ liệu: ' + xhr.responseText);
-
-          }else {
+          } else if(xhr.status==403){
+            alert("Không có quyền");
+          }  else {
             alert('Lỗi :' + error);
           }
         }
@@ -252,7 +252,9 @@ $(document).ready(function() {
             }else {
               alert('Lỗi khi thêm dữ liệu: ' + xhr.responseText);
             }
-          }else {
+          } else if(xhr.status==403){
+            alert("Không có quyền");
+          }  else {
             alert('Lỗi :' + error);
           }
         }

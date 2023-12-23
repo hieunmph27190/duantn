@@ -210,7 +210,7 @@ $(document).ready(function() {
     },
     searchDelay: 1500,
     "paging": true,
-    "pageLength": 25,
+    "pageLength": 100,
     "lengthMenu": [10, 25, 50, 100],
   });
 
@@ -263,7 +263,12 @@ $(document).ready(function() {
         }
       },
       error: function(xhr, status, error) {
-        alert("Không thể lấy dữ liệu")
+       if(xhr.status==403){
+          alert("Không có quyền");
+        }else{
+           alert("Không thể lấy dữ liệu")
+        }
+
       }
     });
   }
@@ -304,7 +309,9 @@ $(document).ready(function() {
             }else {
               alert('Lỗi :' + error);
             }
-          }else {
+          } else if(xhr.status==403){
+            alert("Không có quyền");
+          }  else {
             alert('Lỗi :' + error);
           }
         }
@@ -349,7 +356,9 @@ $(document).ready(function() {
               alert('Lỗi khi cập nhật dữ liệu: ' + xhr.responseText);
             }
             // Hiển thị thông báo lỗi tương ứng với từng trường
-          }else {
+          } else if(xhr.status==403){
+            alert("Không có quyền");
+          }  else {
             alert('Lỗi :' + error);
           }
 
@@ -370,7 +379,12 @@ $(document).ready(function() {
           alert("Xóa thành công")
         },
         error: function(xhr, status, error) {
-          alert('Lỗi :' + xhr.responseText);
+         if(xhr.status==403){
+            alert("Không có quyền");
+          }else{
+           alert('Lỗi :' + xhr.responseText);
+         }
+
         }
       });
     }else {
@@ -577,7 +591,12 @@ $(document).ready(function() {
           alert("Xóa thành công")
         },
         error: function(xhr, status, error) {
-          alert('Lỗi :' + xhr.responseText);
+         if(xhr.status==403){
+            alert("Không có quyền");
+          }else{
+           alert('Lỗi :' + xhr.responseText);
+         }
+
         }
       });
     }else {
@@ -620,7 +639,9 @@ $(document).ready(function() {
               alert('Lỗi khi cập nhật dữ liệu: ' + xhr.responseText);
             }
             // Hiển thị thông báo lỗi tương ứng với từng trường
-          }else {
+          }else if(xhr.status==403){
+            alert("Không có quyền");
+          } else {
             alert('Lỗi :' + error);
           }
 
@@ -663,7 +684,9 @@ $(document).ready(function() {
               alert('Lỗi khi cập nhật dữ liệu: ' + xhr.responseText);
             }
             // Hiển thị thông báo lỗi tương ứng với từng trường
-          }else {
+          } else if(xhr.status==403){
+            alert("Không có quyền");
+          }  else {
             alert('Lỗi :' + error);
           }
 
@@ -699,7 +722,12 @@ $(document).ready(function() {
         $(`#form-${objectNameDetail}-update input[name='product.id']`).val(dataProductSelected.id)
       },
       error: function(xhr, status, error) {
-        alert("Không thể lấy dữ liệu")
+       if(xhr.status==403){
+          alert("Không có quyền");
+        }else {
+         alert("Không thể lấy dữ liệu")
+       }
+
       }
     });
 
@@ -997,7 +1025,12 @@ $(document).ready(function() {
           alert("Sửa thành công")
         },
         error: function(xhr, status, error) {
-          alert('Lỗi :' + xhr.responseText);
+         if(xhr.status==403){
+            alert("Không có quyền");
+          }else {
+           alert('Lỗi :' + xhr.responseText);
+         }
+
         }
       });
     }else {
@@ -1016,7 +1049,12 @@ $(document).ready(function() {
           alert("Xóa thành công")
         },
         error: function(xhr, status, error) {
-          alert('Lỗi :' + xhr.responseText);
+         if(xhr.status==403){
+            alert("Không có quyền");
+          }else {
+           alert('Lỗi :' + xhr.responseText);
+         }
+
         }
       });
     }else {
@@ -1057,7 +1095,12 @@ $(document).ready(function() {
         }
       });
     }else {
-      alert("Chưa chọn ảnh")
+     if(xhr.status==403){
+        alert("Không có quyền");
+      }else {
+       alert("Chưa chọn ảnh")
+     }
+
     }
   });
 

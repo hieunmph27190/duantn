@@ -303,7 +303,9 @@ $(document).ready(function() {
             }else {
               alert('Lỗi khi sửa dữ liệu: ' + xhr.responseText);
             }
-          }else {
+          }else if(xhr.status==403){
+              alert("Không có quyền");
+          } else {
             alert('Lỗi :' + error);
           }
         }
@@ -323,7 +325,12 @@ $(document).ready(function() {
           alert("Xóa thành công")
         },
         error: function(xhr, status, error) {
-          alert('Lỗi :' + xhr.responseText);
+         if(xhr.status==403){
+            alert("Không có quyền");
+          }else {
+           alert('Lỗi :' + xhr.responseText);
+         }
+
         }
       });
     }
